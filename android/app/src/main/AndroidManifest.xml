@@ -45,7 +45,7 @@
         </provider>
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-8875342677218505~6773810494"/>
+            android:value="ca-app-pub-8875342677218505~3362615880"/>
         <service
             android:name="com.dexterous.flutterlocalnotifications.ForegroundService"
             android:exported="false"
@@ -60,5 +60,8 @@
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
+        <meta-data
+ android:name="com.google.firebase.messaging.default_notification_channel_id"
+ android:value="@string/default_notification_channel_id"/> 
     </application>
 </manifest>

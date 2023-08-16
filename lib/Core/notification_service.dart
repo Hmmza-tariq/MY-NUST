@@ -28,17 +28,11 @@ class NotificationService {
   }
 
   Future<void> requestNotificationPermission() async {
-    final bool result = await _notification
+    await _notification
             .resolvePlatformSpecificImplementation<
                 AndroidFlutterLocalNotificationsPlugin>()
             ?.requestPermission() ??
         false;
-
-    if (result == true) {
-      print('Notification permission granted');
-    } else {
-      print('Notification permission denied');
-    }
   }
 
   Future scheduleNotification(
@@ -47,7 +41,6 @@ class NotificationService {
       String? body,
       String? payLoad,
       required DateTime scheduledNotificationDateTime}) async {
-    print('Notification added: $scheduledNotificationDateTime');
     return _notification.zonedSchedule(
         id,
         title,
@@ -63,6 +56,11 @@ class NotificationService {
   }
 
   Future<void> cancelNotification(int id) async {
+    // final List<PendingNotificationRequest> pendingNotificationRequests =
+    //     await _notification.pendingNotificationRequests();
+    // for (var pendingRequest in pendingNotificationRequests) {
+    //   _notification.cancel(pendingRequest.id);
+    // }
     await _notification.cancel(id);
   }
 }

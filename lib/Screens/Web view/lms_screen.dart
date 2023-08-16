@@ -17,6 +17,8 @@ class _LmsScreenState extends State<LmsScreen> with TickerProviderStateMixin {
   AnimationController? animationController;
   bool showCopyButton = true;
   bool forwardAnimation = true;
+  Timer? _timer;
+  int _duration = 50;
   @override
   void initState() {
     animationController = AnimationController(
@@ -26,8 +28,7 @@ class _LmsScreenState extends State<LmsScreen> with TickerProviderStateMixin {
       showCopyButton = false;
       forwardAnimation = false;
     }
-
-    Timer(const Duration(seconds: 50), () {
+    _timer = Timer(Duration(seconds: _duration), () {
       if (mounted) {
         setState(() {
           animationController!.repeat();
@@ -50,6 +51,8 @@ class _LmsScreenState extends State<LmsScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _duration = 0;
+    _timer!.cancel();
     animationController?.dispose();
     super.dispose();
   }

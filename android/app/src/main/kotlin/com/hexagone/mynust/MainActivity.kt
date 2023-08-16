@@ -1,4 +1,4 @@
-package com.hmmza.mynust
+package com.hexagone.mynust
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

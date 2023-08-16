@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
@@ -12,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'Components/error_widget.dart';
 import 'Components/hex_color.dart';
 import 'Core/assessment_provider.dart';
+import 'Core/firebase_api.dart';
 import 'Core/gpa_provider.dart';
 import 'Core/notification_service.dart';
 import 'Core/theme_provider.dart';
@@ -31,6 +33,9 @@ Future<void> main() async {
 
   NotificationService().initNotification();
   tz.initializeTimeZones();
+
+  await Firebase.initializeApp();
+  await FirebaseApi().initNotification();
 
   final sp = await SharedPreferences.getInstance();
   final String? themeMode = sp.getString('theme');

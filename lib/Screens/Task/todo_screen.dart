@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/action_button.dart';
 import '../../Core/app_theme.dart';
 import '../../Core/theme_provider.dart';
@@ -61,7 +62,7 @@ class TodoListPageState extends State<ScheduleTaskScreen> {
     _showUndoButton = true;
     _saveTasks();
     setState(() {});
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
         setState(() {
           _showUndoButton = false;
@@ -194,54 +195,83 @@ class TodoListPageState extends State<ScheduleTaskScreen> {
                 final isTaskCompleted = _tasks[index].startsWith("✓ ");
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: themeProvider.primaryColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                          color: isLightMode
-                              ? AppTheme.grey
-                              : themeProvider.primaryColor.withOpacity(0.8),
-                          width: 3),
+                  child: SwipeableTile.card(
+                    color: Colors.transparent,
+                    shadow: const BoxShadow(
+                      color: Colors.transparent,
+                      blurRadius: 0,
+                      offset: Offset(2, 2),
                     ),
-                    child: ListTile(
-                      title: Text(
-                        _tasks[index],
-                        style: TextStyle(
-                            decoration: isTaskCompleted
-                                ? TextDecoration.lineThrough
-                                : TextDecoration.none,
-                            color: !isLightMode
-                                ? isTaskCompleted
-                                    ? Colors.grey
-                                    : Colors.white
-                                : isTaskCompleted
-                                    ? AppTheme.grey
-                                    : Colors.black),
+                    horizontalPadding: 0,
+                    verticalPadding: 0,
+                    direction: SwipeDirection.horizontal,
+                    onSwiped: (direction) => _deleteTask(index),
+                    backgroundBuilder: (context, direction, progress) {
+                      return AnimatedBuilder(
+                        animation: progress,
+                        builder: (context, child) {
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 400),
+                            color: progress.value > 0.4
+                                ? const Color(0xFFed7474)
+                                : isLightMode
+                                    ? AppTheme.white
+                                    : AppTheme.nearlyBlack,
+                          );
+                        },
+                      );
+                    },
+                    key: UniqueKey(),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: themeProvider.primaryColor.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                            color: isLightMode
+                                ? AppTheme.grey
+                                : themeProvider.primaryColor.withOpacity(0.8),
+                            width: 3),
                       ),
-                      leading: Theme(
-                        data: ThemeData(
-                            unselectedWidgetColor:
-                                isLightMode ? AppTheme.grey : Colors.white),
-                        child: Checkbox(
-                          activeColor:
-                              isLightMode ? AppTheme.grey : Colors.white,
-                          checkColor:
-                              isLightMode ? Colors.white : AppTheme.nearlyBlack,
-                          value: isTaskCompleted,
-                          onChanged: (value) => _toggleTask(index),
+                      child: ListTile(
+                        title: Text(
+                          _tasks[index],
+                          style: TextStyle(
+                              decoration: isTaskCompleted
+                                  ? TextDecoration.lineThrough
+                                  : TextDecoration.none,
+                              color: !isLightMode
+                                  ? isTaskCompleted
+                                      ? Colors.grey
+                                      : Colors.white
+                                  : isTaskCompleted
+                                      ? AppTheme.grey
+                                      : Colors.black),
+                        ),
+                        trailing: !isTaskCompleted
+                            ? IconButton(
+                                icon: const Icon(Icons.edit),
+                                color:
+                                    isLightMode ? AppTheme.grey : Colors.white,
+                                onPressed: () {
+                                  _showEditTaskDialog(index, isLightMode);
+                                },
+                              )
+                            : null,
+                        leading: Theme(
+                          data: ThemeData(
+                              unselectedWidgetColor:
+                                  isLightMode ? AppTheme.grey : Colors.white),
+                          child: Checkbox(
+                            activeColor:
+                                isLightMode ? AppTheme.grey : Colors.white,
+                            checkColor: isLightMode
+                                ? Colors.white
+                                : AppTheme.nearlyBlack,
+                            value: isTaskCompleted,
+                            onChanged: (value) => _toggleTask(index),
+                          ),
                         ),
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        color: isLightMode ? AppTheme.grey : Colors.white,
-                        onPressed: () => _deleteTask(index),
-                      ),
-                      onTap: () {
-                        !isTaskCompleted
-                            ? _showEditTaskDialog(index, isLightMode)
-                            : null;
-                      },
                     ),
                   ),
                 );

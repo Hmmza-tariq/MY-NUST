@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
     as picker;
+import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/action_button.dart';
 import '../../Core/app_Theme.dart';
 import '../../Core/notification_service.dart';
@@ -32,7 +33,7 @@ class CalendarScreenState extends State<CalendarScreen> {
   final TextEditingController _taskController = TextEditingController();
   Map<DateTime, List<Event>> _events = {};
   bool _showUndoButton = false;
-  late Event _deletedEvent;
+  Event _deletedEvent = Event();
   final ValueNotifier<DateTime?> _focusedDayNotifier =
       ValueNotifier<DateTime?>(null);
 
@@ -103,7 +104,7 @@ class CalendarScreenState extends State<CalendarScreen> {
 
   void _showAddEventDialog(bool isLightMode) {
     bool notificationAllowed = false;
-    DateTime selectedTime = _selectedDay;
+    DateTime selectedTime = DateTime.now();
     showDialog(
       context: context,
       builder: (context) {
@@ -180,10 +181,15 @@ class CalendarScreenState extends State<CalendarScreen> {
                                 ),
                                 showSecondsColumn: false,
                                 showTitleActions: true, onConfirm: (date) {
-                              selectedTime = _selectedDay.copyWith(
-                                hour: date.hour,
-                                minute: date.minute,
-                              );
+                              setState(() {
+                                selectedTime = DateTime.now().copyWith(
+                                    year: _selectedDay.year,
+                                    month: _selectedDay.month,
+                                    day: _selectedDay.day,
+                                    hour: date.hour,
+                                    minute: date.minute,
+                                    second: 0);
+                              });
                             },
                                 currentTime: DateTime.now(),
                                 locale: picker.LocaleType.en);
@@ -228,21 +234,17 @@ class CalendarScreenState extends State<CalendarScreen> {
                     }
                   });
                   if (notificationAllowed) {
+                    int id = Random().nextInt(9999999);
                     _events[_selectedDay]!.add(Event(
                         title: _taskController.text,
-                        id: DateTime.now().microsecond,
+                        id: id,
                         notification: true,
                         eventTime: selectedTime));
                     NotificationService().scheduleNotification(
-                        id: _selectedDay.day,
+                        id: id,
                         title: 'Reminder:',
                         body: _taskController.text,
                         scheduledNotificationDateTime: selectedTime);
-                    NotificationService().showNotification(
-                      id: Random().nextInt(999999999),
-                      title: 'added:',
-                      body: _taskController.text,
-                    );
                   } else {
                     _events[_selectedDay]!.add(Event(
                       title: _taskController.text,
@@ -325,13 +327,13 @@ class CalendarScreenState extends State<CalendarScreen> {
     setState(() {
       _showUndoButton = true;
       _deletedEvent = event;
-      _events[_selectedDay]!.remove(event);
-      if (event.notification == true) {
-        NotificationService().cancelNotification(event.id);
+      _events[_selectedDay]!.remove(_deletedEvent);
+      if (_deletedEvent.notification == true) {
+        NotificationService().cancelNotification(_deletedEvent.id);
       }
     });
     _saveEvents();
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
         setState(() {
           _showUndoButton = false;
@@ -532,42 +534,70 @@ class CalendarScreenState extends State<CalendarScreen> {
                           .map(
                             (event) => Padding(
                               padding: const EdgeInsets.only(bottom: 8.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: themeProvider.primaryColor
-                                      .withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                      color: themeProvider.primaryColor
-                                          .withOpacity(0.8),
-                                      width: 3),
+                              child: SwipeableTile.card(
+                                color: Colors.transparent,
+                                shadow: const BoxShadow(
+                                  color: Colors.transparent,
+                                  blurRadius: 0,
+                                  offset: Offset(2, 2),
                                 ),
-                                child: ListTile(
-                                  title: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          event.title,
-                                          style: TextStyle(
-                                              color: !isLightMode
-                                                  ? Colors.white
-                                                  : Colors.black),
-                                        ),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete),
-                                        color: isLightMode
-                                            ? AppTheme.grey
-                                            : Colors.white,
-                                        onPressed: () {
-                                          _deleteEvent(event);
-                                        },
-                                      ),
-                                    ],
+                                horizontalPadding: 0,
+                                verticalPadding: 0,
+                                direction: SwipeDirection.horizontal,
+                                onSwiped: (direction) => _deleteEvent(event),
+                                backgroundBuilder:
+                                    (context, direction, progress) {
+                                  return AnimatedBuilder(
+                                    animation: progress,
+                                    builder: (context, child) {
+                                      return AnimatedContainer(
+                                        duration:
+                                            const Duration(milliseconds: 400),
+                                        color: progress.value > 0.4
+                                            ? const Color(0xFFed7474)
+                                            : isLightMode
+                                                ? AppTheme.white
+                                                : AppTheme.nearlyBlack,
+                                      );
+                                    },
+                                  );
+                                },
+                                key: UniqueKey(),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: themeProvider.primaryColor
+                                        .withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                        color: themeProvider.primaryColor
+                                            .withOpacity(0.8),
+                                        width: 3),
                                   ),
-                                  onTap: () {
-                                    _showEditEventDialog(event, isLightMode);
-                                  },
+                                  child: ListTile(
+                                    title: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            event.title,
+                                            style: TextStyle(
+                                                color: !isLightMode
+                                                    ? Colors.white
+                                                    : Colors.black),
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.edit),
+                                          color: isLightMode
+                                              ? AppTheme.grey
+                                              : Colors.white,
+                                          onPressed: () {
+                                            _showEditEventDialog(
+                                                event, isLightMode);
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),

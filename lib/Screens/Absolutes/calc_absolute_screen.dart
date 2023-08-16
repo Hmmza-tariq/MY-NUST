@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:info_popup/info_popup.dart';
 import 'package:provider/provider.dart';
+import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/action_button.dart';
 import '../../Core/assessments.dart';
 import '../../Core/app_theme.dart';
@@ -752,7 +753,7 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
       deletedAssessment = assessment;
       _showUndoButton = true;
     });
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
         setState(() {
           _showUndoButton = false;
@@ -990,12 +991,36 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                       itemCount: sectionAssessments.length,
                       itemBuilder: (context, index) {
                         final assessment = sectionAssessments[index];
-                        return GestureDetector(
-                          onTap: () {
-                            _editAssessment(assessment, index, isLightMode);
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: SwipeableTile.card(
+                            color: Colors.transparent,
+                            shadow: const BoxShadow(
+                              color: Colors.transparent,
+                              blurRadius: 0,
+                              offset: Offset(2, 2),
+                            ),
+                            horizontalPadding: 0,
+                            verticalPadding: 0,
+                            direction: SwipeDirection.horizontal,
+                            onSwiped: (direction) =>
+                                _deleteAssessment(assessment),
+                            backgroundBuilder: (context, direction, progress) {
+                              return AnimatedBuilder(
+                                animation: progress,
+                                builder: (context, child) {
+                                  return AnimatedContainer(
+                                    duration: const Duration(milliseconds: 400),
+                                    color: progress.value > 0.4
+                                        ? const Color(0xFFed7474)
+                                        : isLightMode
+                                            ? AppTheme.white
+                                            : AppTheme.nearlyBlack,
+                                  );
+                                },
+                              );
+                            },
+                            key: UniqueKey(),
                             child: Container(
                               decoration: BoxDecoration(
                                 color:
@@ -1061,13 +1086,14 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                                 ),
                                 trailing: IconButton(
                                   icon: Icon(
-                                    Icons.delete,
+                                    Icons.edit,
                                     color: isLightMode
                                         ? AppTheme.nearlyBlack
                                         : AppTheme.white,
                                   ), // Changed the delete icon to edit icon
                                   onPressed: () {
-                                    _deleteAssessment(assessment);
+                                    _editAssessment(
+                                        assessment, index, isLightMode);
                                   },
                                 ),
                               ),

@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "577789407385",
+    "project_id": "my-nust-1c25e",
+    "storage_bucket": "my-nust-1c25e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:577789407385:android:fb20728cfda89cfe7fc808",
+        "android_client_info": {
+          "package_name": "com.hexagone.mynust"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "577789407385-q4lag61nmaaadvsb5h80v0tg2ejovqpk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC21dFo06A9QZVrJQufMoXIdzaNBQquc9c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "577789407385-q4lag61nmaaadvsb5h80v0tg2ejovqpk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:577789407385:android:2d8a08169c18916d7fc808",
+        "android_client_info": {
+          "package_name": "com.hmmza.mynust"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "577789407385-q4lag61nmaaadvsb5h80v0tg2ejovqpk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC21dFo06A9QZVrJQufMoXIdzaNBQquc9c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "577789407385-q4lag61nmaaadvsb5h80v0tg2ejovqpk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

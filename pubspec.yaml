@@ -37,8 +37,11 @@ dependencies:
   google_mobile_ads: ^3.0.0
   page_transition: ^2.0.9
   flutter_local_notifications: ^15.1.0+1
-  flutter_datetime_picker: ^1.5.1
   flutter_datetime_picker_plus: ^2.0.1
+  firebase_messaging: ^14.6.5
+  firebase_core: ^2.15.0
+  change_app_package_name: ^1.1.0
+  timezone: ^0.9.2
 
 dev_dependencies:
   flutter_test:

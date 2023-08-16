@@ -101,7 +101,9 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                           Expanded(
                               child: TextField(
                             onChanged: (value) => saveTextValues(),
-                            keyboardType: TextInputType.visiblePassword,
+                            keyboardType: hideId
+                                ? TextInputType.visiblePassword
+                                : TextInputType.name,
                             obscureText: hideId,
                             style: const TextStyle(color: Colors.white),
                             controller: idTextController,
@@ -124,6 +126,7 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                           ),
                           IconButton(
                             onPressed: () {
+                              saveTextValues();
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                       backgroundColor: HexColor('#0F6FC5'),
@@ -140,7 +143,9 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                           Expanded(
                               child: TextField(
                             onChanged: (value) => saveTextValues(),
-                            keyboardType: TextInputType.visiblePassword,
+                            keyboardType: hidePass
+                                ? TextInputType.visiblePassword
+                                : TextInputType.name,
                             obscureText: hidePass,
                             style: const TextStyle(color: Colors.white),
                             controller: passTextController,
@@ -163,6 +168,7 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                           ),
                           IconButton(
                             onPressed: () {
+                              saveTextValues();
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                       backgroundColor: HexColor('#0F6FC5'),
