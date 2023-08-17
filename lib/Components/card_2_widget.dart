@@ -295,26 +295,8 @@ class Card2WidgetState extends State<Card2Widget>
                       Padding(
                         padding:
                             const EdgeInsets.only(left: 16, right: 14, top: 6),
-                        child: Container(
-                          width: 40,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            color: HexColor('#E8EDFE'),
-                            borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(80.0),
-                                bottomLeft: Radius.circular(80.0),
-                                bottomRight: Radius.circular(80.0),
-                                topRight: Radius.circular(80.0)),
-                            boxShadow: <BoxShadow>[
-                              BoxShadow(
-                                  color: AppTheme.grey.withOpacity(0.4),
-                                  offset: const Offset(2, 2),
-                                  blurRadius: 4),
-                            ],
-                          ),
-                          child: WaveView(
-                            grade: grade,
-                          ),
+                        child: WaveView(
+                          grade: grade,
                         ),
                       )
                     ],

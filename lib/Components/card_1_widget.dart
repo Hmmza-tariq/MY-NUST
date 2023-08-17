@@ -27,7 +27,7 @@ class Card1Widget extends StatelessWidget {
     if (gpa < 2.0) {
       gpaColor = Colors.red;
     } else if (gpa >= 2.0 && gpa < 3.0) {
-      gpaColor = Colors.yellow;
+      gpaColor = Colors.orange;
     } else {
       gpaColor = Colors.green;
     }
