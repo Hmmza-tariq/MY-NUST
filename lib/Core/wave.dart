@@ -1,8 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:mynust/Core/app_theme.dart';
+import 'package:mynust/Core/theme_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:vector_math/vector_math.dart' as vector;
-
-import 'app_Theme.dart';
 
 class WaveView extends StatefulWidget {
   final String grade;
@@ -20,6 +21,7 @@ class WaveViewState extends State<WaveView> with TickerProviderStateMixin {
   Offset bottleOffset2 = const Offset(60, 0);
   List<Offset> animList2 = [];
   double gradePoints = 0;
+  int box = 1;
   Color gpaColor = Colors.white;
 
   @override
@@ -83,34 +85,42 @@ class WaveViewState extends State<WaveView> with TickerProviderStateMixin {
       switch (widget.grade) {
         case 'A':
           gradePoints = 4.0;
+          box = 7;
           break;
         case 'B+':
           gradePoints = 3.5;
+          box = 6;
           break;
         case 'B':
           gradePoints = 3.0;
+          box = 5;
           break;
         case 'C+':
           gradePoints = 2.5;
+          box = 4;
           break;
         case 'C':
           gradePoints = 2.0;
+          box = 3;
           break;
         case 'D+':
           gradePoints = 1.5;
+          box = 2;
           break;
         case 'D':
           gradePoints = 1.0;
+          box = 1;
           break;
         default:
           gradePoints = 0.0;
+          box = 1;
           break;
       }
 
       if (gradePoints <= 1) {
         gpaColor = Colors.red;
       } else if (gradePoints > 1 && gradePoints < 3) {
-        gpaColor = Colors.yellow;
+        gpaColor = Colors.orange;
       } else {
         gpaColor = Colors.green;
       }
@@ -127,169 +137,59 @@ class WaveViewState extends State<WaveView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    bool isLightMode = themeProvider.isLightMode ??
+        MediaQuery.of(context).platformBrightness == Brightness.light;
+
     return StatefulBuilder(builder: (context, setState) {
       return Container(
-        alignment: Alignment.center,
+        height: 130,
+        width: 30,
+        padding: const EdgeInsets.only(bottom: 15),
+        alignment: Alignment.bottomCenter,
         child: AnimatedBuilder(
           animation: CurvedAnimation(
             parent: animationController!,
             curve: Curves.easeInOut,
           ),
-          builder: (context, child) => Stack(
-            children: <Widget>[
-              ClipPath(
-                clipper: WaveClipper(animationController!.value, animList1),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.darkerText.withOpacity(0.5),
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(80.0),
-                        bottomLeft: Radius.circular(80.0),
-                        bottomRight: Radius.circular(80.0),
-                        topRight: Radius.circular(80.0)),
-                    gradient: LinearGradient(
-                      colors: [
-                        AppTheme.darkerText.withOpacity(0.2),
-                        AppTheme.darkerText.withOpacity(0.5)
+          builder: (context, child) => ListView.builder(
+            reverse: true,
+            itemCount: box,
+            itemBuilder: (context, index) {
+              bool last = index == (box - 1);
+              return Stack(
+                alignment: AlignmentDirectional.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    height: last ? 30 : 13,
+                    width: 30,
+                    decoration: BoxDecoration(
+                      color: gpaColor,
+                      borderRadius: BorderRadius.circular(last ? 6 : 4),
+                      border: Border.all(
+                          color: isLightMode ? Colors.white : AppTheme.grey,
+                          width: 1),
+                      boxShadow: <BoxShadow>[
+                        BoxShadow(
+                            color: AppTheme.grey.withOpacity(0.3),
+                            offset: const Offset(1, 1),
+                            blurRadius: 12.0),
                       ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
                     ),
                   ),
-                ),
-              ),
-              ClipPath(
-                clipper: WaveClipper(animationController!.value, animList2),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppTheme.darkerText,
-                    gradient: LinearGradient(
-                      colors: [
-                        gpaColor.withOpacity(0.4),
-                        gpaColor,
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(80.0),
-                        bottomLeft: Radius.circular(80.0),
-                        bottomRight: Radius.circular(80.0),
-                        topRight: Radius.circular(80.0)),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 48),
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        widget.grade,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontFamily: AppTheme.fontName,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 18,
-                          letterSpacing: 0.0,
-                          color: AppTheme.grey,
-                        ),
+                  if (last)
+                    Text(
+                      widget.grade,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 0,
-                left: 6,
-                bottom: 8,
-                child: ScaleTransition(
-                  alignment: Alignment.center,
-                  scale: Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-                      parent: animationController!,
-                      curve: const Interval(0.0, 1.0,
-                          curve: Curves.fastOutSlowIn))),
-                  child: Container(
-                    width: 2,
-                    height: 2,
-                    decoration: BoxDecoration(
-                      color: AppTheme.white.withOpacity(0.4),
-                      shape: BoxShape.circle,
                     ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 24,
-                right: 0,
-                bottom: 16,
-                child: ScaleTransition(
-                  alignment: Alignment.center,
-                  scale: Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-                      parent: animationController!,
-                      curve: const Interval(0.4, 1.0,
-                          curve: Curves.fastOutSlowIn))),
-                  child: Container(
-                    width: 4,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppTheme.white.withOpacity(0.4),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                right: 24,
-                bottom: 32,
-                child: ScaleTransition(
-                  alignment: Alignment.center,
-                  scale: Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
-                      parent: animationController!,
-                      curve: const Interval(0.6, 0.8,
-                          curve: Curves.fastOutSlowIn))),
-                  child: Container(
-                    width: 3,
-                    height: 3,
-                    decoration: BoxDecoration(
-                      color: AppTheme.white.withOpacity(0.4),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 0,
-                right: 20,
-                bottom: 0,
-                child: Transform(
-                  transform: Matrix4.translationValues(
-                      0.0, 16 * (1.0 - animationController!.value), 0.0),
-                  child: Container(
-                    width: 4,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppTheme.white.withOpacity(
-                          animationController!.status == AnimationStatus.reverse
-                              ? 0.0
-                              : 0.4),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ),
-              Column(
-                children: <Widget>[
-                  AspectRatio(
-                    aspectRatio: 1,
-                    child: Image.asset("assets/images/bottle.png"),
-                  ),
                 ],
-              )
-            ],
+              );
+            },
           ),
         ),
       );
@@ -320,3 +220,155 @@ class WaveClipper extends CustomClipper<Path> {
   bool shouldReclip(WaveClipper oldClipper) =>
       animation != oldClipper.animation;
 }
+// ClipPath(
+//   clipper: WaveClipper(animationController!.value, animList1),
+//   child: Container(
+//     decoration: BoxDecoration(
+//       color: AppTheme.darkerText.withOpacity(0.5),
+//       borderRadius: const BorderRadius.only(
+//           topLeft: Radius.circular(80.0),
+//           bottomLeft: Radius.circular(80.0),
+//           bottomRight: Radius.circular(80.0),
+//           topRight: Radius.circular(80.0)),
+//       gradient: LinearGradient(
+//         colors: [
+//           AppTheme.darkerText.withOpacity(0.2),
+//           AppTheme.darkerText.withOpacity(0.5)
+//         ],
+//         begin: Alignment.topLeft,
+//         end: Alignment.bottomRight,
+//       ),
+//     ),
+//   ),
+// ),
+// ClipPath(
+//   clipper: WaveClipper(animationController!.value, animList2),
+//   child: Container(
+//     decoration: BoxDecoration(
+//       color: AppTheme.darkerText,
+//       gradient: LinearGradient(
+//         colors: [
+//           gpaColor.withOpacity(0.4),
+//           gpaColor,
+//         ],
+//         begin: Alignment.topLeft,
+//         end: Alignment.bottomRight,
+//       ),
+//       borderRadius: const BorderRadius.only(
+//           topLeft: Radius.circular(80.0),
+//           bottomLeft: Radius.circular(80.0),
+//           bottomRight: Radius.circular(80.0),
+//           topRight: Radius.circular(80.0)),
+//     ),
+//   ),
+// ),
+// Padding(
+//   padding: const EdgeInsets.only(top: 48),
+//   child: Center(
+//     child: Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: <Widget>[
+//         Text(
+//           widget.grade,
+//           textAlign: TextAlign.center,
+//           style: const TextStyle(
+//             fontFamily: AppTheme.fontName,
+//             fontWeight: FontWeight.w500,
+//             fontSize: 18,
+//             letterSpacing: 0.0,
+//             color: AppTheme.grey,
+//           ),
+//         ),
+//       ],
+//     ),
+//   ),
+// ),
+// Positioned(
+//   top: 0,
+//   left: 6,
+//   bottom: 8,
+//   child: ScaleTransition(
+//     alignment: Alignment.center,
+//     scale: Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+//         parent: animationController!,
+//         curve: const Interval(0.0, 1.0,
+//             curve: Curves.fastOutSlowIn))),
+//     child: Container(
+//       width: 2,
+//       height: 2,
+//       decoration: BoxDecoration(
+//         color: AppTheme.white.withOpacity(0.4),
+//         shape: BoxShape.circle,
+//       ),
+//     ),
+//   ),
+// ),
+// Positioned(
+//   left: 24,
+//   right: 0,
+//   bottom: 16,
+//   child: ScaleTransition(
+//     alignment: Alignment.center,
+//     scale: Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+//         parent: animationController!,
+//         curve: const Interval(0.4, 1.0,
+//             curve: Curves.fastOutSlowIn))),
+//     child: Container(
+//       width: 4,
+//       height: 4,
+//       decoration: BoxDecoration(
+//         color: AppTheme.white.withOpacity(0.4),
+//         shape: BoxShape.circle,
+//       ),
+//     ),
+//   ),
+// ),
+// Positioned(
+//   left: 0,
+//   right: 24,
+//   bottom: 32,
+//   child: ScaleTransition(
+//     alignment: Alignment.center,
+//     scale: Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+//         parent: animationController!,
+//         curve: const Interval(0.6, 0.8,
+//             curve: Curves.fastOutSlowIn))),
+//     child: Container(
+//       width: 3,
+//       height: 3,
+//       decoration: BoxDecoration(
+//         color: AppTheme.white.withOpacity(0.4),
+//         shape: BoxShape.circle,
+//       ),
+//     ),
+//   ),
+// ),
+// Positioned(
+//   top: 0,
+//   right: 20,
+//   bottom: 0,
+//   child: Transform(
+//     transform: Matrix4.translationValues(
+//         0.0, 16 * (1.0 - animationController!.value), 0.0),
+//     child: Container(
+//       width: 4,
+//       height: 4,
+//       decoration: BoxDecoration(
+//         color: AppTheme.white.withOpacity(
+//             animationController!.status == AnimationStatus.reverse
+//                 ? 0.0
+//                 : 0.4),
+//         shape: BoxShape.circle,
+//       ),
+//     ),
+//   ),
+// ),
+// Column(
+//   children: <Widget>[
+//     AspectRatio(
+//       aspectRatio: 1,
+//       child: Image.asset("assets/images/bottle.png"),
+//     ),
+//   ],
+// )

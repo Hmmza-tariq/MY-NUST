@@ -17,7 +17,10 @@ class CalcAggregateScreen extends StatefulWidget {
 class CalcAggregateScreenState extends State<CalcAggregateScreen> {
   TextEditingController sscPercentageController = TextEditingController(),
       hsscPercentageController = TextEditingController(),
-      netPercentageController = TextEditingController();
+      netPercentageController = TextEditingController(),
+      sscController = TextEditingController(),
+      hsscController = TextEditingController(),
+      netController = TextEditingController();
   double ssc = 0.0,
       hssc = 0.0,
       net = 0.0,
@@ -254,6 +257,7 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
               ),
               padding: const EdgeInsets.only(left: 20, right: 20),
               child: SwitchListTile(
+                contentPadding: const EdgeInsets.all(0),
                 activeTrackColor: Colors.grey,
                 inactiveTrackColor: Colors.grey,
                 inactiveThumbColor: Colors.white,
@@ -271,7 +275,13 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
                 value: _marks,
                 onChanged: (bool value) {
                   _isEditing
-                      ? null
+                      ? setState(() {
+                          if (sscController.text.isEmpty &&
+                              hsscController.text.isEmpty &&
+                              netController.text.isEmpty) {
+                            _isEditing = !_isEditing;
+                          }
+                        })
                       : setState(() {
                           _marks = !_marks;
                         });
@@ -303,12 +313,14 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
                     Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: TextField(
+                        controller: sscController,
                         decoration: InputDecoration(
                           label: Text(_marks
                               ? 'Enter Marks obtained in SSC (out of 1100):'
                               : 'Enter percentage obtained in SSC or equivalent:'),
                           labelStyle: TextStyle(
-                              color: isLightMode ? Colors.black : Colors.white),
+                              color: isLightMode ? Colors.black : Colors.white,
+                              fontSize: 12),
                         ),
                         style: TextStyle(
                             color: isLightMode ? Colors.black : Colors.white),
@@ -324,6 +336,7 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
                     Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: TextField(
+                        controller: hsscController,
                         decoration: InputDecoration(
                           label: Text(
                             _marks
@@ -331,7 +344,8 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
                                 : 'Enter percentage obtained in HSSC or equivalent:',
                           ),
                           labelStyle: TextStyle(
-                              color: isLightMode ? Colors.black : Colors.white),
+                              color: isLightMode ? Colors.black : Colors.white,
+                              fontSize: 12),
                         ),
                         style: TextStyle(
                             color: isLightMode ? Colors.black : Colors.white),
@@ -347,12 +361,14 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
                     Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: TextField(
+                        controller: netController,
                         decoration: InputDecoration(
                           label: const Text(
                             'Enter Marks obtained in NET (out of 200):',
                           ),
                           labelStyle: TextStyle(
-                              color: isLightMode ? Colors.black : Colors.white),
+                              color: isLightMode ? Colors.black : Colors.white,
+                              fontSize: 12),
                         ),
                         style: TextStyle(
                             color: isLightMode ? Colors.black : Colors.white),

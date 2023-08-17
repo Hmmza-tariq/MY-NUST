@@ -262,7 +262,7 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
     if (cgpa < 2.0) {
       gpaColor = Colors.red;
     } else if (cgpa >= 2.0 && cgpa < 3.0) {
-      gpaColor = Colors.yellow;
+      gpaColor = Colors.orange;
     } else {
       gpaColor = Colors.green;
     }
