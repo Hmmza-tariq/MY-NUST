@@ -1,16 +1,5 @@
-# mynust
+# My NUST
 
 A new Flutter project.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The NUST Student portal is an all-in-one platform designed to provide a seamless experience for students of NUST across all campuses. With the integration of various resources such as the Learning Management System (LMS), Qalam, and other essential tools, students can access a wide range of academic materials and resources from a single, convenient location. The LMS is a powerful tool that allows students to access course materials, submit assignments, participate in discussions, and communicate with instructors and peers. Through the LMS, students can view and download study materials such as lecture notes, slides, and other resources, ensuring that they have all the necessary information to excel in their courses. Qalam, on the other hand, is a platform that allows students to view their grades, attendance, and GPA, as well as perform other tasks such as applying for leave, updating personal information, and downloading fee challan. With Qalam, students can keep track of their academic progress and ensure that they are on track to meet their academic goals. Overall, the NUST Student portal is a valuable resource for students looking to streamline their academic experience. By providing easy access to all the tools and resources they need in one place, students can focus on their studies and achieve academic success.
