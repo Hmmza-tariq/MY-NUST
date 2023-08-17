@@ -255,7 +255,7 @@ class AboutScreenState extends State<AboutScreen> {
                                       MaterialPageRoute(
                                           builder: (context) => const WebsiteView(
                                               initialUrl:
-                                                  "https://github.com/Hmmza-tariq")),
+                                                  "https://github.com/Hmmza-tariq/My-NUST-request-")),
                                     );
                                   },
                                   child: const Row(
