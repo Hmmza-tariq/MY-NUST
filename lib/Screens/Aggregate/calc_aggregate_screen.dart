@@ -14,20 +14,17 @@ class CalcAggregateScreen extends StatefulWidget {
   CalcAggregateScreenState createState() => CalcAggregateScreenState();
 }
 
-class CalcAggregateScreenState extends State<CalcAggregateScreen>
-    with TickerProviderStateMixin {
-  AnimationController? animationController;
-
-  TextEditingController sscPercentageController = TextEditingController();
-  TextEditingController hsscPercentageController = TextEditingController();
-  TextEditingController netPercentageController = TextEditingController();
-  double ssc = 0.0;
-  double hssc = 0.0;
-  double net = 0.0;
-  double sscPercentage = 10;
-  double hsscPercentage = 15;
-  double netPercentage = 75;
-
+class CalcAggregateScreenState extends State<CalcAggregateScreen> {
+  TextEditingController sscPercentageController = TextEditingController(),
+      hsscPercentageController = TextEditingController(),
+      netPercentageController = TextEditingController();
+  double ssc = 0.0,
+      hssc = 0.0,
+      net = 0.0,
+      sscPercentage = 10,
+      hsscPercentage = 15,
+      netPercentage = 75;
+  bool _marks = false, _isEditing = false;
   @override
   void initState() {
     sscPercentageController.text = '10';
@@ -37,9 +34,13 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen>
   }
 
   double calculateAggregate() {
-    return ((ssc / 1100) * sscPercentage +
-        (hssc / 1100) * hsscPercentage +
-        (net / 200) * netPercentage);
+    return _marks
+        ? ((ssc / 1100) * sscPercentage +
+            (hssc / 1100) * hsscPercentage +
+            (net / 200) * netPercentage)
+        : ((ssc / 100 * sscPercentage) +
+            (hssc / 100 * hsscPercentage) +
+            ((net / 200) * netPercentage));
   }
 
   void resultDialog(bool isLightMode) {
@@ -106,7 +107,6 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen>
     final themeProvider = Provider.of<ThemeProvider>(context);
     bool isLightMode = themeProvider.isLightMode ??
         MediaQuery.of(context).platformBrightness == Brightness.light;
-    animationController?.forward();
     return Scaffold(
       backgroundColor:
           isLightMode == true ? AppTheme.white : AppTheme.nearlyBlack,
@@ -167,7 +167,7 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen>
                     children: [
                       TextField(
                         decoration: InputDecoration(
-                          label: const Text('SSC Percentage:'),
+                          label: const Text('SSC weightage:'),
                           labelStyle: TextStyle(
                               color: isLightMode ? Colors.black : Colors.white),
                         ),
@@ -184,7 +184,7 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen>
                       TextField(
                         decoration: InputDecoration(
                           label: const Text(
-                            'HSSC Percentage:',
+                            'HSSC weightage:',
                           ),
                           labelStyle: TextStyle(
                               color: isLightMode ? Colors.black : Colors.white),
@@ -202,7 +202,7 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen>
                       TextField(
                         decoration: InputDecoration(
                           label: const Text(
-                            'NET Score Percentage:',
+                            'NET Score weightage:',
                           ),
                           labelStyle: TextStyle(
                               color: isLightMode ? Colors.black : Colors.white),
@@ -234,54 +234,140 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              decoration: InputDecoration(
-                label: const Text('Enter SSC Marks (out of 1100):'),
-                labelStyle:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
+            Container(
+              decoration: BoxDecoration(
+                color: isLightMode ? AppTheme.white : AppTheme.nearlyBlack,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                    color: isLightMode
+                        ? AppTheme.notWhite
+                        : themeProvider.primaryColor,
+                    width: 3),
+                boxShadow: !isLightMode
+                    ? null
+                    : <BoxShadow>[
+                        BoxShadow(
+                            color: Colors.grey.withOpacity(0.6),
+                            offset: const Offset(0, 8),
+                            blurRadius: 8.0),
+                      ],
               ),
-              style:
-                  TextStyle(color: isLightMode ? Colors.black : Colors.white),
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  ssc = double.parse(value);
-                });
-              },
-            ),
-            TextField(
-              decoration: InputDecoration(
-                label: const Text(
-                  'Enter HSSC Marks (out of 1100):',
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: SwitchListTile(
+                activeTrackColor: Colors.grey,
+                inactiveTrackColor: Colors.grey,
+                inactiveThumbColor: Colors.white,
+                title: Text(
+                  _marks ? 'Add Marks' : 'Add Percentages',
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: _isEditing
+                          ? Colors.grey
+                          : isLightMode
+                              ? Colors.black
+                              : Colors.white),
                 ),
-                labelStyle:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
+                value: _marks,
+                onChanged: (bool value) {
+                  _isEditing
+                      ? null
+                      : setState(() {
+                          _marks = !_marks;
+                        });
+                },
               ),
-              style:
-                  TextStyle(color: isLightMode ? Colors.black : Colors.white),
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  hssc = double.parse(value);
-                });
-              },
             ),
-            TextField(
-              decoration: InputDecoration(
-                label: const Text(
-                  'Enter NET Score (out of 200):',
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isLightMode ? AppTheme.white : AppTheme.nearlyBlack,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                      color: isLightMode
+                          ? AppTheme.notWhite
+                          : themeProvider.primaryColor,
+                      width: 3),
+                  boxShadow: !isLightMode
+                      ? null
+                      : <BoxShadow>[
+                          BoxShadow(
+                              color: Colors.grey.withOpacity(0.6),
+                              offset: const Offset(0, 8),
+                              blurRadius: 8.0),
+                        ],
                 ),
-                labelStyle:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: TextField(
+                        decoration: InputDecoration(
+                          label: Text(_marks
+                              ? 'Enter Marks obtained in SSC (out of 1100):'
+                              : 'Enter percentage obtained in SSC or equivalent:'),
+                          labelStyle: TextStyle(
+                              color: isLightMode ? Colors.black : Colors.white),
+                        ),
+                        style: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) {
+                          setState(() {
+                            _isEditing = true;
+                            ssc = double.parse(value);
+                          });
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: TextField(
+                        decoration: InputDecoration(
+                          label: Text(
+                            _marks
+                                ? 'Enter Marks obtained in HSSC (out of 1100):'
+                                : 'Enter percentage obtained in HSSC or equivalent:',
+                          ),
+                          labelStyle: TextStyle(
+                              color: isLightMode ? Colors.black : Colors.white),
+                        ),
+                        style: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) {
+                          setState(() {
+                            _isEditing = true;
+                            hssc = double.parse(value);
+                          });
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: TextField(
+                        decoration: InputDecoration(
+                          label: const Text(
+                            'Enter Marks obtained in NET (out of 200):',
+                          ),
+                          labelStyle: TextStyle(
+                              color: isLightMode ? Colors.black : Colors.white),
+                        ),
+                        style: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) {
+                          setState(() {
+                            _isEditing = true;
+                            net = double.parse(value);
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              style:
-                  TextStyle(color: isLightMode ? Colors.black : Colors.white),
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                setState(() {
-                  net = double.parse(value);
-                });
-              },
             ),
           ],
         ),

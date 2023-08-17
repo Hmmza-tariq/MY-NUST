@@ -305,7 +305,8 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                               autoPlay: true,
                               enableInfiniteScroll: true,
                               autoPlayAnimationDuration:
-                                  const Duration(seconds: 5),
+                                  const Duration(seconds: 4),
+                              autoPlayInterval: const Duration(seconds: 6),
                               enlargeCenterPage: true,
                               onPageChanged: (index, reason) {
                                 setState(() => currentPageIndex = index);

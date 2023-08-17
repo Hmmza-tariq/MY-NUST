@@ -265,7 +265,6 @@ class SettingsScreenState extends State<SettingsScreen> {
     setState(() {
       _selectedNoticeBoardOption = value!;
     });
-    print('_selectedNoticeBoardOption: $_selectedNoticeBoardOption');
   }
 
   void _chooseNoticeBoard(bool isLightMode) {
