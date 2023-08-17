@@ -1,6 +1,6 @@
 # My NUST
 
-A new Flutter project.
+Nust unofficial student portal
 
 The NUST Student portal is an all-in-one platform designed to provide a seamless experience for students of NUST across all campuses. With the integration of various resources such as the Learning Management System (LMS), Qalam, and other essential tools, students can access a wide range of academic materials and resources from a single, convenient location. 
 The LMS is a powerful tool that allows students to access course materials, submit assignments, participate in discussions, and communicate with instructors and peers. Through the LMS, students can view and download study materials such as lecture notes, slides, and other resources, ensuring that they have all the necessary information to excel in their courses. 
