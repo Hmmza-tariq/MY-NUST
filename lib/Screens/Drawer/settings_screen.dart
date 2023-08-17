@@ -1,4 +1,6 @@
+import 'package:info_popup/info_popup.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:mynust/Core/notice_board_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:group_radio_button/group_radio_button.dart';
@@ -17,8 +19,23 @@ class SettingsScreenState extends State<SettingsScreen> {
   late final LocalAuthentication auth;
   bool _supportState = false;
   bool _enableBiometricAuth = false;
-  String _selectedOption = 'System default';
-  final _radioOptionsList = ['Light mode', 'Dark mode', 'System default'];
+  String _selectedThemeOption = 'System default';
+  final _radioThemeOptionsList = ['Light mode', 'Dark mode', 'System default'];
+  String _selectedNoticeBoardOption = 'CEME';
+  final _radioNoticeBoardOptionsList = [
+    'CEME',
+    'MCS',
+    'SMME',
+    'SEECS',
+    'PNEC',
+    'NBS',
+    'SNS',
+    'CAE',
+    'NBC',
+    'SCME',
+    'MCE',
+    'IESE'
+  ];
 
   //--------------------------------------------------------------------------
 
@@ -34,16 +51,19 @@ class SettingsScreenState extends State<SettingsScreen> {
       });
     });
     _loadThemePreference();
+    _loadNoticePreference();
     super.initState();
   }
 
   Future<void> _resetSettings(bool isLightMode) async {
     setState(() {
-      _selectedOption = 'System default';
+      _selectedThemeOption = 'System default';
+      _selectedNoticeBoardOption = 'CEME';
       _enableBiometricAuth = false;
     });
     _setBiometricPreference(_enableBiometricAuth);
-    _setThemePreference(_selectedOption, isLightMode);
+    _setNoticePreference(_selectedNoticeBoardOption);
+    _setThemePreference(_selectedThemeOption, isLightMode);
   }
 
   void _resetDialog(BuildContext context, bool isLightMode) async {
@@ -149,15 +169,19 @@ class SettingsScreenState extends State<SettingsScreen> {
   Future<void> _setThemePreference(String value, bool isLightMode) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('theme', value);
+    int option = 0;
     setState(() {
       if (value == 'Light mode') {
         isLightMode = true;
+        option = 1;
       } else if (value == 'Dark mode') {
         isLightMode = false;
+        option = 2;
       } else {
         var brightness = MediaQuery.of(context).platformBrightness;
         isLightMode = brightness == Brightness.light;
       }
+      Provider.of<ThemeProvider>(context, listen: false).setTheme(option);
     });
   }
 
@@ -165,19 +189,11 @@ class SettingsScreenState extends State<SettingsScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? value = prefs.getString('theme');
     setState(() {
-      _selectedOption = value!;
-    });
-  }
-
-  void _handleRadioValueChanged(String? value, bool isLightMode) {
-    setState(() {
-      _selectedOption = value!;
-      _setThemePreference(_selectedOption, isLightMode);
+      _selectedThemeOption = value!;
     });
   }
 
   void _chooseThemeDialog(bool isLightMode) {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
     showDialog(
       context: context,
       builder: (context) {
@@ -186,29 +202,26 @@ class SettingsScreenState extends State<SettingsScreen> {
           return AlertDialog(
             backgroundColor:
                 isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-            title: Text(
-              'Choose Theme Mode',
-              style: TextStyle(
-                  fontSize: 16,
-                  color: isLightMode ? Colors.black : Colors.white),
+            title: Center(
+              child: Text(
+                'Choose Theme mode',
+                textAlign: TextAlign.start,
+                style: TextStyle(
+                    fontSize: 16,
+                    color: isLightMode ? Colors.black : Colors.white),
+              ),
             ),
             content: SizedBox(
               height: 150.0,
               child: RadioGroup<String>.builder(
                 direction: Axis.vertical,
-                groupValue: _selectedOption,
+                groupValue: _selectedThemeOption,
                 horizontalAlignment: MainAxisAlignment.center,
                 onChanged: (value) => setState(() {
-                  int option = 0;
-                  if (value == 'Light mode') {
-                    option = 1;
-                  } else if (value == 'Dark mode') {
-                    option = 2;
-                  }
-                  themeProvider.setTheme(option);
-                  _handleRadioValueChanged(value, isLightMode);
+                  _selectedThemeOption = value!;
+                  _setThemePreference(_selectedThemeOption, isLightMode);
                 }),
-                items: _radioOptionsList,
+                items: _radioThemeOptionsList,
                 textStyle: TextStyle(
                     fontSize: 16,
                     color: isLightMode ? Colors.black : Colors.white),
@@ -237,6 +250,108 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 //--------------------------------------------------------------------------
 
+  Future<void> _setNoticePreference(String value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('noticeBoard', value);
+    setState(() {
+      Provider.of<NoticeBoardProvider>(context, listen: false)
+          .setNoticeBoard(_selectedNoticeBoardOption);
+    });
+  }
+
+  Future<void> _loadNoticePreference() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? value = prefs.getString('noticeBoard');
+    setState(() {
+      _selectedNoticeBoardOption = value!;
+    });
+    print('_selectedNoticeBoardOption: $_selectedNoticeBoardOption');
+  }
+
+  void _chooseNoticeBoard(bool isLightMode) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            backgroundColor:
+                isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+            title: Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Center(
+                child: Text(
+                  'Choose School/College',
+                  textAlign: TextAlign.start,
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: isLightMode ? Colors.black : Colors.white),
+                ),
+              ),
+            ),
+            content: SizedBox(
+              height: 450.0,
+              child: SingleChildScrollView(
+                child: RadioGroup<String>.builder(
+                  direction: Axis.vertical,
+                  groupValue: _selectedNoticeBoardOption,
+                  horizontalAlignment: MainAxisAlignment.center,
+                  onChanged: (value) => setState(() {
+                    _selectedNoticeBoardOption = value!;
+
+                    _setNoticePreference(_selectedNoticeBoardOption);
+                  }),
+                  items: _radioNoticeBoardOptionsList,
+                  textStyle: TextStyle(
+                      fontSize: 16,
+                      color: isLightMode ? Colors.black : Colors.white),
+                  itemBuilder: (item) => RadioButtonBuilder(
+                    item.toString(),
+                  ),
+                ),
+              ),
+            ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: InfoPopupWidget(
+                  contentOffset: const Offset(0, 0),
+                  arrowTheme: InfoPopupArrowTheme(
+                    arrowDirection: ArrowDirection.down,
+                    color: isLightMode
+                        ? const Color.fromARGB(255, 199, 199, 199)
+                        : const Color.fromARGB(255, 1, 54, 98),
+                  ),
+                  contentTheme: InfoPopupContentTheme(
+                    infoContainerBackgroundColor: isLightMode
+                        ? const Color.fromARGB(255, 199, 199, 199)
+                        : const Color.fromARGB(255, 1, 54, 98),
+                    infoTextStyle: TextStyle(
+                      color:
+                          isLightMode ? AppTheme.nearlyBlack : AppTheme.white,
+                    ),
+                    contentPadding: const EdgeInsets.all(6),
+                    contentBorderRadius:
+                        const BorderRadius.all(Radius.circular(10)),
+                    infoTextAlign: TextAlign.center,
+                  ),
+                  dismissTriggerBehavior: PopupDismissTriggerBehavior.anyWhere,
+                  contentTitle:
+                      "Need to add your School/College/Campus? Contact support.",
+                  child: const Icon(
+                    Icons.info_outline,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ],
+          );
+        });
+      },
+    );
+  }
+
+//--------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     bool isLightMode = Provider.of<ThemeProvider>(context).isLightMode ??
@@ -261,7 +376,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                 title: Text(
                   _supportState
                       ? 'Enable biometric authentication'
-                      : 'Biometric not supported',
+                      : 'Biometric not supported on your device',
+                  textAlign: TextAlign.start,
                   style: TextStyle(
                       fontSize: 16,
                       color: _supportState
@@ -286,6 +402,7 @@ class SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Text(
                   'Choose theme',
+                  textAlign: TextAlign.start,
                   style: TextStyle(
                       fontSize: 16,
                       color: isLightMode ? Colors.black : Colors.white),
@@ -325,6 +442,58 @@ class SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
               ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    'Choose Notice\nBoard',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
+                  Container(
+                    width: 100,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: isLightMode ? Colors.blue : Colors.white,
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(4.0)),
+                      boxShadow: !isLightMode
+                          ? null
+                          : <BoxShadow>[
+                              BoxShadow(
+                                  color: Colors.grey.withOpacity(0.6),
+                                  offset: const Offset(1, 1),
+                                  blurRadius: 2.0),
+                            ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => _chooseNoticeBoard(isLightMode),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Text(
+                              'Notice Board',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color:
+                                    isLightMode ? Colors.white : Colors.black,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 28.0),

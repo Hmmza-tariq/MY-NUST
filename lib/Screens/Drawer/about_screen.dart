@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mynust/Components/webview.dart';
 import 'package:provider/provider.dart';
 import '../../Core/app_theme.dart';
 import '../../Core/theme_provider.dart';
@@ -61,20 +62,25 @@ class AboutScreenState extends State<AboutScreen> {
                                 color: themeProvider.primaryColor
                                     .withOpacity(0.3)),
                           ),
-                          Text(
-                            'Hello! I am Hamza Tariq (CE-43, CEME), the developer of this app. I am passionate about Flutter and creating useful applications. I hope you find this app helpful and enjoy using it!',
-                            style: TextStyle(
-                                fontSize: 16,
-                                color:
-                                    isLightMode ? Colors.black : Colors.white),
-                            textAlign: TextAlign.center,
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              "Hey there, I'm Hamza Tariq (CE-43, CEME), the brain behind Hexagone. Flutter fanatic, app aficionado, and your friendly neighborhood developer. I cooked up this app with a pinch of code, a sprinkle of passion, and a massive 10,000 lines of \"are we there yet?\" code. Hope it rocks your phone and brings a smile. Enjoy the adventure",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: isLightMode
+                                      ? Colors.black
+                                      : Colors.white),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ],
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Container(
                       decoration: BoxDecoration(
                         color: themeProvider.primaryColor.withOpacity(0.2),
@@ -98,7 +104,7 @@ class AboutScreenState extends State<AboutScreen> {
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              'We take your privacy seriously. This app does not collect any personal data or information from its users. Any data you enter in the app, such as LMS / Qalam ID, Passwords and your GPA, is stored locally on your device and not shared with any third parties.',
+                              'We take your privacy seriously. This app does not collect any personal data or information from its users. Any data you enter in the app, such as LMS / Qalam ID, Passwords or your GPA, is stored locally on your device and not shared with any third parties.',
                               style: TextStyle(
                                   fontSize: 16,
                                   color: isLightMode
@@ -131,16 +137,123 @@ class AboutScreenState extends State<AboutScreen> {
                                       ? Colors.black
                                       : Colors.white),
                             ),
-                            Text(
-                              '- This app may use cookies or similar technologies to enhance user experience, but these are used for app functionality only and not for tracking or collecting data.',
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'For more details visit:',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: isLightMode
+                                            ? Colors.black
+                                            : Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                TextButton(
+                                  onPressed: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => const WebsiteView(
+                                              initialUrl:
+                                                  "https://sites.google.com/view/mynust-privacy-policy/home")),
+                                    );
+                                  },
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.link_rounded),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        'Privacy Policy',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                TextButton(
+                                  onPressed: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => const WebsiteView(
+                                              initialUrl:
+                                                  "https://sites.google.com/view/mynust-terms-and-conditions/home")),
+                                    );
+                                  },
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.link_rounded),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        'Terms and Conditions',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: themeProvider.primaryColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: themeProvider.primaryColor.withOpacity(0.8),
+                          width: 3),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Why ads?',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              ":)))",
                               style: TextStyle(
                                   fontSize: 16,
                                   color: isLightMode
                                       ? Colors.black
                                       : Colors.white),
+                              textAlign: TextAlign.center,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

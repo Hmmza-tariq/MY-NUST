@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:mynust/Screens/Web%20view/lms_screen.dart';
+import 'package:mynust/Screens/Web%20view/notice_board_screen.dart';
 import 'package:mynust/Screens/Web%20view/qalam_screen.dart';
-import 'package:mynust/Components/webview.dart';
 
 class LargeSliderListData {
   LargeSliderListData({
@@ -29,11 +29,9 @@ class LargeSliderListData {
       navigateScreen: const QalamScreen(),
     ),
     LargeSliderListData(
-      imagePath: 'assets/images/ceme.png',
+      imagePath: 'assets/images/noticeBoard.png',
       name: 'Notice Board',
-      navigateScreen: const WebsiteView(
-          initialUrl:
-              'https://ceme.nust.edu.pk/downloads/student-notice-board-ug/'),
-    ),
+      navigateScreen: const NoticeBoardScreen(),
+    )
   ];
 }

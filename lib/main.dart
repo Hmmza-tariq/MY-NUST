@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
@@ -7,13 +6,13 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:mynust/Core/notice_board_provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Components/error_widget.dart';
 import 'Components/hex_color.dart';
 import 'Core/assessment_provider.dart';
-import 'Core/firebase_api.dart';
 import 'Core/gpa_provider.dart';
 import 'Core/notification_service.dart';
 import 'Core/theme_provider.dart';
@@ -34,10 +33,11 @@ Future<void> main() async {
   NotificationService().initNotification();
   tz.initializeTimeZones();
 
-  await Firebase.initializeApp();
-  await FirebaseApi().initNotification();
-
+  // await FirebaseApi().initNotification();
   final sp = await SharedPreferences.getInstance();
+
+  final String? noticeBoard = sp.getString('noticeBoard');
+
   final String? themeMode = sp.getString('theme');
   int option = themeMode != null
       ? themeMode == 'Light mode'
@@ -54,6 +54,9 @@ Future<void> main() async {
         providers: [
           ChangeNotifierProvider<ThemeProvider>(
             create: (_) => ThemeProvider(option),
+          ),
+          ChangeNotifierProvider<NoticeBoardProvider>(
+            create: (_) => NoticeBoardProvider(noticeBoard ?? 'CEME'),
           ),
           ChangeNotifierProvider<GpaProvider>(
             create: (_) => GpaProvider(),

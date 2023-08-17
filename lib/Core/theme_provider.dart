@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'app_theme.dart';
 
 class ThemeProvider with ChangeNotifier {
@@ -17,6 +16,7 @@ class ThemeProvider with ChangeNotifier {
     splashColor: const Color.fromARGB(128, 80, 143, 244),
     textTheme: AppTheme.textTheme,
   );
+
   void setTheme(int option) {
     if (option == 1) {
       isLightMode = true;
