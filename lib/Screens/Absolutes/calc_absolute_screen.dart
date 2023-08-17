@@ -907,13 +907,16 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
         ? Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Center(
-              child: Text(
-                'No $sectionName Assessment found. Add an assessment using the " + " button.',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                  color: Colors.grey,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 18.0),
+                child: Text(
+                  'No $sectionName Assessment found. Add an assessment using the " + " button.',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
                 ),
               ),
             ),
@@ -922,10 +925,20 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
             padding: const EdgeInsets.all(8.0),
             child: Container(
               decoration: BoxDecoration(
-                color: themeProvider.primaryColor.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
+                color: isLightMode
+                    ? AppTheme.white
+                    : themeProvider.primaryColor.withOpacity(0.2),
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                      color: AppTheme.grey.withOpacity(0.2),
+                      offset: const Offset(1.1, 1.1),
+                      blurRadius: 10.0),
+                ],
                 border: Border.all(
-                    color: themeProvider.primaryColor.withOpacity(0.8),
+                    color: isLightMode
+                        ? AppTheme.grey
+                        : themeProvider.primaryColor.withOpacity(0.8),
                     width: 3),
               ),
               child: ExpansionTile(
@@ -1025,10 +1038,12 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                               decoration: BoxDecoration(
                                 color:
                                     themeProvider.primaryColor.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                    color: themeProvider.primaryColor
-                                        .withOpacity(0.8),
+                                    color: isLightMode
+                                        ? AppTheme.grey
+                                        : themeProvider.primaryColor
+                                            .withOpacity(0.8),
                                     width: 3),
                               ),
                               child: ListTile(

@@ -19,33 +19,21 @@ class CalcSgpaScreen extends StatefulWidget {
   CalcSgpaScreenState createState() => CalcSgpaScreenState();
 }
 
-class CalcSgpaScreenState extends State<CalcSgpaScreen>
-    with TickerProviderStateMixin {
-  List<int> creditHoursList = [0, 1, 2, 3, 4, 5, 6];
+class CalcSgpaScreenState extends State<CalcSgpaScreen> {
+  List<int> creditHoursList = [1, 2, 3, 4, 5, 6];
   List<String> expectedGradesList = ['A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'];
   List<Subject> subjects = [];
   late Subject _deletedSubject;
   bool isEditingTitle = false;
   final TextEditingController _titleController = TextEditingController();
   bool _showUndoButton = false;
-  AnimationController? animationController;
 
   /// *********************************************************
 
   @override
   void initState() {
-    animationController = AnimationController(
-        duration: const Duration(milliseconds: 0), vsync: this);
-
     subjects.addAll(widget.semester.subjects);
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    animationController?.dispose();
-
-    super.dispose();
   }
 
   void updateData() {
@@ -62,6 +50,7 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen>
     String subjectName = subject.name;
     int selectedCreditHours = subject.creditHours;
     String selectedExpectedGrade = subject.expectedGrade;
+    bool isSnackBarVisible = false;
 
     showDialog(
       context: context,
@@ -167,6 +156,25 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen>
                     selectedCreditHours = 0;
                   });
                   Navigator.pop(context);
+                } else {
+                  if (!isSnackBarVisible) {
+                    setState(() {
+                      isSnackBarVisible = true;
+                    });
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(
+                          const SnackBar(
+                            content: Text('Incorrect name.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        )
+                        .closed
+                        .then((_) {
+                      setState(() {
+                        isSnackBarVisible = false;
+                      });
+                    });
+                  }
                 }
               },
             ),
@@ -201,6 +209,7 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen>
   }
 
   void _editTitle(bool isLightMode) {
+    bool isSnackBarVisible = false;
     showDialog(
       context: context,
       builder: (context) {
@@ -248,14 +257,34 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen>
                       color: isLightMode ? Colors.black : Colors.white),
                 ),
                 onPressed: () {
-                  if (_titleController.text != '') {
+                  if ((int.parse(_titleController.text) > 0) &&
+                      int.parse(_titleController.text) < 9) {
                     setState(() {
                       widget.semester.name = _titleController.text;
                       isEditingTitle = false;
                       updateData();
                     });
+                    Navigator.pop(context);
+                  } else {
+                    if (!isSnackBarVisible) {
+                      setState(() {
+                        isSnackBarVisible = true;
+                      });
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(
+                            const SnackBar(
+                              content: Text('Incorrect name.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          )
+                          .closed
+                          .then((_) {
+                        setState(() {
+                          isSnackBarVisible = false;
+                        });
+                      });
+                    }
                   }
-                  Navigator.pop(context);
                 },
               ),
             ],
@@ -267,8 +296,9 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen>
 
   void addSubject(bool isLightMode) {
     String selectedExpectedGrade = 'A';
-    int selectedCreditHours = 0;
+    int selectedCreditHours = 1;
     String subjectName = '';
+    bool isSnackBarVisible = false;
     showDialog(
       context: context,
       builder: (context) {
@@ -371,6 +401,25 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen>
                     updateData();
                   });
                   Navigator.pop(context);
+                } else {
+                  if (!isSnackBarVisible) {
+                    setState(() {
+                      isSnackBarVisible = true;
+                    });
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(
+                          const SnackBar(
+                            content: Text('Incorrect name.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        )
+                        .closed
+                        .then((_) {
+                      setState(() {
+                        isSnackBarVisible = false;
+                      });
+                    });
+                  }
                 }
               },
             ),
@@ -539,7 +588,6 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen>
     final themeProvider = Provider.of<ThemeProvider>(context);
     bool isLightMode = themeProvider.isLightMode ??
         MediaQuery.of(context).platformBrightness == Brightness.light;
-    animationController?.forward();
     return Scaffold(
       backgroundColor:
           isLightMode == true ? AppTheme.white : AppTheme.nearlyBlack,
@@ -634,13 +682,6 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen>
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: Card2Widget(
-                          mainScreenAnimation:
-                              Tween<double>(begin: 0.0, end: 1.0).animate(
-                                  CurvedAnimation(
-                                      parent: animationController!,
-                                      curve: const Interval((1 / 9) * 7, 1.0,
-                                          curve: Curves.fastOutSlowIn))),
-                          mainScreenAnimationController: animationController!,
                           credits: subject.creditHours,
                           grade: grade,
                           name: subject.name,

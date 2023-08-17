@@ -66,7 +66,7 @@ class AboutScreenState extends State<AboutScreen> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
-                              "Hey there, I'm Hamza Tariq (CE-43, CEME), the brain behind Hexagone. Flutter fanatic, app aficionado, and your friendly neighborhood developer. I cooked up this app with a pinch of code, a sprinkle of passion, and a massive 10,000 lines of \"are we there yet?\" code. Hope it rocks your phone and brings a smile. Enjoy the adventure",
+                              "Hey there, I'm Hamza Tariq (CE-43, CEME), the brain behind this app. Flutter fanatic, app aficionado, and your friendly neighborhood developer. I cooked up this app with a pinch of code, a sprinkle of passion, and a massive 10,000 lines of \"are we there yet?\" code. Hope it rocks your phone and brings a smile. Enjoy the adventure",
                               style: TextStyle(
                                   fontSize: 16,
                                   color: isLightMode
@@ -214,7 +214,69 @@ class AboutScreenState extends State<AboutScreen> {
                                   ),
                                 ),
                               ],
-                            )
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Row(
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Request source code:',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: isLightMode
+                                                ? Colors.black
+                                                : Colors.white),
+                                      ),
+                                      Text(
+                                        '(not going to approve it though)',
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w300,
+                                            color: isLightMode
+                                                ? Colors.black
+                                                : Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                TextButton(
+                                  onPressed: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => const WebsiteView(
+                                              initialUrl:
+                                                  "https://github.com/Hmmza-tariq")),
+                                    );
+                                  },
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.link_rounded),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        'Github',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),

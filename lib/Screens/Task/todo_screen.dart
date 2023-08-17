@@ -72,6 +72,9 @@ class TodoListPageState extends State<ScheduleTaskScreen> {
   }
 
   void _showEditTaskDialog(int index, bool isLightMode) {
+    String task = '';
+    bool isSnackBarVisible = false;
+
     showDialog(
       context: context,
       builder: (context) {
@@ -93,7 +96,7 @@ class TodoListPageState extends State<ScheduleTaskScreen> {
             controller: editedTaskController,
             onChanged: (value) {
               setState(() {
-                _tasks[index] = value;
+                task = value;
               });
             },
             decoration: InputDecoration(
@@ -120,8 +123,97 @@ class TodoListPageState extends State<ScheduleTaskScreen> {
                     TextStyle(color: isLightMode ? Colors.black : Colors.white),
               ),
               onPressed: () {
-                _saveTasks();
-                Navigator.pop(context);
+                if (task != '') {
+                  _tasks[index] = task;
+                  _saveTasks();
+                  Navigator.pop(context);
+                } else {
+                  if (!isSnackBarVisible) {
+                    setState(() {
+                      isSnackBarVisible = true;
+                    });
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(
+                          const SnackBar(
+                            content: Text('Incorrect task.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        )
+                        .closed
+                        .then((_) {
+                      setState(() {
+                        isSnackBarVisible = false;
+                      });
+                    });
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void addTask(bool isLightMode) {
+    bool isSnackBarVisible = false;
+    showDialog(
+      context: context,
+      builder: (context) {
+        String newTask = '';
+        return AlertDialog(
+          backgroundColor:
+              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+          title: Text(
+            'Add Task',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isLightMode ? Colors.black : Colors.white,
+            ),
+          ),
+          content: TextField(
+            decoration: InputDecoration(
+              labelText: 'Task',
+              labelStyle:
+                  TextStyle(color: isLightMode ? Colors.black : Colors.white),
+            ),
+            onChanged: (value) {
+              newTask = value;
+            },
+            style: TextStyle(color: isLightMode ? Colors.black : Colors.white),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Add',
+                style:
+                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
+              ),
+              onPressed: () {
+                if (newTask.isNotEmpty) {
+                  _addTask(newTask);
+                  Navigator.pop(context);
+                } else {
+                  if (!isSnackBarVisible) {
+                    setState(() {
+                      isSnackBarVisible = true;
+                    });
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(
+                          const SnackBar(
+                            content: Text('Incorrect task.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        )
+                        .closed
+                        .then((_) {
+                      setState(() {
+                        isSnackBarVisible = false;
+                      });
+                    });
+                  }
+                }
               },
             ),
           ],
@@ -225,7 +317,7 @@ class TodoListPageState extends State<ScheduleTaskScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: themeProvider.primaryColor.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                             color: isLightMode
                                 ? AppTheme.grey
@@ -286,53 +378,6 @@ class TodoListPageState extends State<ScheduleTaskScreen> {
             icon: Icons.add,
             color: themeProvider.primaryColor),
       ),
-    );
-  }
-
-  void addTask(bool isLightMode) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        String newTask = '';
-        return AlertDialog(
-          backgroundColor:
-              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-          title: Text(
-            'Add Task',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: isLightMode ? Colors.black : Colors.white,
-            ),
-          ),
-          content: TextField(
-            decoration: InputDecoration(
-              labelText: 'Task',
-              labelStyle:
-                  TextStyle(color: isLightMode ? Colors.black : Colors.white),
-            ),
-            onChanged: (value) {
-              newTask = value;
-            },
-            style: TextStyle(color: isLightMode ? Colors.black : Colors.white),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Add',
-                style:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
-              ),
-              onPressed: () {
-                if (newTask.isNotEmpty) {
-                  _addTask(newTask);
-                  Navigator.pop(context);
-                }
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }
