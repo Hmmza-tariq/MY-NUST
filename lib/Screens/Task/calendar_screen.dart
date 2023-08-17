@@ -445,12 +445,12 @@ class CalendarScreenState extends State<CalendarScreen> {
               padding: const EdgeInsets.all(18.0),
               child: Container(
                 decoration: BoxDecoration(
-                  color: isLightMode == true
-                      ? AppTheme.white
-                      : AppTheme.nearlyBlack,
-                  borderRadius: BorderRadius.circular(12),
+                  color: themeProvider.primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                      color: themeProvider.primaryColor.withOpacity(0.9),
+                      color: isLightMode
+                          ? AppTheme.grey
+                          : themeProvider.primaryColor.withOpacity(0.8),
                       width: 3),
                 ),
                 child: TableCalendar<Event>(
@@ -514,16 +514,19 @@ class CalendarScreenState extends State<CalendarScreen> {
                         border: Border.fromBorderSide(
                             BorderSide(color: Color(0xFF9FA8DA), width: 1.4)),
                         shape: BoxShape.circle),
-                    weekendTextStyle: const TextStyle(
-                        color: Color.fromARGB(255, 115, 115, 115)),
+                    weekendTextStyle: TextStyle(
+                      color: !isLightMode == true
+                          ? AppTheme.white.withOpacity(.2)
+                          : AppTheme.nearlyBlack.withOpacity(.4),
+                    ),
                     weekendDecoration:
                         const BoxDecoration(shape: BoxShape.circle),
                     weekNumberTextStyle:
                         const TextStyle(fontSize: 12, color: Color(0xFFBFBFBF)),
                     defaultTextStyle: TextStyle(
                       color: !isLightMode == true
-                          ? AppTheme.white.withOpacity(.4)
-                          : AppTheme.nearlyBlack.withOpacity(.4),
+                          ? AppTheme.white.withOpacity(.5)
+                          : AppTheme.nearlyBlack.withOpacity(.6),
                     ),
                   ),
                 ),
@@ -569,7 +572,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                         color: isLightMode ? Colors.black : Colors.white),
                   ),
                   const SizedBox(height: 10),
-                  if (_events[_selectedDay] != null)
+                  if (_events[_selectedDay]!.isNotEmpty)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: _events[_selectedDay]!
@@ -611,8 +614,10 @@ class CalendarScreenState extends State<CalendarScreen> {
                                         .withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                        color: themeProvider.primaryColor
-                                            .withOpacity(0.8),
+                                        color: isLightMode
+                                            ? AppTheme.grey
+                                            : themeProvider.primaryColor
+                                                .withOpacity(0.8),
                                         width: 3),
                                   ),
                                   child: ListTile(

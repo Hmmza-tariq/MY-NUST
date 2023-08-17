@@ -8,6 +8,7 @@ class AppTheme {
   static const Color nearlyBlack = Color.fromARGB(255, 0, 36, 66);
   static const Color grey = Color(0xFF3A5160);
   static const Color darkGrey = Color(0xFF313A44);
+  static const Color ace = Color.fromARGB(255, 148, 64, 251);
 
   static const Color darkText = Color(0xFF253840);
   static const Color darkerText = Color(0xFF17262A);

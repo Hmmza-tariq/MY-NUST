@@ -438,20 +438,28 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
       gpaColor = Colors.red;
     } else if (gpa >= 2.0 && gpa < 3.0) {
       gpaColor = Colors.orange;
-    } else {
+    } else if (gpa < 4) {
       gpaColor = Colors.green;
+    } else {
+      gpaColor = AppTheme.ace;
     }
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
+          titlePadding: const EdgeInsets.only(top: 22),
+          iconPadding: const EdgeInsets.all(0),
+          buttonPadding: const EdgeInsets.all(4),
+          insetPadding: const EdgeInsets.all(0),
+          actionsPadding: const EdgeInsets.all(4),
+          contentPadding: const EdgeInsets.all(4),
           backgroundColor:
               isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
           title: Text(
             'Expected SGPA',
             textAlign: TextAlign.center,
             style: TextStyle(
-                fontSize: 13,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: isLightMode ? Colors.black : Colors.white),
           ),
@@ -459,7 +467,7 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
             textAlign: TextAlign.center,
             gpa.toStringAsFixed(2),
             style: TextStyle(
-                fontSize: 24, color: gpaColor, fontWeight: FontWeight.bold),
+                fontSize: 34, color: gpaColor, fontWeight: FontWeight.bold),
           ),
           actions: [
             TextButton(

@@ -27,7 +27,7 @@ class SmallSliderListData {
   static List<SmallSliderListData> tabIconsList = <SmallSliderListData>[
     SmallSliderListData(
       title: 'Calculate',
-      subtitle: <String>['GPA'],
+      subtitle: <String>['SGPA'],
       startColor: '#FA7D82',
       endColor: '#FFB295',
       icon: Icons.calculate,

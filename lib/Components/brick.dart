@@ -119,10 +119,12 @@ class WaveViewState extends State<WaveView> with TickerProviderStateMixin {
 
       if (gradePoints <= 1) {
         gpaColor = Colors.red;
-      } else if (gradePoints > 1 && gradePoints < 3) {
+      } else if (gradePoints < 3) {
         gpaColor = Colors.orange;
-      } else {
+      } else if (gradePoints < 4) {
         gpaColor = Colors.green;
+      } else {
+        gpaColor = AppTheme.ace;
       }
     });
   }
