@@ -572,85 +572,91 @@ class CalendarScreenState extends State<CalendarScreen> {
                         color: isLightMode ? Colors.black : Colors.white),
                   ),
                   const SizedBox(height: 10),
-                  if (_events[_selectedDay]!.isNotEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: _events[_selectedDay]!
-                          .map(
-                            (event) => Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: SwipeableTile.card(
-                                color: Colors.transparent,
-                                shadow: const BoxShadow(
+                  if ((_events[_selectedDay] != null))
+                    if (_events[_selectedDay]!.isNotEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _events[_selectedDay]!
+                            .map(
+                              (event) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: SwipeableTile.card(
                                   color: Colors.transparent,
-                                  blurRadius: 0,
-                                  offset: Offset(2, 2),
-                                ),
-                                horizontalPadding: 0,
-                                verticalPadding: 0,
-                                direction: SwipeDirection.horizontal,
-                                onSwiped: (direction) => _deleteEvent(event),
-                                backgroundBuilder:
-                                    (context, direction, progress) {
-                                  return AnimatedBuilder(
-                                    animation: progress,
-                                    builder: (context, child) {
-                                      return AnimatedContainer(
-                                        duration:
-                                            const Duration(milliseconds: 400),
-                                        color: progress.value > 0.4
-                                            ? const Color(0xFFed7474)
-                                            : isLightMode
-                                                ? AppTheme.white
-                                                : AppTheme.nearlyBlack,
-                                      );
-                                    },
-                                  );
-                                },
-                                key: UniqueKey(),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: themeProvider.primaryColor
-                                        .withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(
-                                        color: isLightMode
-                                            ? AppTheme.grey
-                                            : themeProvider.primaryColor
-                                                .withOpacity(0.8),
-                                        width: 3),
+                                  shadow: const BoxShadow(
+                                    color: Colors.transparent,
+                                    blurRadius: 0,
+                                    offset: Offset(2, 2),
                                   ),
-                                  child: ListTile(
-                                    title: Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            event.title,
-                                            style: TextStyle(
-                                                color: !isLightMode
-                                                    ? Colors.white
-                                                    : Colors.black),
-                                          ),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(Icons.edit),
+                                  horizontalPadding: 0,
+                                  verticalPadding: 0,
+                                  direction: SwipeDirection.horizontal,
+                                  onSwiped: (direction) => _deleteEvent(event),
+                                  backgroundBuilder:
+                                      (context, direction, progress) {
+                                    return AnimatedBuilder(
+                                      animation: progress,
+                                      builder: (context, child) {
+                                        return AnimatedContainer(
+                                          duration:
+                                              const Duration(milliseconds: 400),
+                                          color: progress.value > 0.4
+                                              ? const Color(0xFFed7474)
+                                              : isLightMode
+                                                  ? AppTheme.white
+                                                  : AppTheme.nearlyBlack,
+                                        );
+                                      },
+                                    );
+                                  },
+                                  key: UniqueKey(),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: themeProvider.primaryColor
+                                          .withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
                                           color: isLightMode
                                               ? AppTheme.grey
-                                              : Colors.white,
-                                          onPressed: () {
-                                            _showEditEventDialog(
-                                                event, isLightMode);
-                                          },
-                                        ),
-                                      ],
+                                              : themeProvider.primaryColor
+                                                  .withOpacity(0.8),
+                                          width: 3),
+                                    ),
+                                    child: ListTile(
+                                      title: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              event.title,
+                                              style: TextStyle(
+                                                  color: !isLightMode
+                                                      ? Colors.white
+                                                      : Colors.black),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.edit),
+                                            color: isLightMode
+                                                ? AppTheme.grey
+                                                : Colors.white,
+                                            onPressed: () {
+                                              _showEditEventDialog(
+                                                  event, isLightMode);
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          )
-                          .toList(),
-                    )
+                            )
+                            .toList(),
+                      )
+                    else
+                      const Text(
+                        'No Event Found. Add an Event using the " + " button.',
+                        style: TextStyle(fontSize: 13, color: Colors.grey),
+                      )
                   else
                     const Text(
                       'No Event Found. Add an Event using the " + " button.',
