@@ -21,9 +21,9 @@ For more details visit:
 
 
 # Screenshots:
-<img src="assets/images/ss.png" width=20% height =35%>   
-<img src="assets/images/ss2.png" width=20% height =35%>   
-<img src="assets/images/ss1.png" width=20% height =35%>   
-<img src="assets/images/ss3.png" width=20% height =35%>   
-<img src="assets/images/ss4.png" width=20% height =35%>   
-<img src="assets/images/ss5.png" width=20% height =35%>   
+<img src="assets/images/ss.png">   
+<img src="assets/images/ss2.png">   
+<img src="assets/images/ss1.png">   
+<img src="assets/images/ss3.png">   
+<img src="assets/images/ss4.png">   
+<img src="assets/images/ss5.png">   
