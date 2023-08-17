@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/card_1_widget.dart';
 import '../../Core/app_theme.dart';
@@ -46,6 +47,7 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
   /// *********************************************************
 
   void addSemester(bool isLightMode) {
+    bool isSnackBarVisible = false;
     var gpaProvider = Provider.of<GpaProvider>(context, listen: false);
     showDialog(
       context: context,
@@ -81,12 +83,32 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
                       color: isLightMode ? Colors.black : Colors.white)),
               onPressed: () {
                 _saveSemesters();
-                if (newSemesterName.isNotEmpty) {
+                if ((int.parse(newSemesterName) < 9) &&
+                    int.parse(newSemesterName) > 0) {
                   setState(() {
                     Semester sem = Semester(newSemesterName, [], gpa: 0);
                     semesters = gpaProvider.addSemesterData(sem);
                   });
                   Navigator.pop(context);
+                } else {
+                  if (!isSnackBarVisible) {
+                    setState(() {
+                      isSnackBarVisible = true;
+                    });
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(
+                          const SnackBar(
+                            content: Text('Incorrect name.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        )
+                        .closed
+                        .then((_) {
+                      setState(() {
+                        isSnackBarVisible = false;
+                      });
+                    });
+                  }
                 }
               },
             ),
@@ -312,22 +334,22 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
                         splashColor:
                             isLightMode ? AppTheme.white : AppTheme.nearlyBlack,
                         onTap: () async {
-                          var updatedGpa = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CalcSgpaScreen(
-                                semester: semester,
-                                index: index,
-                              ),
-                            ),
-                          );
-                          updatedGpa = gpaProvider.getSemester()[index].gpa;
-                          if (updatedGpa != null) {
-                            setState(() {
-                              semesters = gpaProvider.getSemester();
-                              _saveSemesters();
-                            });
-                          }
+                          await Navigator.push(
+                              context,
+                              PageTransition(
+                                  duration: const Duration(milliseconds: 500),
+                                  type: PageTransitionType.rightToLeft,
+                                  alignment: Alignment.bottomCenter,
+                                  child: CalcSgpaScreen(
+                                    semester: semester,
+                                    index: index,
+                                  ),
+                                  inheritTheme: true,
+                                  ctx: context));
+                          setState(() {
+                            semesters = gpaProvider.getSemester();
+                            _saveSemesters();
+                          });
                         },
                         subtitle: SwipeableTile.card(
                           color: Colors.transparent,

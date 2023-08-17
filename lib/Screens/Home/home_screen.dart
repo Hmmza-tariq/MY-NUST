@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:info_popup/info_popup.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -233,11 +234,16 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                 (!homeList[index].isWidget)
                                     ? Navigator.push<dynamic>(
                                         context,
-                                        MaterialPageRoute<dynamic>(
-                                          builder: (BuildContext context) =>
-                                              homeList[index].navigateScreen!,
-                                        ),
-                                      )
+                                        PageTransition(
+                                            duration: const Duration(
+                                                milliseconds: 500),
+                                            type:
+                                                PageTransitionType.rightToLeft,
+                                            alignment: Alignment.bottomCenter,
+                                            child:
+                                                homeList[index].navigateScreen!,
+                                            inheritTheme: true,
+                                            ctx: context))
                                     : null;
                               },
                               child: Stack(

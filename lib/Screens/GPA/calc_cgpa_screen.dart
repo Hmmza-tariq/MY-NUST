@@ -46,6 +46,8 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
     int semesterNo = semester.name;
     int credits = semester.credits;
     double sgpa = semester.sgpa;
+    bool isSnackBarVisible = false;
+
     showDialog(
       context: context,
       builder: (context) {
@@ -125,6 +127,25 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
                   });
                   _saveSemesters();
                   Navigator.pop(context);
+                } else {
+                  if (!isSnackBarVisible) {
+                    setState(() {
+                      isSnackBarVisible = true;
+                    });
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(
+                          const SnackBar(
+                            content: Text('Incorrect data.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        )
+                        .closed
+                        .then((_) {
+                      setState(() {
+                        isSnackBarVisible = false;
+                      });
+                    });
+                  }
                 }
               },
             ),
@@ -162,6 +183,7 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
     double sgpa = 0.0;
     int credits = 0;
     int semesterNo = 1;
+    bool isSnackBarVisible = false;
     showDialog(
       context: context,
       builder: (context) {
@@ -245,6 +267,25 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
                   });
                   _saveSemesters();
                   Navigator.pop(context);
+                } else {
+                  if (!isSnackBarVisible) {
+                    setState(() {
+                      isSnackBarVisible = true;
+                    });
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(
+                          const SnackBar(
+                            content: Text('Incorrect data.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        )
+                        .closed
+                        .then((_) {
+                      setState(() {
+                        isSnackBarVisible = false;
+                      });
+                    });
+                  }
                 }
               },
             ),

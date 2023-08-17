@@ -105,6 +105,7 @@ class CalendarScreenState extends State<CalendarScreen> {
   void _showAddEventDialog(bool isLightMode) {
     bool notificationAllowed = false;
     DateTime selectedTime = DateTime.now();
+    bool isSnackBarVisible = false;
     showDialog(
       context: context,
       builder: (context) {
@@ -253,6 +254,25 @@ class CalendarScreenState extends State<CalendarScreen> {
                   _saveEvents();
                   _taskController.clear();
                   Navigator.pop(context);
+                } else {
+                  if (!isSnackBarVisible) {
+                    setState(() {
+                      isSnackBarVisible = true;
+                    });
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(
+                          const SnackBar(
+                            content: Text('Incorrect event.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        )
+                        .closed
+                        .then((_) {
+                      setState(() {
+                        isSnackBarVisible = false;
+                      });
+                    });
+                  }
                 }
               },
             ),
@@ -264,6 +284,7 @@ class CalendarScreenState extends State<CalendarScreen> {
 
   void _showEditEventDialog(Event event, bool isLightMode) {
     String title = event.title;
+    bool isSnackBarVisible = false;
     showDialog(
       context: context,
       builder: (context) {
@@ -312,9 +333,30 @@ class CalendarScreenState extends State<CalendarScreen> {
                     TextStyle(color: isLightMode ? Colors.black : Colors.white),
               ),
               onPressed: () {
-                event.title = title;
-                _saveEvents();
-                Navigator.pop(context);
+                if (title.isNotEmpty) {
+                  event.title = title;
+                  _saveEvents();
+                  Navigator.pop(context);
+                } else {
+                  if (!isSnackBarVisible) {
+                    setState(() {
+                      isSnackBarVisible = true;
+                    });
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(
+                          const SnackBar(
+                            content: Text('Incorrect event.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        )
+                        .closed
+                        .then((_) {
+                      setState(() {
+                        isSnackBarVisible = false;
+                      });
+                    });
+                  }
+                }
               },
             ),
           ],
@@ -567,7 +609,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                                   decoration: BoxDecoration(
                                     color: themeProvider.primaryColor
                                         .withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
                                         color: themeProvider.primaryColor
                                             .withOpacity(0.8),
