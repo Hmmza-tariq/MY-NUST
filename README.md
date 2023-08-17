@@ -1,5 +1,7 @@
 # My NUST
+# My NUST
 
+Nust unofficial student portal
 Nust unofficial student portal
 
 # About:
