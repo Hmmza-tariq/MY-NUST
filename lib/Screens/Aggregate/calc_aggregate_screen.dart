@@ -47,32 +47,38 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
   }
 
   void resultDialog(bool isLightMode) {
-    double result = 0;
     Color gpaColor;
+    double result = calculateAggregate();
     bool error1 = (ssc == 0 || hssc == 0 || net == 0);
     bool error2 = ((sscPercentage + hsscPercentage + netPercentage) != 100);
-
-    if (error1 || error2) {
+    bool error3 = (result > 100);
+    if (error1 || error2 || error3) {
       gpaColor = isLightMode ? Colors.black : Colors.white;
     } else {
-      result = calculateAggregate();
-
       if (result < 50) {
         gpaColor = Colors.red;
-      } else if (result >= 50 && result < 80) {
+      } else if (result >= 50 && result < 70) {
         gpaColor = Colors.orange;
-      } else {
+      } else if (result < 90) {
         gpaColor = Colors.green;
+      } else {
+        gpaColor = AppTheme.ace;
       }
     }
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
+          titlePadding: const EdgeInsets.only(top: 22),
+          iconPadding: const EdgeInsets.all(0),
+          buttonPadding: const EdgeInsets.all(4),
+          insetPadding: const EdgeInsets.all(0),
+          actionsPadding: const EdgeInsets.all(4),
+          contentPadding: const EdgeInsets.only(top: 8),
           backgroundColor:
               isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
           title: Text(
-            (error1 || error2) ? 'Error!' : 'Aggregate:',
+            (error1 || error2 || error3) ? 'Error!' : 'Aggregate:',
             textAlign: TextAlign.center,
             style: TextStyle(
                 fontSize: 16,
@@ -85,9 +91,13 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
                 ? 'Incomplete Data'
                 : error2
                     ? 'Total percentage is not equal to 100'
-                    : result.toStringAsFixed(2),
+                    : error3
+                        ? 'Incorrect Data'
+                        : result.toStringAsFixed(2),
             style: TextStyle(
-                fontSize: 20, color: gpaColor, fontWeight: FontWeight.bold),
+                fontSize: (error1 || error2 || error3) ? 20 : 34,
+                color: gpaColor,
+                fontWeight: FontWeight.bold),
           ),
           actions: [
             TextButton(

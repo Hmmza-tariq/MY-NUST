@@ -247,12 +247,19 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          titlePadding: const EdgeInsets.only(top: 22),
+          iconPadding: const EdgeInsets.all(0),
+          buttonPadding: const EdgeInsets.all(4),
+          insetPadding: const EdgeInsets.all(0),
+          actionsPadding: const EdgeInsets.all(4),
+          contentPadding: const EdgeInsets.all(4),
           backgroundColor:
               isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
           title: Text(
             error ? '' : 'Absolute Marks',
+            textAlign: TextAlign.center,
             style: TextStyle(
-                fontSize: 13,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: isLightMode ? Colors.black : Colors.white),
           ),
@@ -260,7 +267,7 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
             error ? 'ERROR!' : absoluteMarks.toStringAsFixed(2),
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 34,
               fontWeight: FontWeight.bold,
               color: error
                   ? Colors.red
@@ -268,7 +275,9 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                       ? Colors.red
                       : (absoluteMarks >= 33 && absoluteMarks < 60)
                           ? Colors.orange
-                          : Colors.green,
+                          : (absoluteMarks < 90)
+                              ? Colors.green
+                              : AppTheme.ace,
             ),
           ),
           actions: [

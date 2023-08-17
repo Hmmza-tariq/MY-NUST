@@ -304,40 +304,50 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
       gpaColor = Colors.red;
     } else if (cgpa >= 2.0 && cgpa < 3.0) {
       gpaColor = Colors.orange;
-    } else {
+    } else if (cgpa < 4) {
       gpaColor = Colors.green;
+    } else {
+      gpaColor = AppTheme.ace;
     }
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          backgroundColor:
-              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-          title: Text(
-            'Expected CGPA',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: isLightMode ? Colors.black : Colors.white),
-          ),
-          content: Text(
-            textAlign: TextAlign.center,
-            cgpa.toStringAsFixed(2),
-            style: TextStyle(
-                fontSize: 24, color: gpaColor, fontWeight: FontWeight.bold),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('OK',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: isLightMode ? Colors.black : Colors.white)),
+        return SizedBox(
+          child: AlertDialog(
+            titlePadding: const EdgeInsets.only(top: 22),
+            iconPadding: const EdgeInsets.all(0),
+            buttonPadding: const EdgeInsets.all(4),
+            insetPadding: const EdgeInsets.all(0),
+            actionsPadding: const EdgeInsets.all(4),
+            contentPadding: const EdgeInsets.all(4),
+            backgroundColor:
+                isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+            title: Text(
+              'Expected CGPA',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isLightMode ? Colors.black : Colors.white),
             ),
-          ],
+            content: Text(
+              textAlign: TextAlign.center,
+              cgpa.toStringAsFixed(2),
+              style: TextStyle(
+                  fontSize: 34, color: gpaColor, fontWeight: FontWeight.bold),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('OK',
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: isLightMode ? Colors.black : Colors.white)),
+              ),
+            ],
+          ),
         );
       },
     );

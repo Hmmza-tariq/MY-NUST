@@ -28,8 +28,10 @@ class Card1Widget extends StatelessWidget {
       gpaColor = Colors.red;
     } else if (gpa >= 2.0 && gpa < 3.0) {
       gpaColor = Colors.orange;
-    } else {
+    } else if (gpa < 4) {
       gpaColor = Colors.green;
+    } else {
+      gpaColor = AppTheme.ace;
     }
     bool isLightMode = Provider.of<ThemeProvider>(context).isLightMode ??
         MediaQuery.of(context).platformBrightness == Brightness.light;

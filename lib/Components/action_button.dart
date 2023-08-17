@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:mynust/Core/app_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ActionButton extends StatefulWidget {
   const ActionButton({
@@ -21,8 +22,11 @@ class _ActionButtonState extends State<ActionButton> {
   final adUnitId = 'ca-app-pub-8875342677218505/9904823569';
   RewardedInterstitialAd? _rewardedInterstitialAd;
   bool isAdLoaded = false;
+  bool adBlock = true;
+  int counter = 0;
   @override
   void initState() {
+    _loadAdBlocker();
     (widget.icon == Icons.calculate) ? loadAd() : null;
     super.initState();
   }
@@ -49,6 +53,15 @@ class _ActionButtonState extends State<ActionButton> {
     );
   }
 
+  Future<void> _loadAdBlocker() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int value = prefs.getInt('adBlock') ?? 5;
+    await prefs.setInt('adBlock', (value == 0) ? 0 : (value--));
+    setState(() {
+      counter = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -59,13 +72,10 @@ class _ActionButtonState extends State<ActionButton> {
         child: IconButton(
           iconSize: 30,
           onPressed: () {
-            print('ad clicked: $isAdLoaded');
-
-            isAdLoaded
-                ? _rewardedInterstitialAd!.show(onUserEarnedReward:
-                    (AdWithoutView ad, RewardItem rewardItem) {
-                    print('ad reward: $rewardItem');
-                  })
+            (isAdLoaded && (counter == 0))
+                ? _rewardedInterstitialAd!.show(
+                    onUserEarnedReward:
+                        (AdWithoutView ad, RewardItem rewardItem) {})
                 : null;
             widget.func();
           },
