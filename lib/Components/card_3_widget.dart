@@ -9,27 +9,28 @@ import '../Core/theme_provider.dart';
 class Card3Widget extends StatelessWidget {
   final double marksObtained;
   final double marksTotal;
-  final String name;
-  final String nameTitle;
-  final String descriptionTitle;
-  final String description;
+  final String title1;
+  final double description1;
+  final String title2;
+  final double description2;
   final String type;
   final Color color;
 
   const Card3Widget(
       {Key? key,
       required this.marksObtained,
-      required this.name,
-      required this.description,
+      required this.description1,
+      required this.description2,
       required this.marksTotal,
-      required this.nameTitle,
-      required this.descriptionTitle,
-      required this.type, required this.color})
+      required this.title1,
+      required this.title2,
+      required this.type,
+      required this.color})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-       bool isLightMode = Provider.of<ThemeProvider>(context).isLightMode ??
+    bool isLightMode = Provider.of<ThemeProvider>(context).isLightMode ??
         MediaQuery.of(context).platformBrightness == Brightness.light;
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
@@ -80,7 +81,7 @@ class Card3Widget extends StatelessWidget {
                                       padding: const EdgeInsets.only(
                                           left: 4, bottom: 2),
                                       child: Text(
-                                        nameTitle,
+                                        title1,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontFamily: AppTheme.fontName,
@@ -100,7 +101,7 @@ class Card3Widget extends StatelessWidget {
                                       child: SizedBox(
                                         width: 80,
                                         child: Text(
-                                          name,
+                                          description1.toStringAsFixed(0),
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontFamily: AppTheme.fontName,
@@ -142,7 +143,7 @@ class Card3Widget extends StatelessWidget {
                                       padding: const EdgeInsets.only(
                                           left: 4, bottom: 2),
                                       child: Text(
-                                        descriptionTitle,
+                                        title2,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontFamily: AppTheme.fontName,
@@ -160,7 +161,7 @@ class Card3Widget extends StatelessWidget {
                                       padding: const EdgeInsets.only(
                                           left: 4, bottom: 3),
                                       child: Text(
-                                        description,
+                                        description2.toStringAsFixed(0),
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontFamily: AppTheme.fontName,

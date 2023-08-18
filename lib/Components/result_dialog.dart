@@ -10,8 +10,13 @@ class ResultDialog {
 
   void showResult(
       {required context,
-      required String title,
-      required String description,
+      required marksObtained,
+      required marksTotal,
+      required description1,
+      required description2,
+      required title1,
+      required title2,
+      required type,
       required bool isLightMode,
       required Color color}) {
     showDialog(
@@ -31,7 +36,7 @@ class ResultDialog {
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Text(
-                    title,
+                    'Expected $type',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
@@ -44,7 +49,7 @@ class ResultDialog {
                 ),
                 const SizedBox(height: 16.0),
                 Text(
-                  description,
+                  marksObtained.toStringAsFixed(2),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 34,
@@ -95,18 +100,44 @@ class ResultDialog {
                           children: [
                             RepaintBoundary(
                                 key: previewContainer,
-                                child: Card3Widget(
-                                  nameTitle: 'Semester',
-                                  name: '1',
-                                  descriptionTitle: 'Credit Hours',
-                                  description: '2',
-                                  marksObtained: double.parse(description),
-                                  marksTotal: 4,
-                                  type: 'SGPA',
-                                  color: color,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16.0),
+                                    color: isLightMode
+                                        ? AppTheme.nearlyWhite
+                                        : AppTheme.nearlyBlack,
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                            'My Expected Progress for this session:',
+                                            style: TextStyle(
+                                              fontFamily: AppTheme.fontName,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 14,
+                                              color: isLightMode
+                                                  ? AppTheme.darkText
+                                                  : AppTheme.white,
+                                            )),
+                                      ),
+                                      Card3Widget(
+                                        title1: title1,
+                                        description1: description1,
+                                        title2: title2,
+                                        description2: description2,
+                                        marksObtained: marksObtained,
+                                        marksTotal: marksTotal,
+                                        type: type,
+                                        color: color,
+                                      ),
+                                    ],
+                                  ),
                                 )),
                             IconButton(
-                                onPressed: () => captureScreenShot(),
+                                onPressed: () => captureScreenShot(type),
                                 icon: Icon(
                                   Icons.share,
                                   color: isLightMode
@@ -220,10 +251,11 @@ class ResultDialog {
     );
   }
 
-  Future<bool> captureScreenShot() async {
+  Future<bool> captureScreenShot(String type) async {
     await ShareFilesAndScreenshotWidgets().shareScreenshot(
-        previewContainer, 800, "Logo", "result.png", "image/png",
-        text: "Hey! Check this out");
+        previewContainer, 1000, "Logo", "result.png", "image/png",
+        text:
+            "Hey! Check this out. I calculated my expected $type using 'My NUST' app.");
     return true;
   }
 }

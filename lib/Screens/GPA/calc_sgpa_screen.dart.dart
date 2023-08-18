@@ -460,12 +460,22 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
     } else {
       gpaColor = AppTheme.ace;
     }
+
+    int credits = 0;
+    for (Subject s in subjects) {
+      credits += s.creditHours;
+    }
     ResultDialog().showResult(
-        title: 'Expected SGPA',
-        description: gpa.toStringAsFixed(2),
-        color: gpaColor,
+        context: context,
         isLightMode: isLightMode,
-        context: context);
+        color: gpaColor,
+        title1: 'Subjects',
+        description1: subjects.length.toDouble(),
+        title2: 'Credit Hours',
+        description2: credits.toDouble(),
+        marksObtained: gpa.toDouble(),
+        marksTotal: (4).toDouble(),
+        type: 'SGPA');
   }
 
   double calculateSGPA() {

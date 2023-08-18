@@ -74,11 +74,21 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
             isLightMode: isLightMode,
             context: context)
         : ResultDialog().showResult(
-            title: 'Absolute Marks',
-            description: aggregate.toStringAsFixed(2),
-            color: aggregateColor,
+            context: context,
             isLightMode: isLightMode,
-            context: context);
+            color: aggregateColor,
+            title1: 'NET',
+            description1: ((net / 200) * netPercentage).toDouble(),
+            title2: 'Previous',
+            description2: _marks
+                ? ((ssc / 1100) * sscPercentage +
+                        (hssc / 1100) * hsscPercentage)
+                    .toDouble()
+                : ((ssc / 100 * sscPercentage) + (hssc / 100 * hsscPercentage))
+                    .toDouble(),
+            marksObtained: aggregate.toDouble(),
+            marksTotal: (100).toDouble(),
+            type: 'Aggregate');
   }
 
   @override

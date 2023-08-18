@@ -27,6 +27,7 @@ class CalcGpaScreen extends StatefulWidget {
 class CalcGpaScreenState extends State<CalcGpaScreen>
     with TickerProviderStateMixin {
   List<Semester> semesters = [];
+  int credits = 0;
   late SnackBar snackBar;
   bool _showUndoButton = false;
   late Semester deletedSemester;
@@ -34,6 +35,7 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
 
   @override
   void initState() {
+    credits = 0;
     animationController = AnimationController(
         duration: const Duration(milliseconds: 2000), vsync: this);
     _loadSemesters();
@@ -213,11 +215,16 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
       gpaColor = AppTheme.ace;
     }
     ResultDialog().showResult(
-        title: 'Expected CGPA',
-        description: gpa.toStringAsFixed(2),
-        color: gpaColor,
+        context: context,
         isLightMode: isLightMode,
-        context: context);
+        color: gpaColor,
+        title1: 'Semesters',
+        description1: semesters.length.toDouble(),
+        title2: 'Credit Hours',
+        description2: credits.toDouble(),
+        marksObtained: gpa.toDouble(),
+        marksTotal: (4).toDouble(),
+        type: 'CGPA');
   }
 
   double calculateCGPA() {
@@ -306,6 +313,7 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
                           in gpaProvider.getSemester()[index].subjects) {
                         totalCreditHours += subj.creditHours;
                       }
+                      credits += totalCreditHours;
                     }
                     return ListTile(
                         splashColor:
@@ -325,6 +333,7 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
                                   ctx: context));
                           setState(() {
                             semesters = gpaProvider.getSemester();
+                            credits = 0;
                             _saveSemesters();
                           });
                         },
