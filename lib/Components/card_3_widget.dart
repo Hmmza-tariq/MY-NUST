@@ -10,29 +10,26 @@ class Card3Widget extends StatelessWidget {
   final double marksObtained;
   final double marksTotal;
   final String name;
+  final String nameTitle;
+  final String descriptionTitle;
   final String description;
+  final String type;
+  final Color color;
+
   const Card3Widget(
       {Key? key,
       required this.marksObtained,
       required this.name,
       required this.description,
-      required this.marksTotal})
+      required this.marksTotal,
+      required this.nameTitle,
+      required this.descriptionTitle,
+      required this.type, required this.color})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    Color color;
-    if (marksObtained < (marksTotal * 0.4)) {
-      color = Colors.red;
-    } else if (marksObtained >= (marksTotal * 0.4) &&
-        marksObtained < (marksTotal * 0.6)) {
-      color = Colors.orange;
-    } else if (marksObtained < (marksTotal)) {
-      color = Colors.green;
-    } else {
-      color = AppTheme.ace;
-    }
-    bool isLightMode = Provider.of<ThemeProvider>(context).isLightMode ??
+       bool isLightMode = Provider.of<ThemeProvider>(context).isLightMode ??
         MediaQuery.of(context).platformBrightness == Brightness.light;
     return Padding(
       padding: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
@@ -54,12 +51,12 @@ class Card3Widget extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+              padding: const EdgeInsets.only(top: 16, left: 8, right: 8),
               child: Row(
                 children: <Widget>[
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 8, right: 8, top: 4),
+                      padding: const EdgeInsets.only(left: 4, right: 4, top: 4),
                       child: Column(
                         children: <Widget>[
                           Row(
@@ -83,7 +80,7 @@ class Card3Widget extends StatelessWidget {
                                       padding: const EdgeInsets.only(
                                           left: 4, bottom: 2),
                                       child: Text(
-                                        'Semester',
+                                        nameTitle,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontFamily: AppTheme.fontName,
@@ -103,7 +100,7 @@ class Card3Widget extends StatelessWidget {
                                       child: SizedBox(
                                         width: 80,
                                         child: Text(
-                                          '#$name',
+                                          name,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontFamily: AppTheme.fontName,
@@ -128,7 +125,7 @@ class Card3Widget extends StatelessWidget {
                             children: <Widget>[
                               Container(
                                 height: 48,
-                                width: 2,
+                                width: 1,
                                 decoration: BoxDecoration(
                                   color: HexColor('#F56E98').withOpacity(0.5),
                                   borderRadius: const BorderRadius.all(
@@ -136,8 +133,7 @@ class Card3Widget extends StatelessWidget {
                                 ),
                               ),
                               Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(8.0, 8, 8, 12),
+                                padding: const EdgeInsets.fromLTRB(4, 4, 4, 8),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,7 +142,7 @@ class Card3Widget extends StatelessWidget {
                                       padding: const EdgeInsets.only(
                                           left: 4, bottom: 2),
                                       child: Text(
-                                        'Credit Hours',
+                                        descriptionTitle,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontFamily: AppTheme.fontName,
@@ -226,7 +222,7 @@ class Card3Widget extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    'SGPA',
+                                    type,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontFamily: AppTheme.fontName,
@@ -259,7 +255,7 @@ class Card3Widget extends StatelessWidget {
                                           color.withOpacity(.8),
                                           color,
                                         ],
-                                  angle: (marksObtained / 100) * 360),
+                                  angle: (marksObtained / marksTotal) * 360),
                               child: const SizedBox(
                                 width: 108,
                                 height: 108,
