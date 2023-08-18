@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/action_button.dart';
 import '../../Components/card_1_widget.dart';
+import '../../Components/result_dialog.dart';
 import '../../Core/app_theme.dart';
 import '../../Core/theme_provider.dart';
 
@@ -132,19 +134,24 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
                     setState(() {
                       isSnackBarVisible = true;
                     });
+                    final snackBar = SnackBar(
+                      elevation: 0,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error',
+                        message: "Incorrect Data",
+                        contentType: ContentType.warning,
+                      ),
+                    );
+
                     ScaffoldMessenger.of(context)
-                        .showSnackBar(
-                          const SnackBar(
-                            content: Text('Incorrect data.'),
-                            backgroundColor: Colors.red,
-                          ),
-                        )
-                        .closed
-                        .then((_) {
-                      setState(() {
-                        isSnackBarVisible = false;
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar).closed.then((_) {
+                        setState(() {
+                          isSnackBarVisible = false;
+                        });
                       });
-                    });
                   }
                 }
               },
@@ -272,19 +279,24 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
                     setState(() {
                       isSnackBarVisible = true;
                     });
+                    final snackBar = SnackBar(
+                      elevation: 0,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error',
+                        message: "Incorrect Data",
+                        contentType: ContentType.warning,
+                      ),
+                    );
+
                     ScaffoldMessenger.of(context)
-                        .showSnackBar(
-                          const SnackBar(
-                            content: Text('Incorrect data.'),
-                            backgroundColor: Colors.red,
-                          ),
-                        )
-                        .closed
-                        .then((_) {
-                      setState(() {
-                        isSnackBarVisible = false;
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar).closed.then((_) {
+                        setState(() {
+                          isSnackBarVisible = false;
+                        });
                       });
-                    });
                   }
                 }
               },
@@ -309,48 +321,13 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
     } else {
       gpaColor = AppTheme.ace;
     }
-    showDialog(
-      context: context,
-      builder: (context) {
-        return SizedBox(
-          child: AlertDialog(
-            titlePadding: const EdgeInsets.only(top: 22),
-            iconPadding: const EdgeInsets.all(0),
-            buttonPadding: const EdgeInsets.all(4),
-            insetPadding: const EdgeInsets.all(0),
-            actionsPadding: const EdgeInsets.all(4),
-            contentPadding: const EdgeInsets.all(4),
-            backgroundColor:
-                isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-            title: Text(
-              'Expected CGPA',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: isLightMode ? Colors.black : Colors.white),
-            ),
-            content: Text(
-              textAlign: TextAlign.center,
-              cgpa.toStringAsFixed(2),
-              style: TextStyle(
-                  fontSize: 34, color: gpaColor, fontWeight: FontWeight.bold),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text('OK',
-                    style: TextStyle(
-                        fontSize: 12,
-                        color: isLightMode ? Colors.black : Colors.white)),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+
+    ResultDialog().showResult(
+        title: 'Expected CGPA',
+        description: cgpa.toStringAsFixed(2),
+        color: gpaColor,
+        isLightMode: isLightMode,
+        context: context);
   }
 
   double calculateCGPA() {

@@ -3,6 +3,7 @@
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -72,9 +73,20 @@ class _PdfScreenState extends State<PdfScreen> {
           savedDir: (await getTemporaryDirectory()).path,
           saveInPublicStorage: true,
           fileName: filename);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Downloading in progress"),
-      ));
+      final snackBar = SnackBar(
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          title: 'Downloading in progress',
+          message: "Check notification",
+          contentType: ContentType.help,
+        ),
+      );
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
     }
   }
 
@@ -101,10 +113,20 @@ class _PdfScreenState extends State<PdfScreen> {
                 if (kDebugMode) {
                   print('ERROR: ${details.description}');
                 }
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    dismissDirection: DismissDirection.horizontal,
-                    backgroundColor: Colors.redAccent,
-                    content: Text('Privacy Error!')));
+                final snackBar = SnackBar(
+                  elevation: 0,
+                  behavior: SnackBarBehavior.floating,
+                  backgroundColor: Colors.transparent,
+                  content: AwesomeSnackbarContent(
+                    title: 'Error',
+                    message: "Navigation blocked due to current sites privacy",
+                    contentType: ContentType.failure,
+                  ),
+                );
+
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(snackBar);
                 Navigator.pop(context);
               },
             )));

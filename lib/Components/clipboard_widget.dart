@@ -1,3 +1,4 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -127,12 +128,22 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                           IconButton(
                             onPressed: () {
                               saveTextValues();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      backgroundColor: HexColor('#0F6FC5'),
-                                      content: const Text('ID Copied')));
                               Clipboard.setData(
                                   ClipboardData(text: idTextController.text));
+                              final snackBar = SnackBar(
+                                elevation: 0,
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.transparent,
+                                content: AwesomeSnackbarContent(
+                                  title: '',
+                                  message: 'ID Copied',
+                                  contentType: ContentType.success,
+                                ),
+                              );
+
+                              ScaffoldMessenger.of(context)
+                                ..hideCurrentSnackBar()
+                                ..showSnackBar(snackBar);
                             },
                             icon: const Icon(Icons.copy, color: Colors.white),
                           ),
@@ -169,12 +180,22 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                           IconButton(
                             onPressed: () {
                               saveTextValues();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      backgroundColor: HexColor('#0F6FC5'),
-                                      content: const Text('Password Copied')));
                               Clipboard.setData(
                                   ClipboardData(text: passTextController.text));
+                              final snackBar = SnackBar(
+                                elevation: 0,
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.transparent,
+                                content: AwesomeSnackbarContent(
+                                  title: '',
+                                  message: 'Password Copied',
+                                  contentType: ContentType.success,
+                                ),
+                              );
+
+                              ScaffoldMessenger.of(context)
+                                ..hideCurrentSnackBar()
+                                ..showSnackBar(snackBar);
                             },
                             icon: const Icon(Icons.copy, color: Colors.white),
                           ),

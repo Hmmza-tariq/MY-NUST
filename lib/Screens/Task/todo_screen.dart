@@ -1,3 +1,4 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/action_button.dart';
@@ -132,19 +133,24 @@ class TodoListPageState extends State<ScheduleTaskScreen> {
                     setState(() {
                       isSnackBarVisible = true;
                     });
+                    final snackBar = SnackBar(
+                      elevation: 0,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error',
+                        message: "Incorrect Task",
+                        contentType: ContentType.warning,
+                      ),
+                    );
+
                     ScaffoldMessenger.of(context)
-                        .showSnackBar(
-                          const SnackBar(
-                            content: Text('Incorrect task.'),
-                            backgroundColor: Colors.red,
-                          ),
-                        )
-                        .closed
-                        .then((_) {
-                      setState(() {
-                        isSnackBarVisible = false;
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar).closed.then((_) {
+                        setState(() {
+                          isSnackBarVisible = false;
+                        });
                       });
-                    });
                   }
                 }
               },
@@ -199,19 +205,24 @@ class TodoListPageState extends State<ScheduleTaskScreen> {
                     setState(() {
                       isSnackBarVisible = true;
                     });
+                    final snackBar = SnackBar(
+                      elevation: 0,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error',
+                        message: "Incorrect Task",
+                        contentType: ContentType.warning,
+                      ),
+                    );
+
                     ScaffoldMessenger.of(context)
-                        .showSnackBar(
-                          const SnackBar(
-                            content: Text('Incorrect task.'),
-                            backgroundColor: Colors.red,
-                          ),
-                        )
-                        .closed
-                        .then((_) {
-                      setState(() {
-                        isSnackBarVisible = false;
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar).closed.then((_) {
+                        setState(() {
+                          isSnackBarVisible = false;
+                        });
                       });
-                    });
                   }
                 }
               },

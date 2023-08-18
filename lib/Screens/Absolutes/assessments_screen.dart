@@ -1,3 +1,4 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import '../../Components/action_button.dart';
 import '../../Core/assessment_provider.dart';
@@ -155,20 +156,25 @@ class AssessmentsScreenState extends State<AssessmentsScreen> {
                       setState(() {
                         _isSnackBarVisible = true;
                       });
+                      final snackBar = SnackBar(
+                        elevation: 0,
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.transparent,
+                        content: AwesomeSnackbarContent(
+                          title: 'Error',
+                          message:
+                              'Obtained marks cannot be more than total marks.',
+                          contentType: ContentType.warning,
+                        ),
+                      );
+
                       ScaffoldMessenger.of(context)
-                          .showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'Obtained marks cannot be more than total marks.'),
-                              backgroundColor: Colors.red,
-                            ),
-                          )
-                          .closed
-                          .then((_) {
-                        setState(() {
-                          _isSnackBarVisible = false;
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(snackBar).closed.then((_) {
+                          setState(() {
+                            _isSnackBarVisible = false;
+                          });
                         });
-                      });
                     }
                   } else {
                     setState(() {
@@ -320,22 +326,27 @@ class AssessmentsScreenState extends State<AssessmentsScreen> {
                         setState(() {
                           _isSnackBarVisible = true;
                         });
+                        final snackBar = SnackBar(
+                          elevation: 0,
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.transparent,
+                          content: AwesomeSnackbarContent(
+                            title: 'Error',
+                            message: (newAssessmentName == null ||
+                                    newAssessmentWeightage == null)
+                                ? 'Incomplete Data'
+                                : 'Obtained marks cannot be more than total marks.',
+                            contentType: ContentType.warning,
+                          ),
+                        );
+
                         ScaffoldMessenger.of(context)
-                            .showSnackBar(
-                              SnackBar(
-                                content: Text((newAssessmentName == null ||
-                                        newAssessmentWeightage == null)
-                                    ? 'Incomplete Data'
-                                    : 'Obtained marks cannot be more than total marks.'),
-                                backgroundColor: Colors.red,
-                              ),
-                            )
-                            .closed
-                            .then((_) {
-                          setState(() {
-                            _isSnackBarVisible = false;
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(snackBar).closed.then((_) {
+                            setState(() {
+                              _isSnackBarVisible = false;
+                            });
                           });
-                        });
                       }
                     }
                   },

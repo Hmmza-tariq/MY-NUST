@@ -30,7 +30,7 @@ showDialogBox(context) {
                     checkInternet(context);
                   })
             ],
-          )); // CupertinoAlertDialog
+          ));
 }
 
 startStreaming(context) {
