@@ -322,12 +322,21 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
       gpaColor = AppTheme.ace;
     }
 
+    int credits = 0;
+    for (Sem s in semesters) {
+      credits += s.credits;
+    }
     ResultDialog().showResult(
-        title: 'Expected CGPA',
-        description: cgpa.toStringAsFixed(2),
-        color: gpaColor,
+        context: context,
         isLightMode: isLightMode,
-        context: context);
+        color: gpaColor,
+        title1: 'Semesters',
+        description1: semesters.length.toDouble(),
+        title2: 'Credit Hours',
+        description2: credits.toDouble(),
+        marksObtained: cgpa.toDouble(),
+        marksTotal: (4).toDouble(),
+        type: 'CGPA');
   }
 
   double calculateCGPA() {

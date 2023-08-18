@@ -30,6 +30,8 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
   double obtainedAbsolutes = 0;
   double lectureAbsolutes = 0;
   double labAbsolutes = 0;
+  double lectureAbsoluteMarks = 0;
+  double labAbsoluteMarks = 0;
   bool _showUndoButton = false;
   bool error = false;
   bool _isSnackBarVisible = false;
@@ -161,8 +163,10 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
   }
 
   double calculateAbsoluteMarks() {
-    double lectureAbsoluteMarks = lectureAbsolutes * (lectureWeightage / 100);
-    double labAbsoluteMarks = labAbsolutes * (labWeightage / 100);
+    setState(() {
+      lectureAbsoluteMarks = lectureAbsolutes * (lectureWeightage / 100);
+      labAbsoluteMarks = labAbsolutes * (labWeightage / 100);
+    });
 
     double absoluteMarks = lectureAbsoluteMarks + labAbsoluteMarks;
     return absoluteMarks;
@@ -258,11 +262,16 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
             isLightMode: isLightMode,
             context: context)
         : ResultDialog().showResult(
-            title: 'Absolute Marks',
-            description: absoluteMarks.toStringAsFixed(2),
-            color: absoluteColor,
+            context: context,
             isLightMode: isLightMode,
-            context: context);
+            color: absoluteColor,
+            title1: 'Lecture',
+            description1: lectureAbsoluteMarks.toDouble(),
+            title2: 'lab',
+            description2: labAbsoluteMarks.toDouble(),
+            marksObtained: absoluteMarks.toDouble(),
+            marksTotal: (100).toDouble(),
+            type: 'Absolutes');
   }
 
   void _editAssessment(Assessment assessment, int index, bool isLightMode) {
