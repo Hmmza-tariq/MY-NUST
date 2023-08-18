@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:info_popup/info_popup.dart';
 import 'package:share_files_and_screenshot_widgets/share_files_and_screenshot_widgets.dart';
 import '../Core/app_Theme.dart';
 import 'card_3_widget.dart';
@@ -52,31 +53,69 @@ class ResultDialog {
                   ),
                 ),
                 const SizedBox(height: 16.0),
-                FittedBox(
-                  child: SizedBox(
-                    height: 100,
-                    width: 400,
-                    child: Visibility(
-                      visible: true,
-                      child: RepaintBoundary(
-                          key: previewContainer,
-                          child: const Card3Widget(
-                            description: '',
-                            marksObtained: 4,
-                            marksTotal: 4,
-                            name: 'GPA',
-                          )),
-                    ),
-                  ),
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    TextButton(
-                      onPressed: () {
-                        captureScreenShot();
-                        Navigator.pop(context);
-                      },
+                    InfoPopupWidget(
+                      contentOffset: const Offset(30, 0),
+                      arrowTheme: InfoPopupArrowTheme(
+                        arrowDirection: ArrowDirection.down,
+                        color: isLightMode
+                            ? const Color.fromARGB(255, 199, 199, 199)
+                            : const Color.fromARGB(255, 1, 54, 98),
+                      ),
+                      contentTheme: InfoPopupContentTheme(
+                        infoContainerBackgroundColor: isLightMode
+                            ? const Color.fromARGB(255, 199, 199, 199)
+                            : const Color.fromARGB(255, 1, 54, 98),
+                        infoTextStyle: TextStyle(
+                          color: isLightMode
+                              ? AppTheme.nearlyBlack
+                              : AppTheme.white,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 3, horizontal: 0),
+                        contentBorderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        infoTextAlign: TextAlign.center,
+                      ),
+                      dismissTriggerBehavior:
+                          PopupDismissTriggerBehavior.onTapArea,
+                      customContent: Container(
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          color: isLightMode == true
+                              ? AppTheme.white
+                              : AppTheme.nearlyBlack,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white, width: 3),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            RepaintBoundary(
+                                key: previewContainer,
+                                child: Card3Widget(
+                                  nameTitle: 'Semester',
+                                  name: '1',
+                                  descriptionTitle: 'Credit Hours',
+                                  description: '2',
+                                  marksObtained: double.parse(description),
+                                  marksTotal: 4,
+                                  type: 'SGPA',
+                                  color: color,
+                                )),
+                            IconButton(
+                                onPressed: () => captureScreenShot(),
+                                icon: Icon(
+                                  Icons.share,
+                                  color: isLightMode
+                                      ? CupertinoColors.black
+                                      : CupertinoColors.white,
+                                ))
+                          ],
+                        ),
+                      ),
                       child: Text(
                         'Share',
                         style: TextStyle(
@@ -181,10 +220,11 @@ class ResultDialog {
     );
   }
 
-  void captureScreenShot() {
-    ShareFilesAndScreenshotWidgets().shareScreenshot(
+  Future<bool> captureScreenShot() async {
+    await ShareFilesAndScreenshotWidgets().shareScreenshot(
         previewContainer, 800, "Logo", "result.png", "image/png",
         text: "Hey! Check this out");
+    return true;
   }
 }
 

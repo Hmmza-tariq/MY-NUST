@@ -79,55 +79,6 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
             color: aggregateColor,
             isLightMode: isLightMode,
             context: context);
-
-    // showDialog(
-    //   context: context,
-    //   builder: (context) {
-    //     return AlertDialog(
-    //       titlePadding: const EdgeInsets.only(top: 22),
-    //       iconPadding: const EdgeInsets.all(0),
-    //       buttonPadding: const EdgeInsets.all(4),
-    //       insetPadding: const EdgeInsets.all(0),
-    //       actionsPadding: const EdgeInsets.all(4),
-    //       contentPadding: const EdgeInsets.only(top: 8),
-    //       backgroundColor:
-    //           isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-    //       title: Text(
-    //         (error1 || error2 || error3) ? 'Error!' : 'Aggregate:',
-    //         textAlign: TextAlign.center,
-    //         style: TextStyle(
-    //             fontSize: 16,
-    //             fontWeight: FontWeight.bold,
-    //             color: isLightMode ? Colors.black : Colors.white),
-    //       ),
-    //       content: Text(
-    //         textAlign: TextAlign.center,
-    //         error1
-    //             ? 'Incomplete Data'
-    //             : error2
-    //                 ? 'Total percentage is not equal to 100'
-    //                 : error3
-    //                     ? 'Incorrect Data'
-    //                     : aggregate.toStringAsFixed(2),
-    //         style: TextStyle(
-    //             fontSize: (error1 || error2 || error3) ? 20 : 34,
-    //             color: aggregateColor,
-    //             fontWeight: FontWeight.bold),
-    //       ),
-    //       actions: [
-    //         TextButton(
-    //           onPressed: () {
-    //             Navigator.pop(context);
-    //           },
-    //           child: Text('OK',
-    //               style: TextStyle(
-    //                   fontSize: 12,
-    //                   color: isLightMode ? Colors.black : Colors.white)),
-    //         ),
-    //       ],
-    //     );
-    //   },
-    // );
   }
 
   @override
