@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:info_popup/info_popup.dart';
 import 'package:mynust/Components/action_button.dart';
+import '../../Components/result_dialog.dart';
 import '../../Core/app_theme.dart';
 import '../../Core/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -47,72 +48,86 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
   }
 
   void resultDialog(bool isLightMode) {
-    Color gpaColor;
-    double result = calculateAggregate();
+    Color aggregateColor;
+    double aggregate = calculateAggregate();
     bool error1 = (ssc == 0 || hssc == 0 || net == 0);
     bool error2 = ((sscPercentage + hsscPercentage + netPercentage) != 100);
-    bool error3 = (result > 100);
-    if (error1 || error2 || error3) {
-      gpaColor = isLightMode ? Colors.black : Colors.white;
+    bool error3 = (aggregate > 100);
+
+    if (aggregate < 50) {
+      aggregateColor = Colors.red;
+    } else if (aggregate >= 50 && aggregate < 70) {
+      aggregateColor = Colors.orange;
+    } else if (aggregate < 90) {
+      aggregateColor = Colors.green;
     } else {
-      if (result < 50) {
-        gpaColor = Colors.red;
-      } else if (result >= 50 && result < 70) {
-        gpaColor = Colors.orange;
-      } else if (result < 90) {
-        gpaColor = Colors.green;
-      } else {
-        gpaColor = AppTheme.ace;
-      }
+      aggregateColor = AppTheme.ace;
     }
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          titlePadding: const EdgeInsets.only(top: 22),
-          iconPadding: const EdgeInsets.all(0),
-          buttonPadding: const EdgeInsets.all(4),
-          insetPadding: const EdgeInsets.all(0),
-          actionsPadding: const EdgeInsets.all(4),
-          contentPadding: const EdgeInsets.only(top: 8),
-          backgroundColor:
-              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-          title: Text(
-            (error1 || error2 || error3) ? 'Error!' : 'Aggregate:',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isLightMode ? Colors.black : Colors.white),
-          ),
-          content: Text(
-            textAlign: TextAlign.center,
-            error1
+
+    (error1 || error2 || error3)
+        ? ResultDialog.showError(
+            description: error1
                 ? 'Incomplete Data'
                 : error2
-                    ? 'Total percentage is not equal to 100'
-                    : error3
-                        ? 'Incorrect Data'
-                        : result.toStringAsFixed(2),
-            style: TextStyle(
-                fontSize: (error1 || error2 || error3) ? 20 : 34,
-                color: gpaColor,
-                fontWeight: FontWeight.bold),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('OK',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: isLightMode ? Colors.black : Colors.white)),
-            ),
-          ],
-        );
-      },
-    );
+                    ? 'Total percentage is \nnot equal to 100'
+                    : 'Incorrect Data',
+            isLightMode: isLightMode,
+            context: context)
+        : ResultDialog().showResult(
+            title: 'Absolute Marks',
+            description: aggregate.toStringAsFixed(2),
+            color: aggregateColor,
+            isLightMode: isLightMode,
+            context: context);
+
+    // showDialog(
+    //   context: context,
+    //   builder: (context) {
+    //     return AlertDialog(
+    //       titlePadding: const EdgeInsets.only(top: 22),
+    //       iconPadding: const EdgeInsets.all(0),
+    //       buttonPadding: const EdgeInsets.all(4),
+    //       insetPadding: const EdgeInsets.all(0),
+    //       actionsPadding: const EdgeInsets.all(4),
+    //       contentPadding: const EdgeInsets.only(top: 8),
+    //       backgroundColor:
+    //           isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+    //       title: Text(
+    //         (error1 || error2 || error3) ? 'Error!' : 'Aggregate:',
+    //         textAlign: TextAlign.center,
+    //         style: TextStyle(
+    //             fontSize: 16,
+    //             fontWeight: FontWeight.bold,
+    //             color: isLightMode ? Colors.black : Colors.white),
+    //       ),
+    //       content: Text(
+    //         textAlign: TextAlign.center,
+    //         error1
+    //             ? 'Incomplete Data'
+    //             : error2
+    //                 ? 'Total percentage is not equal to 100'
+    //                 : error3
+    //                     ? 'Incorrect Data'
+    //                     : aggregate.toStringAsFixed(2),
+    //         style: TextStyle(
+    //             fontSize: (error1 || error2 || error3) ? 20 : 34,
+    //             color: aggregateColor,
+    //             fontWeight: FontWeight.bold),
+    //       ),
+    //       actions: [
+    //         TextButton(
+    //           onPressed: () {
+    //             Navigator.pop(context);
+    //           },
+    //           child: Text('OK',
+    //               style: TextStyle(
+    //                   fontSize: 12,
+    //                   color: isLightMode ? Colors.black : Colors.white)),
+    //         ),
+    //       ],
+    //     );
+    //   },
+    // );
   }
 
   @override

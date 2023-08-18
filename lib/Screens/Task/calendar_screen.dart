@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -259,19 +260,24 @@ class CalendarScreenState extends State<CalendarScreen> {
                     setState(() {
                       isSnackBarVisible = true;
                     });
+                    final snackBar = SnackBar(
+                      elevation: 0,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error',
+                        message: "Incorrect Event",
+                        contentType: ContentType.warning,
+                      ),
+                    );
+
                     ScaffoldMessenger.of(context)
-                        .showSnackBar(
-                          const SnackBar(
-                            content: Text('Incorrect event.'),
-                            backgroundColor: Colors.red,
-                          ),
-                        )
-                        .closed
-                        .then((_) {
-                      setState(() {
-                        isSnackBarVisible = false;
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar).closed.then((_) {
+                        setState(() {
+                          isSnackBarVisible = false;
+                        });
                       });
-                    });
                   }
                 }
               },
@@ -342,19 +348,24 @@ class CalendarScreenState extends State<CalendarScreen> {
                     setState(() {
                       isSnackBarVisible = true;
                     });
+                    final snackBar = SnackBar(
+                      elevation: 0,
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error',
+                        message: "Incorrect Event",
+                        contentType: ContentType.warning,
+                      ),
+                    );
+
                     ScaffoldMessenger.of(context)
-                        .showSnackBar(
-                          const SnackBar(
-                            content: Text('Incorrect event.'),
-                            backgroundColor: Colors.red,
-                          ),
-                        )
-                        .closed
-                        .then((_) {
-                      setState(() {
-                        isSnackBarVisible = false;
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar).closed.then((_) {
+                        setState(() {
+                          isSnackBarVisible = false;
+                        });
                       });
-                    });
                   }
                 }
               },

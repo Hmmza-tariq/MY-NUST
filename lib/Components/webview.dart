@@ -1,3 +1,4 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mynust/Screens/Web%20view/pdf_screen.dart';
@@ -53,26 +54,46 @@ class _WebsiteViewState extends State<WebsiteView> {
             });
           },
           onWebResourceError: (WebResourceError error) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: HexColor('#0F6FC5'),
-                content: const Text('UnKnown Error')));
+            final snackBar = SnackBar(
+              elevation: 0,
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.transparent,
+              content: AwesomeSnackbarContent(
+                title: 'Error!',
+                message: 'Check Internet connection',
+                contentType: ContentType.failure,
+              ),
+            );
+
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(snackBar);
           },
           onNavigationRequest: (NavigationRequest request) async {
             String url = request.url;
             if (Uri.parse(url).host != (Uri.parse(widget.initialUrl).host)) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  dismissDirection: DismissDirection.vertical,
-                  backgroundColor: Colors.redAccent,
-                  content:
-                      Text('Navigation blocked to ${(Uri.parse(url).host)}')));
+              final snackBar = SnackBar(
+                elevation: 0,
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.transparent,
+                content: AwesomeSnackbarContent(
+                  title: 'Error',
+                  message:
+                      'Cannot move outside the current domain, Navigation blocked!',
+                  contentType: ContentType.warning,
+                ),
+              );
+
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(snackBar);
               return NavigationDecision.prevent;
             }
             if (url.toLowerCase().endsWith(".pdf") ||
                 url.toLowerCase().endsWith(".docx") ||
                 url.toLowerCase().endsWith(".pptx") ||
                 url.toLowerCase().endsWith(".docs") ||
-                url.toLowerCase().endsWith(".ppt") ||
-                url.toLowerCase().contains("download")) {
+                url.toLowerCase().endsWith(".ppt")) {
               await Navigator.push(
                 context,
                 MaterialPageRoute(

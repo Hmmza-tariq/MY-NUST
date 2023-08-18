@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:info_popup/info_popup.dart';
 import 'package:provider/provider.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/action_button.dart';
+import '../../Components/result_dialog.dart';
 import '../../Core/assessments.dart';
 import '../../Core/app_theme.dart';
 import '../../Core/theme_provider.dart';
@@ -243,57 +245,24 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
   void resultDialog(bool isLightMode) {
     updateAbsolutes();
     double absoluteMarks = calculateAbsoluteMarks();
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          titlePadding: const EdgeInsets.only(top: 22),
-          iconPadding: const EdgeInsets.all(0),
-          buttonPadding: const EdgeInsets.all(4),
-          insetPadding: const EdgeInsets.all(0),
-          actionsPadding: const EdgeInsets.all(4),
-          contentPadding: const EdgeInsets.all(4),
-          backgroundColor:
-              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-          title: Text(
-            error ? '' : 'Absolute Marks',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isLightMode ? Colors.black : Colors.white),
-          ),
-          content: Text(
-            error ? 'ERROR!' : absoluteMarks.toStringAsFixed(2),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 34,
-              fontWeight: FontWeight.bold,
-              color: error
-                  ? Colors.red
-                  : absoluteMarks < 33
-                      ? Colors.red
-                      : (absoluteMarks >= 33 && absoluteMarks < 60)
-                          ? Colors.orange
-                          : (absoluteMarks < 90)
-                              ? Colors.green
-                              : AppTheme.ace,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('OK',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: isLightMode ? Colors.black : Colors.white)),
-            ),
-          ],
-        );
-      },
-    );
+    Color absoluteColor = absoluteMarks < 33
+        ? Colors.red
+        : (absoluteMarks >= 33 && absoluteMarks < 60)
+            ? Colors.orange
+            : (absoluteMarks < 90)
+                ? Colors.green
+                : AppTheme.ace;
+    (error)
+        ? ResultDialog.showError(
+            description: 'Total Weightage \nexceed 100',
+            isLightMode: isLightMode,
+            context: context)
+        : ResultDialog().showResult(
+            title: 'Absolute Marks',
+            description: absoluteMarks.toStringAsFixed(2),
+            color: absoluteColor,
+            isLightMode: isLightMode,
+            context: context);
   }
 
   void _editAssessment(Assessment assessment, int index, bool isLightMode) {
@@ -427,20 +396,25 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                       setState(() {
                         _isSnackBarVisible = true;
                       });
+                      final snackBar = SnackBar(
+                        elevation: 0,
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Colors.transparent,
+                        content: AwesomeSnackbarContent(
+                          title: 'Error',
+                          message:
+                              'Obtained marks cannot be more than total marks.',
+                          contentType: ContentType.warning,
+                        ),
+                      );
+
                       ScaffoldMessenger.of(context)
-                          .showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'Obtained marks cannot be more than total marks.'),
-                              backgroundColor: Colors.red,
-                            ),
-                          )
-                          .closed
-                          .then((_) {
-                        setState(() {
-                          _isSnackBarVisible = false;
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(snackBar).closed.then((_) {
+                          setState(() {
+                            _isSnackBarVisible = false;
+                          });
                         });
-                      });
                     }
                   } else {
                     setState(() {
@@ -710,22 +684,27 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                         setState(() {
                           _isSnackBarVisible = true;
                         });
+                        final snackBar = SnackBar(
+                          elevation: 0,
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.transparent,
+                          content: AwesomeSnackbarContent(
+                            title: 'Error',
+                            message: (newAssessmentName == null ||
+                                    newAssessmentWeightage == null)
+                                ? 'Incomplete Data'
+                                : 'Obtained marks cannot be more than total marks.',
+                            contentType: ContentType.warning,
+                          ),
+                        );
+
                         ScaffoldMessenger.of(context)
-                            .showSnackBar(
-                              SnackBar(
-                                content: Text((newAssessmentName == null ||
-                                        newAssessmentWeightage == null)
-                                    ? 'Incomplete Data'
-                                    : 'Obtained marks cannot be more than total marks.'),
-                                backgroundColor: Colors.red,
-                              ),
-                            )
-                            .closed
-                            .then((_) {
-                          setState(() {
-                            _isSnackBarVisible = false;
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(snackBar).closed.then((_) {
+                            setState(() {
+                              _isSnackBarVisible = false;
+                            });
                           });
-                        });
                       }
                     }
                   },
