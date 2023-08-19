@@ -34,6 +34,6 @@ To request the source code of this project, please follow the guidelines mention
 
 |              |              |
 |--------------|--------------|
-| ![Screenshot 1](Images/ss.png) | ![Screenshot 2](Images/ss2.png) |
-| ![Screenshot 3](Images/ss1.png) | ![Screenshot 4](Images/ss3.png) |
-| ![Screenshot 5](Images/ss4.png) | ![Screenshot 6](Images/ss5.png) |
+| ![Screenshot 1](assets/images/ss.png) | ![Screenshot 2](assets/images/ss2.png) |
+| ![Screenshot 3](assets/images/ss1.png) | ![Screenshot 4](assets/images/ss3.png) |
+| ![Screenshot 5](assets/images/ss4.png) | ![Screenshot 6](assets/images/ss5.png) |
