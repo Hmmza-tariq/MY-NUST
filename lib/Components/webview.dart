@@ -1,5 +1,6 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mynust/Screens/Web%20view/pdf_screen.dart';
 import 'package:provider/provider.dart';
@@ -120,6 +121,8 @@ class _WebsiteViewState extends State<WebsiteView> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(statusBarIconBrightness: Brightness.dark));
     return isConnected
         ? WillPopScope(
             onWillPop: () async {

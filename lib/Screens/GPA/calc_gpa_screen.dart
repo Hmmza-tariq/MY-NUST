@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/card_1_widget.dart';
-import '../../Components/result_dialog.dart';
+import '../../Components/result_screen.dart';
 import '../../Core/app_theme.dart';
 import '../../Core/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -202,7 +202,7 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
 
   /// *********************************************************
 
-  void resultDialog(bool isLightMode) {
+  void resultDialog(bool isLightMode) async {
     double gpa = calculateCGPA();
     Color gpaColor;
     if (gpa < 2.0) {
@@ -214,17 +214,32 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
     } else {
       gpaColor = AppTheme.ace;
     }
-    ResultDialog().showResult(
-        context: context,
-        isLightMode: isLightMode,
-        color: gpaColor,
-        title1: 'Semesters',
-        description1: semesters.length.toDouble(),
-        title2: 'Credit Hours',
-        description2: credits.toDouble(),
-        marksObtained: gpa.toDouble(),
-        marksTotal: (4).toDouble(),
-        type: 'CGPA');
+    await Navigator.push(
+        context,
+        PageTransition(
+            duration: const Duration(milliseconds: 500),
+            type: PageTransitionType.rightToLeft,
+            alignment: Alignment.bottomCenter,
+            child: ResultScreen(
+                color: gpaColor,
+                title1: 'Semesters',
+                description1: semesters.length.toDouble(),
+                title2: 'Credit Hours',
+                description2: credits.toDouble(),
+                marksObtained: gpa.toDouble(),
+                marksTotal: (4).toDouble(),
+                type: 'CGPA',
+                isAbsolutes: false,
+                isAggregate: false,
+                isCGPA: false,
+                isGPA: true,
+                isSGPA: false,
+                semesters: semesters,
+                sems: const [],
+                subjects: const [],
+                isLightMode: isLightMode),
+            inheritTheme: true,
+            ctx: context));
   }
 
   double calculateCGPA() {
@@ -315,6 +330,7 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
                       }
                       credits += totalCreditHours;
                     }
+                    semester.credits = totalCreditHours;
                     return ListTile(
                         splashColor:
                             isLightMode ? AppTheme.white : AppTheme.nearlyBlack,
