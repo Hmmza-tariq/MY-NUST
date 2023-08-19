@@ -159,30 +159,28 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
                     selectedCreditHours = 0;
                   });
                   Navigator.pop(context);
-                } else {
-                  if (!isSnackBarVisible) {
-                    setState(() {
-                      isSnackBarVisible = true;
-                    });
-                    final snackBar = SnackBar(
-                      elevation: 0,
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      content: AwesomeSnackbarContent(
-                        title: 'Error',
-                        message: "Incorrect name",
-                        contentType: ContentType.warning,
-                      ),
-                    );
+                }
+                if (!isSnackBarVisible) {
+                  setState(() {
+                    isSnackBarVisible = true;
+                  });
+                  final snackBar = SnackBar(
+                    elevation: 0,
+                    backgroundColor: Colors.transparent,
+                    content: AwesomeSnackbarContent(
+                      title: 'Error',
+                      message: "Incorrect name",
+                      contentType: ContentType.warning,
+                    ),
+                  );
 
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(snackBar).closed.then((_) {
-                        setState(() {
-                          isSnackBarVisible = false;
-                        });
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(snackBar).closed.then((_) {
+                      setState(() {
+                        isSnackBarVisible = false;
                       });
-                  }
+                    });
                 }
               },
             ),
@@ -273,30 +271,28 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
                       updateData();
                     });
                     Navigator.pop(context);
-                  } else {
-                    if (!isSnackBarVisible) {
-                      setState(() {
-                        isSnackBarVisible = true;
-                      });
-                      final snackBar = SnackBar(
-                        elevation: 0,
-                        behavior: SnackBarBehavior.floating,
-                        backgroundColor: Colors.transparent,
-                        content: AwesomeSnackbarContent(
-                          title: 'Error',
-                          message: "Incorrect name",
-                          contentType: ContentType.warning,
-                        ),
-                      );
+                  }
+                  if (!isSnackBarVisible) {
+                    setState(() {
+                      isSnackBarVisible = true;
+                    });
+                    final snackBar = SnackBar(
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error',
+                        message: "Incorrect name",
+                        contentType: ContentType.warning,
+                      ),
+                    );
 
-                      ScaffoldMessenger.of(context)
-                        ..hideCurrentSnackBar()
-                        ..showSnackBar(snackBar).closed.then((_) {
-                          setState(() {
-                            isSnackBarVisible = false;
-                          });
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar).closed.then((_) {
+                        setState(() {
+                          isSnackBarVisible = false;
                         });
-                    }
+                      });
                   }
                 },
               ),
@@ -414,30 +410,28 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
                     updateData();
                   });
                   Navigator.pop(context);
-                } else {
-                  if (!isSnackBarVisible) {
-                    setState(() {
-                      isSnackBarVisible = true;
-                    });
-                    final snackBar = SnackBar(
-                      elevation: 0,
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      content: AwesomeSnackbarContent(
-                        title: '',
-                        message: "Incorrect name",
-                        contentType: ContentType.warning,
-                      ),
-                    );
+                }
+                if (!isSnackBarVisible) {
+                  setState(() {
+                    isSnackBarVisible = true;
+                  });
+                  final snackBar = SnackBar(
+                    elevation: 0,
+                    backgroundColor: Colors.transparent,
+                    content: AwesomeSnackbarContent(
+                      title: '',
+                      message: "Incorrect name",
+                      contentType: ContentType.warning,
+                    ),
+                  );
 
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(snackBar).closed.then((_) {
-                        setState(() {
-                          isSnackBarVisible = false;
-                        });
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(snackBar).closed.then((_) {
+                      setState(() {
+                        isSnackBarVisible = false;
                       });
-                  }
+                    });
                 }
               },
             ),

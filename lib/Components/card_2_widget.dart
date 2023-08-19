@@ -53,7 +53,7 @@ class Card2WidgetState extends State<Card2Widget>
     bool isLightMode = Provider.of<ThemeProvider>(context).isLightMode ??
         MediaQuery.of(context).platformBrightness == Brightness.light;
     return Padding(
-      padding: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 2, bottom: 0),
       child: Container(
         decoration: BoxDecoration(
           color: isLightMode ? AppTheme.nearlyWhite : AppTheme.grey,
@@ -71,7 +71,7 @@ class Card2WidgetState extends State<Card2Widget>
         ),
         child: Padding(
           padding:
-              const EdgeInsets.only(top: 20, left: 24, right: 24, bottom: 10),
+              const EdgeInsets.only(top: 4, left: 24, right: 24, bottom: 4),
           child: Row(
             children: <Widget>[
               Expanded(
@@ -84,7 +84,7 @@ class Card2WidgetState extends State<Card2Widget>
                       Row(
                         children: [
                           Container(
-                            height: 48,
+                            height: 36,
                             width: 2,
                             decoration: BoxDecoration(
                               color: HexColor('#87A0E5').withOpacity(0.5),
@@ -99,8 +99,8 @@ class Card2WidgetState extends State<Card2Widget>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(left: 4, bottom: 2),
+                                  padding: const EdgeInsets.only(
+                                      left: 4, bottom: 2, top: 4),
                                   child: Text(
                                     'Subject',
                                     textAlign: TextAlign.center,
@@ -128,7 +128,7 @@ class Card2WidgetState extends State<Card2Widget>
                                       style: TextStyle(
                                         fontFamily: AppTheme.fontName,
                                         fontWeight: FontWeight.w600,
-                                        fontSize: 20,
+                                        fontSize: 16,
                                         color: isLightMode
                                             ? AppTheme.darkText
                                             : AppTheme.white,
@@ -147,7 +147,7 @@ class Card2WidgetState extends State<Card2Widget>
                       Row(
                         children: <Widget>[
                           Container(
-                            height: 48,
+                            height: 36,
                             width: 2,
                             decoration: BoxDecoration(
                               color: HexColor('#F56E98').withOpacity(0.5),
@@ -156,7 +156,7 @@ class Card2WidgetState extends State<Card2Widget>
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 12),
+                            padding: const EdgeInsets.fromLTRB(8.0, 0, 8, 0),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,7 +237,7 @@ class Card2WidgetState extends State<Card2Widget>
                       ),
                     ),
                     const SizedBox(
-                      height: 24,
+                      height: 20,
                     ),
                     GestureDetector(
                       onTap: () => setState(() {
@@ -269,7 +269,7 @@ class Card2WidgetState extends State<Card2Widget>
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 16, right: 14, top: 6),
+                padding: const EdgeInsets.only(left: 16, right: 14),
                 child: WaveView(
                   grade: grade,
                 ),

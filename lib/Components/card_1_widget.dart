@@ -65,7 +65,7 @@ class Card1Widget extends StatelessWidget {
                   children: <Widget>[
                     Padding(
                       padding:
-                          const EdgeInsets.only(top: 16, left: 16, right: 16),
+                          const EdgeInsets.only(top: 8, left: 16, right: 16),
                       child: Row(
                         children: <Widget>[
                           Expanded(
@@ -77,7 +77,7 @@ class Card1Widget extends StatelessWidget {
                                   Row(
                                     children: <Widget>[
                                       Container(
-                                        height: 48,
+                                        height: 36,
                                         width: 2,
                                         decoration: BoxDecoration(
                                           color: HexColor('#87A0E5')
@@ -96,7 +96,7 @@ class Card1Widget extends StatelessWidget {
                                           children: <Widget>[
                                             Padding(
                                               padding: const EdgeInsets.only(
-                                                  left: 4, bottom: 2),
+                                                  left: 4, bottom: 0),
                                               child: Text(
                                                 'Semester',
                                                 textAlign: TextAlign.center,
@@ -115,7 +115,7 @@ class Card1Widget extends StatelessWidget {
                                             ),
                                             Padding(
                                               padding: const EdgeInsets.only(
-                                                  left: 4, bottom: 3),
+                                                  left: 4, bottom: 0),
                                               child: SizedBox(
                                                 width: 80,
                                                 child: Text(
@@ -145,7 +145,7 @@ class Card1Widget extends StatelessWidget {
                                   Row(
                                     children: <Widget>[
                                       Container(
-                                        height: 48,
+                                        height: 36,
                                         width: 2,
                                         decoration: BoxDecoration(
                                           color: HexColor('#F56E98')
@@ -156,7 +156,7 @@ class Card1Widget extends StatelessWidget {
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.fromLTRB(
-                                            8.0, 8, 8, 12),
+                                            8.0, 0, 8, 12),
                                         child: Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -165,7 +165,7 @@ class Card1Widget extends StatelessWidget {
                                           children: <Widget>[
                                             Padding(
                                               padding: const EdgeInsets.only(
-                                                  left: 4, bottom: 2),
+                                                  left: 4, bottom: 0),
                                               child: Text(
                                                 'Credit Hours',
                                                 textAlign: TextAlign.center,
@@ -184,7 +184,7 @@ class Card1Widget extends StatelessWidget {
                                             ),
                                             Padding(
                                               padding: const EdgeInsets.only(
-                                                  left: 4, bottom: 3),
+                                                  left: 4, bottom: 0),
                                               child: Text(
                                                 '${(credits * animation!.value).toInt()}',
                                                 textAlign: TextAlign.center,

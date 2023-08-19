@@ -156,7 +156,7 @@ class _MyAppState extends State<MyApp> {
                   padding: const EdgeInsets.all(30.0),
                   child: SizedBox(
                     height: 300,
-                    child: Image.asset('assets/images/fingerprint.png'),
+                    child: Image.asset('assets/images/appLogo.png'),
                   ),
                 ),
               ),
