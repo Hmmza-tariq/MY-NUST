@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:info_popup/info_popup.dart';
 import 'package:page_transition/page_transition.dart';
@@ -191,6 +192,10 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         MediaQuery.of(context).platformBrightness == Brightness.light;
     _isLightMode = isLightMode;
     itemCount = homeList.length;
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarIconBrightness:
+            isLightMode ? Brightness.dark : Brightness.light));
 
     Animation<double> scaleAnimation1 =
         Tween<double>(begin: 0, end: 1.0).animate(

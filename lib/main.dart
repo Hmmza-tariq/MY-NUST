@@ -77,7 +77,6 @@ Future<void> main() async {
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
-
   @override
   State<MyApp> createState() => _MyAppState();
 }
@@ -86,7 +85,6 @@ class _MyAppState extends State<MyApp> {
   late final LocalAuthentication auth;
   bool locked = true;
   late SharedPreferences prefs;
-
   @override
   void initState() {
     super.initState();
@@ -133,9 +131,12 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    bool isLightMode = Provider.of<ThemeProvider>(context).isLightMode ??
+        MediaQuery.of(context).platformBrightness == Brightness.light;
+
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: isLightMode ? Brightness.dark : Brightness.light,
       statusBarBrightness:
           !kIsWeb && Platform.isAndroid ? Brightness.dark : Brightness.light,
       systemNavigationBarColor: Colors.white,

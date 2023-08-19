@@ -3,10 +3,12 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:info_popup/info_popup.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/action_button.dart';
 import '../../Components/result_dialog.dart';
+import '../../Components/result_screen.dart';
 import '../../Core/assessments.dart';
 import '../../Core/app_theme.dart';
 import '../../Core/theme_provider.dart';
@@ -246,7 +248,7 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
     );
   }
 
-  void resultDialog(bool isLightMode) {
+  void resultDialog(bool isLightMode) async {
     updateAbsolutes();
     double absoluteMarks = calculateAbsoluteMarks();
     Color absoluteColor = absoluteMarks < 33
@@ -261,17 +263,32 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
             description: 'Total Weightage \nexceed 100',
             isLightMode: isLightMode,
             context: context)
-        : ResultDialog().showResult(
-            context: context,
-            isLightMode: isLightMode,
-            color: absoluteColor,
-            title1: 'Lecture',
-            description1: lectureAbsoluteMarks.toDouble(),
-            title2: 'lab',
-            description2: labAbsoluteMarks.toDouble(),
-            marksObtained: absoluteMarks.toDouble(),
-            marksTotal: (100).toDouble(),
-            type: 'Absolutes');
+        : await Navigator.push(
+            context,
+            PageTransition(
+                duration: const Duration(milliseconds: 500),
+                type: PageTransitionType.rightToLeft,
+                alignment: Alignment.bottomCenter,
+                child: ResultScreen(
+                    color: absoluteColor,
+                    title1: 'Lecture',
+                    description1: lectureAbsoluteMarks.toDouble(),
+                    title2: 'lab',
+                    description2: labAbsoluteMarks.toDouble(),
+                    marksObtained: absoluteMarks.toDouble(),
+                    marksTotal: (100).toDouble(),
+                    type: 'Absolutes',
+                    isAbsolutes: true,
+                    isAggregate: false,
+                    isCGPA: false,
+                    isGPA: false,
+                    isSGPA: false,
+                    semesters: const [],
+                    sems: const [],
+                    subjects: const [],
+                    isLightMode: isLightMode),
+                inheritTheme: true,
+                ctx: context));
   }
 
   void _editAssessment(Assessment assessment, int index, bool isLightMode) {

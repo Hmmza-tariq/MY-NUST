@@ -1,10 +1,11 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/action_button.dart';
 import '../../Components/card_2_widget.dart';
-import '../../Components/result_dialog.dart';
+import '../../Components/result_screen.dart';
 import '../../Core/semester.dart';
 import '../../Core/app_theme.dart';
 import '../../Core/gpa_provider.dart';
@@ -448,7 +449,7 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
 
   /// *********************************************************
 
-  void resultDialog(bool isLightMode) {
+  void resultDialog(bool isLightMode) async {
     double gpa = calculateSGPA();
     Color gpaColor;
     if (gpa < 2.0) {
@@ -465,17 +466,32 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
     for (Subject s in subjects) {
       credits += s.creditHours;
     }
-    ResultDialog().showResult(
-        context: context,
-        isLightMode: isLightMode,
-        color: gpaColor,
-        title1: 'Subjects',
-        description1: subjects.length.toDouble(),
-        title2: 'Credit Hours',
-        description2: credits.toDouble(),
-        marksObtained: gpa.toDouble(),
-        marksTotal: (4).toDouble(),
-        type: 'SGPA');
+    await Navigator.push(
+        context,
+        PageTransition(
+            duration: const Duration(milliseconds: 500),
+            type: PageTransitionType.rightToLeft,
+            alignment: Alignment.bottomCenter,
+            child: ResultScreen(
+                color: gpaColor,
+                title1: 'Subjects',
+                description1: subjects.length.toDouble(),
+                title2: 'Credit Hours',
+                description2: credits.toDouble(),
+                marksObtained: gpa.toDouble(),
+                marksTotal: (4).toDouble(),
+                type: 'SGPA',
+                isAbsolutes: false,
+                isAggregate: false,
+                isCGPA: false,
+                isGPA: false,
+                isSGPA: true,
+                semesters: const [],
+                sems: const [],
+                subjects: subjects,
+                isLightMode: isLightMode),
+            inheritTheme: true,
+            ctx: context));
   }
 
   double calculateSGPA() {

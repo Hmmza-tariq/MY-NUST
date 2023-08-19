@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:info_popup/info_popup.dart';
 import 'package:mynust/Components/action_button.dart';
+import 'package:page_transition/page_transition.dart';
 import '../../Components/result_dialog.dart';
+import '../../Components/result_screen.dart';
 import '../../Core/app_theme.dart';
 import '../../Core/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +49,7 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
             ((net / 200) * netPercentage));
   }
 
-  void resultDialog(bool isLightMode) {
+  void resultDialog(bool isLightMode) async {
     Color aggregateColor;
     double aggregate = calculateAggregate();
     bool error1 = (ssc == 0 || hssc == 0 || net == 0);
@@ -73,22 +75,39 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
                     : 'Incorrect Data',
             isLightMode: isLightMode,
             context: context)
-        : ResultDialog().showResult(
-            context: context,
-            isLightMode: isLightMode,
-            color: aggregateColor,
-            title1: 'NET',
-            description1: ((net / 200) * netPercentage).toDouble(),
-            title2: 'Previous',
-            description2: _marks
-                ? ((ssc / 1100) * sscPercentage +
-                        (hssc / 1100) * hsscPercentage)
-                    .toDouble()
-                : ((ssc / 100 * sscPercentage) + (hssc / 100 * hsscPercentage))
-                    .toDouble(),
-            marksObtained: aggregate.toDouble(),
-            marksTotal: (100).toDouble(),
-            type: 'Aggregate');
+        : await Navigator.push(
+            context,
+            PageTransition(
+                duration: const Duration(milliseconds: 500),
+                type: PageTransitionType.rightToLeft,
+                alignment: Alignment.bottomCenter,
+                child: ResultScreen(
+                  isLightMode: isLightMode,
+                  color: aggregateColor,
+                  title1: 'NET',
+                  description1: ((net / 200) * netPercentage).toDouble(),
+                  title2: 'Previous',
+                  description2: _marks
+                      ? ((ssc / 1100) * sscPercentage +
+                              (hssc / 1100) * hsscPercentage)
+                          .toDouble()
+                      : ((ssc / 100 * sscPercentage) +
+                              (hssc / 100 * hsscPercentage))
+                          .toDouble(),
+                  marksObtained: aggregate.toDouble(),
+                  marksTotal: (100).toDouble(),
+                  type: 'Aggregate',
+                  isAbsolutes: false,
+                  isAggregate: true,
+                  isCGPA: false,
+                  isGPA: false,
+                  isSGPA: false,
+                  semesters: const [],
+                  sems: const [],
+                  subjects: const [],
+                ),
+                inheritTheme: true,
+                ctx: context));
   }
 
   @override
