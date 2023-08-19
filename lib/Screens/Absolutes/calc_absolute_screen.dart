@@ -7,7 +7,6 @@ import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/action_button.dart';
-import '../../Components/result_dialog.dart';
 import '../../Components/result_screen.dart';
 import '../../Core/assessments.dart';
 import '../../Core/app_theme.dart';
@@ -258,11 +257,9 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
             : (absoluteMarks < 90)
                 ? Colors.green
                 : AppTheme.ace;
+
     (error)
-        ? ResultDialog.showError(
-            description: 'Total Weightage \nexceed 100',
-            isLightMode: isLightMode,
-            context: context)
+        ? showError('Total Weightage exceed 100')
         : await Navigator.push(
             context,
             PageTransition(
@@ -289,6 +286,22 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                     isLightMode: isLightMode),
                 inheritTheme: true,
                 ctx: context));
+  }
+
+  void showError(String message) {
+    final snackBar = SnackBar(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: 'Error',
+        message: message,
+        contentType: ContentType.failure,
+      ),
+    );
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
   }
 
   void _editAssessment(Assessment assessment, int index, bool isLightMode) {
@@ -416,7 +429,7 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                 if (editedAssessmentWeightage != null &&
                     editedAssessmentObtainedMarks != null &&
                     editedAssessmentTotalMarks != null) {
-                  if (editedAssessmentObtainedMarks! >
+                  if (editedAssessmentObtainedMarks! <
                       editedAssessmentTotalMarks!) {
                     if (!_isSnackBarVisible) {
                       setState(() {
@@ -424,7 +437,6 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                       });
                       final snackBar = SnackBar(
                         elevation: 0,
-                        behavior: SnackBarBehavior.floating,
                         backgroundColor: Colors.transparent,
                         content: AwesomeSnackbarContent(
                           title: 'Error',
@@ -712,7 +724,6 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                         });
                         final snackBar = SnackBar(
                           elevation: 0,
-                          behavior: SnackBarBehavior.floating,
                           backgroundColor: Colors.transparent,
                           content: AwesomeSnackbarContent(
                             title: 'Error',

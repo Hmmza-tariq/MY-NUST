@@ -1,8 +1,8 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:info_popup/info_popup.dart';
 import 'package:mynust/Components/action_button.dart';
 import 'package:page_transition/page_transition.dart';
-import '../../Components/result_dialog.dart';
 import '../../Components/result_screen.dart';
 import '../../Core/app_theme.dart';
 import '../../Core/theme_provider.dart';
@@ -67,14 +67,11 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
     }
 
     (error1 || error2 || error3)
-        ? ResultDialog.showError(
-            description: error1
-                ? 'Incomplete Data'
-                : error2
-                    ? 'Total percentage is \nnot equal to 100'
-                    : 'Incorrect Data',
-            isLightMode: isLightMode,
-            context: context)
+        ? showError(error1
+            ? 'Incomplete Data'
+            : error2
+                ? 'Total percentage is not equal to 100'
+                : 'Incorrect Data')
         : await Navigator.push(
             context,
             PageTransition(
@@ -108,6 +105,22 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
                 ),
                 inheritTheme: true,
                 ctx: context));
+  }
+
+  void showError(String message) {
+    final snackBar = SnackBar(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: 'Error',
+        message: message,
+        contentType: ContentType.failure,
+      ),
+    );
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
   }
 
   @override

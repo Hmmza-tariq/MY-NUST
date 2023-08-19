@@ -147,7 +147,7 @@ class WaveViewState extends State<WaveView> with TickerProviderStateMixin {
       return Container(
         height: 130,
         width: 30,
-        padding: const EdgeInsets.only(bottom: 15),
+        padding: const EdgeInsets.only(bottom: 8),
         alignment: Alignment.bottomCenter,
         child: AnimatedBuilder(
           animation: CurvedAnimation(

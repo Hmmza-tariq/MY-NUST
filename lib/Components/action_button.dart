@@ -22,6 +22,7 @@ class _ActionButtonState extends State<ActionButton> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: FloatingActionButton(
+          heroTag: null,
           backgroundColor: widget.color,
           onPressed: () {
             widget.func();

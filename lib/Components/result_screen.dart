@@ -208,14 +208,28 @@ class _ResultScreenState extends State<ResultScreen> {
                               ),
                             ],
                           ),
-                          Text(
-                            'MY NUST',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: isLightMode
-                                    ? Colors.black.withOpacity(.4)
-                                    : Colors.white.withOpacity(.4)),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(12)),
+                              border: Border.all(
+                                  width: 2,
+                                  color: isLightMode
+                                      ? Colors.black.withOpacity(.4)
+                                      : Colors.white.withOpacity(.4)),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Text(
+                                'MY NUST',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: isLightMode
+                                        ? Colors.black.withOpacity(.4)
+                                        : Colors.white.withOpacity(.4)),
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -244,8 +258,10 @@ class _ResultScreenState extends State<ResultScreen> {
                 const SizedBox(height: 20),
                 (widget.isAbsolutes || widget.isAggregate)
                     ? Container()
-                    : SizedBox(
-                        height: (items * (55 + defaultPadding)),
+                    : ConstrainedBox(
+                        constraints: BoxConstraints(
+                            minHeight: 0,
+                            maxHeight: (items * (55 + defaultPadding))),
                         child: ListView.builder(
                           itemCount: items,
                           itemBuilder: (context, index) {
@@ -548,11 +564,14 @@ class DetailCard extends StatelessWidget {
               ),
             ),
           ),
-          Text(
-            trailing,
-            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                color: isLightMode ? Colors.black : Colors.white,
-                fontWeight: FontWeight.bold),
+          SizedBox(
+            width: 35,
+            child: Text(
+              trailing,
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  color: isLightMode ? Colors.black : Colors.white,
+                  fontWeight: FontWeight.w700),
+            ),
           )
         ],
       ),

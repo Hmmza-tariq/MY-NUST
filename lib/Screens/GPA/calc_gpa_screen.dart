@@ -87,37 +87,38 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
                       color: isLightMode ? Colors.black : Colors.white)),
               onPressed: () {
                 _saveSemesters();
-                if ((int.parse(newSemesterName) < 9) &&
-                    int.parse(newSemesterName) > 0) {
-                  setState(() {
-                    Semester sem = Semester(newSemesterName, [], gpa: 0);
-                    semesters = gpaProvider.addSemesterData(sem);
-                  });
-                  Navigator.pop(context);
-                } else {
-                  if (!isSnackBarVisible) {
+                if (newSemesterName.isNotEmpty) {
+                  if ((int.parse(newSemesterName) < 9) &&
+                      int.parse(newSemesterName) > 0) {
                     setState(() {
-                      isSnackBarVisible = true;
+                      Semester sem = Semester(newSemesterName, [], gpa: 0);
+                      semesters = gpaProvider.addSemesterData(sem);
                     });
-                    final snackBar = SnackBar(
-                      elevation: 0,
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      content: AwesomeSnackbarContent(
-                        title: 'Error',
-                        message: "Incorrect name",
-                        contentType: ContentType.warning,
-                      ),
-                    );
-
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(snackBar).closed.then((_) {
-                        setState(() {
-                          isSnackBarVisible = false;
-                        });
-                      });
+                    Navigator.pop(context);
                   }
+                }
+
+                if (!isSnackBarVisible) {
+                  setState(() {
+                    isSnackBarVisible = true;
+                  });
+                  final snackBar = SnackBar(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    content: AwesomeSnackbarContent(
+                      title: 'Error',
+                      message: "Incorrect name",
+                      contentType: ContentType.warning,
+                    ),
+                  );
+
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(snackBar).closed.then((_) {
+                      setState(() {
+                        isSnackBarVisible = false;
+                      });
+                    });
                 }
               },
             ),
@@ -204,6 +205,7 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
 
   void resultDialog(bool isLightMode) async {
     double gpa = calculateCGPA();
+
     Color gpaColor;
     if (gpa < 2.0) {
       gpaColor = Colors.red;
@@ -226,7 +228,7 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
                 description1: semesters.length.toDouble(),
                 title2: 'Credit Hours',
                 description2: credits.toDouble(),
-                marksObtained: gpa.toDouble(),
+                marksObtained: gpa,
                 marksTotal: (4).toDouble(),
                 type: 'CGPA',
                 isAbsolutes: false,
@@ -253,12 +255,15 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
         semesterCreditHours += subject.creditHours;
       }
 
+      print(
+          'semesterSGPA: $semesterSGPA,semesterCreditHours: $semesterCreditHours');
       totalQualityPoints += (semesterSGPA * semesterCreditHours);
       totalCreditHours += semesterCreditHours;
     }
     if (totalQualityPoints == 0 || totalCreditHours == 0) {
       return 0;
     }
+
     double cgpa = totalQualityPoints / totalCreditHours;
 
     return cgpa;

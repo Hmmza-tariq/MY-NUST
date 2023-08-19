@@ -69,6 +69,7 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
+                keyboardType: TextInputType.number,
                 style:
                     TextStyle(color: isLightMode ? Colors.black : Colors.white),
                 onChanged: (value) {
@@ -82,6 +83,7 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
                 controller: TextEditingController(text: semesterNo.toString()),
               ),
               TextField(
+                keyboardType: TextInputType.number,
                 style:
                     TextStyle(color: isLightMode ? Colors.black : Colors.white),
                 onChanged: (value) {
@@ -95,6 +97,7 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
                 controller: TextEditingController(text: sgpa.toString()),
               ),
               TextField(
+                keyboardType: TextInputType.number,
                 style:
                     TextStyle(color: isLightMode ? Colors.black : Colors.white),
                 onChanged: (value) {
@@ -131,30 +134,28 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
                   });
                   _saveSemesters();
                   Navigator.pop(context);
-                } else {
-                  if (!isSnackBarVisible) {
-                    setState(() {
-                      isSnackBarVisible = true;
-                    });
-                    final snackBar = SnackBar(
-                      elevation: 0,
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      content: AwesomeSnackbarContent(
-                        title: 'Error',
-                        message: "Incorrect Data",
-                        contentType: ContentType.warning,
-                      ),
-                    );
+                }
+                if (!isSnackBarVisible) {
+                  setState(() {
+                    isSnackBarVisible = true;
+                  });
+                  final snackBar = SnackBar(
+                    elevation: 0,
+                    backgroundColor: Colors.transparent,
+                    content: AwesomeSnackbarContent(
+                      title: 'Error',
+                      message: "Incorrect Data",
+                      contentType: ContentType.warning,
+                    ),
+                  );
 
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(snackBar).closed.then((_) {
-                        setState(() {
-                          isSnackBarVisible = false;
-                        });
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(snackBar).closed.then((_) {
+                      setState(() {
+                        isSnackBarVisible = false;
                       });
-                  }
+                    });
                 }
               },
             ),
@@ -281,10 +282,10 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
                     setState(() {
                       isSnackBarVisible = true;
                     });
+
                     final snackBar = SnackBar(
-                      elevation: 0,
-                      behavior: SnackBarBehavior.floating,
                       backgroundColor: Colors.transparent,
+                      elevation: 0,
                       content: AwesomeSnackbarContent(
                         title: 'Error',
                         message: "Incorrect Data",
@@ -362,6 +363,8 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
     for (var semester in semesters) {
       double semesterSGPA = semester.sgpa;
       int semesterCreditHours = semester.credits;
+      print(
+          'semesterSGPA: $semesterSGPA,semesterCreditHours: $semesterCreditHours');
 
       totalQualityPoints += (semesterSGPA * semesterCreditHours);
       totalCreditHours += semesterCreditHours;
