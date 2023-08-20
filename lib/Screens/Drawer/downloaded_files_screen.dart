@@ -5,6 +5,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:swipeable_tile/swipeable_tile.dart';
 
 import '../../Components/hex_color.dart';
 import '../../Core/app_Theme.dart';
@@ -19,7 +20,7 @@ class DownloadedFilesScreen extends StatefulWidget {
 
 class DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
   late Future<List<FileSystemEntity>> files;
-
+  List<FileSystemEntity> fileList = [];
   @override
   void initState() {
     super.initState();
@@ -35,6 +36,84 @@ class DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
     } else {
       await filePath.create(recursive: true);
       return [];
+    }
+  }
+
+  Future<void> deleteAllFilesInDirectory() async {
+    String directoryPath = await getPath();
+    final directory = Directory(directoryPath);
+
+    if (await directory.exists()) {
+      final files = await directory.list().toList();
+
+      for (var file in files) {
+        if (file is File) {
+          await file.delete();
+        }
+      }
+      setState(() {
+        fileList.clear();
+      });
+    }
+  }
+
+  Future<String> getPath() async {
+    final Directory? tempDir = await getExternalStorageDirectory();
+    final filePath = Directory("${tempDir!.path}/files");
+    if (await filePath.exists()) {
+      return filePath.path;
+    } else {
+      await filePath.create(recursive: true);
+      return filePath.path;
+    }
+  }
+
+  void _deleteDialog(BuildContext context, bool isLightMode) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor:
+              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+          title: Text(
+            'Confirm Delete',
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isLightMode ? Colors.black : Colors.white),
+          ),
+          content: Text('Are you sure you want to delete all files?',
+              style: TextStyle(
+                  fontSize: 14,
+                  color: isLightMode ? Colors.black : Colors.white)),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel',
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: isLightMode ? Colors.black : Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteAllFilesInDirectory();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Delete',
+                  style: TextStyle(fontSize: 14, color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> deleteFile(String filePath) async {
+    final file = File(filePath);
+    if (await file.exists()) {
+      await file.delete();
     }
   }
 
@@ -61,6 +140,11 @@ class DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
               fontWeight: FontWeight.bold,
               color: isLightMode ? Colors.black : Colors.white),
         ),
+        actions: [
+          IconButton(
+              onPressed: () => _deleteDialog(context, isLightMode),
+              icon: const Icon(Icons.delete_rounded))
+        ],
       ),
       body: FutureBuilder<List<FileSystemEntity>>(
         future: files,
@@ -73,41 +157,73 @@ class DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
               ),
             );
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return const Center(
+                child: Text('Error!', style: TextStyle(color: Colors.red)));
           } else {
-            final fileList = snapshot.data ?? [];
+            fileList = snapshot.data ?? [];
             if (fileList.isEmpty) {
-              return const Center(child: Text('No files found.'));
+              return Center(
+                  child: Text('No files found.',
+                      style: TextStyle(
+                          color: isLightMode ? Colors.black : Colors.white)));
             }
             return ListView.builder(
               itemCount: fileList.length,
               itemBuilder: (context, index) {
                 final file = fileList[index];
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: themeProvider.primaryColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                          color: isLightMode
-                              ? AppTheme.grey
-                              : themeProvider.primaryColor.withOpacity(0.8),
-                          width: 3),
+                return SwipeableTile.card(
+                    color: Colors.transparent,
+                    shadow: const BoxShadow(
+                      color: Colors.transparent,
+                      blurRadius: 0,
+                      offset: Offset(2, 2),
                     ),
-                    child: ListTile(
-                      onTap: () => OpenFile.open(file.path),
-                      title: Text(' ${file.uri.pathSegments.last}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              color:
-                                  isLightMode ? Colors.black : Colors.white)),
-                      leading: Icon(Icons.open_in_new_rounded,
-                          color: isLightMode ? Colors.black : Colors.white),
-                    ),
-                  ),
-                );
+                    horizontalPadding: 0,
+                    verticalPadding: 0,
+                    direction: SwipeDirection.horizontal,
+                    onSwiped: (direction) => deleteFile(file.path),
+                    backgroundBuilder: (context, direction, progress) {
+                      return AnimatedBuilder(
+                        animation: progress,
+                        builder: (context, child) {
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 400),
+                            color: progress.value > 0.4
+                                ? const Color(0xFFed7474)
+                                : isLightMode
+                                    ? AppTheme.white
+                                    : AppTheme.nearlyBlack,
+                          );
+                        },
+                      );
+                    },
+                    key: UniqueKey(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: themeProvider.primaryColor.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                              color: isLightMode
+                                  ? AppTheme.grey
+                                  : themeProvider.primaryColor.withOpacity(0.8),
+                              width: 3),
+                        ),
+                        child: ListTile(
+                          onTap: () => OpenFile.open(file.path),
+                          title: Text(' ${file.uri.pathSegments.last}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  color: isLightMode
+                                      ? Colors.black
+                                      : Colors.white)),
+                          leading: Icon(Icons.open_in_new_rounded,
+                              color: isLightMode ? Colors.black : Colors.white),
+                        ),
+                      ),
+                    ));
               },
             );
           }

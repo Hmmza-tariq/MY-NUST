@@ -17,6 +17,7 @@ class _QalamScreenState extends State<QalamScreen>
   AnimationController? animationController;
   bool showCopyButton = true;
   bool forwardAnimation = true;
+  Timer? _timer;
   @override
   void initState() {
     animationController = AnimationController(
@@ -27,7 +28,7 @@ class _QalamScreenState extends State<QalamScreen>
         setState(() {
           animationController!.repeat();
           forwardAnimation = false;
-          Timer(const Duration(milliseconds: 700), () {
+          _timer = Timer(const Duration(milliseconds: 700), () {
             if (mounted) {
               setState(() {
                 animationController!.stop();
@@ -46,6 +47,7 @@ class _QalamScreenState extends State<QalamScreen>
   @override
   void dispose() {
     animationController?.dispose();
+    _timer!.cancel();
     super.dispose();
   }
 
