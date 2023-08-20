@@ -194,8 +194,12 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     itemCount = homeList.length;
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarIconBrightness:
-            isLightMode ? Brightness.dark : Brightness.light));
+      statusBarIconBrightness: isLightMode ? Brightness.dark : Brightness.light,
+      systemNavigationBarColor:
+          isLightMode ? AppTheme.white : AppTheme.nearlyBlack,
+      systemNavigationBarIconBrightness:
+          isLightMode ? Brightness.dark : Brightness.light,
+    ));
 
     Animation<double> scaleAnimation1 =
         Tween<double>(begin: 0, end: 1.0).animate(

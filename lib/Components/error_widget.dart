@@ -1,33 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:mynust/Core/app_theme.dart';
-import 'package:provider/provider.dart';
 
-import '../Core/theme_provider.dart';
-
-class ErrorScreen extends StatelessWidget {
+class ErrorScreen extends StatefulWidget {
   const ErrorScreen({
     super.key,
     required this.errorName,
   });
   final String errorName;
+
+  @override
+  State<ErrorScreen> createState() => _ErrorScreenState();
+}
+
+class _ErrorScreenState extends State<ErrorScreen> {
   @override
   Widget build(BuildContext context) {
-    bool isLightMode = Provider.of<ThemeProvider>(context).isLightMode ??
-        MediaQuery.of(context).platformBrightness == Brightness.light;
+    // Provider.of<InternetProvider>(context).isConnected ? Navigator.pop(context) : null;
     return Container(
-      color: isLightMode ? Colors.white : Colors.black,
+      color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            errorName.toUpperCase(),
-            style: TextStyle(
+            widget.errorName.toUpperCase(),
+            style: const TextStyle(
               decoration: TextDecoration.none,
               fontFamily: AppTheme.fontName,
               fontSize: 15,
               fontWeight: FontWeight.bold,
-              color: isLightMode ? Colors.black : Colors.white,
+              color: Colors.black,
             ),
           ),
           SizedBox(

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:mynust/Core/internet_manager.dart';
 import '../../Components/clipboard_widget.dart';
 import '../../Components/webview.dart';
 
@@ -22,11 +21,6 @@ class _QalamScreenState extends State<QalamScreen>
   void initState() {
     animationController = AnimationController(
         duration: const Duration(milliseconds: 2000), vsync: this);
-
-    if (!isConnected) {
-      showCopyButton = false;
-      forwardAnimation = false;
-    }
 
     Timer(const Duration(seconds: 50), () {
       if (mounted) {

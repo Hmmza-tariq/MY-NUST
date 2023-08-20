@@ -68,77 +68,79 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
                 fontWeight: FontWeight.bold,
                 color: isLightMode ? Colors.black : Colors.white),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                style:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
-                onChanged: (value) {
-                  subjectName = value;
-                },
-                decoration: InputDecoration(
-                  labelText: 'Subject Name',
-                  labelStyle: TextStyle(
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  style: TextStyle(
                       color: isLightMode ? Colors.black : Colors.white),
+                  onChanged: (value) {
+                    subjectName = value;
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Subject Name',
+                    labelStyle: TextStyle(
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
+                  controller: TextEditingController(text: subjectName),
                 ),
-                controller: TextEditingController(text: subjectName),
-              ),
-              DropdownButtonFormField<int>(
-                dropdownColor:
-                    isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-                style:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
-                value: selectedCreditHours,
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedCreditHours = newValue!;
-                  });
-                },
-                items: creditHoursList.map((creditHours) {
-                  return DropdownMenuItem<int>(
-                    value: creditHours,
-                    child: Text(
-                      creditHours.toString(),
-                      style: TextStyle(
-                          color: isLightMode ? Colors.black : Colors.white),
-                    ),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  labelText: 'Credit Hours',
-                  labelStyle: TextStyle(
+                DropdownButtonFormField<int>(
+                  dropdownColor:
+                      isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+                  style: TextStyle(
                       color: isLightMode ? Colors.black : Colors.white),
+                  value: selectedCreditHours,
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedCreditHours = newValue!;
+                    });
+                  },
+                  items: creditHoursList.map((creditHours) {
+                    return DropdownMenuItem<int>(
+                      value: creditHours,
+                      child: Text(
+                        creditHours.toString(),
+                        style: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                      ),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'Credit Hours',
+                    labelStyle: TextStyle(
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
                 ),
-              ),
-              DropdownButtonFormField<String>(
-                dropdownColor:
-                    isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-                style:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
-                value: selectedExpectedGrade,
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedExpectedGrade = newValue!;
-                  });
-                },
-                items: expectedGradesList.map((grade) {
-                  return DropdownMenuItem<String>(
-                    value: grade,
-                    child: Text(
-                      grade,
-                      style: TextStyle(
-                          color: isLightMode ? Colors.black : Colors.white),
-                    ),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  labelText: 'Expected Grade',
-                  labelStyle: TextStyle(
+                DropdownButtonFormField<String>(
+                  dropdownColor:
+                      isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+                  style: TextStyle(
                       color: isLightMode ? Colors.black : Colors.white),
+                  value: selectedExpectedGrade,
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedExpectedGrade = newValue!;
+                    });
+                  },
+                  items: expectedGradesList.map((grade) {
+                    return DropdownMenuItem<String>(
+                      value: grade,
+                      child: Text(
+                        grade,
+                        style: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                      ),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'Expected Grade',
+                    labelStyle: TextStyle(
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: <Widget>[
             TextButton(
@@ -159,28 +161,29 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
                     selectedCreditHours = 0;
                   });
                   Navigator.pop(context);
-                }
-                if (!isSnackBarVisible) {
-                  setState(() {
-                    isSnackBarVisible = true;
-                  });
-                  final snackBar = SnackBar(
-                    elevation: 0,
-                    backgroundColor: Colors.transparent,
-                    content: AwesomeSnackbarContent(
-                      title: 'Error',
-                      message: "Incorrect name",
-                      contentType: ContentType.warning,
-                    ),
-                  );
-
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(snackBar).closed.then((_) {
-                      setState(() {
-                        isSnackBarVisible = false;
-                      });
+                } else {
+                  if (!isSnackBarVisible) {
+                    setState(() {
+                      isSnackBarVisible = true;
                     });
+                    final snackBar = SnackBar(
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error',
+                        message: "Incorrect name",
+                        contentType: ContentType.warning,
+                      ),
+                    );
+
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar).closed.then((_) {
+                        setState(() {
+                          isSnackBarVisible = false;
+                        });
+                      });
+                  }
                 }
               },
             ),
@@ -321,78 +324,80 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
                 fontWeight: FontWeight.bold,
                 color: isLightMode ? Colors.black : Colors.white),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                style:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
-                onChanged: (value) {
-                  setState(() {
-                    subjectName = value;
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'Subject Name',
-                  labelStyle: TextStyle(
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  style: TextStyle(
                       color: isLightMode ? Colors.black : Colors.white),
+                  onChanged: (value) {
+                    setState(() {
+                      subjectName = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Subject Name',
+                    labelStyle: TextStyle(
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
                 ),
-              ),
-              DropdownButtonFormField<int>(
-                dropdownColor:
-                    isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-                style:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
-                value: selectedCreditHours,
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedCreditHours = newValue!;
-                  });
-                },
-                items: creditHoursList.map((creditHours) {
-                  return DropdownMenuItem<int>(
-                    value: creditHours,
-                    child: Text(
-                      creditHours.toString(),
-                      style: TextStyle(
-                          color: isLightMode ? Colors.black : Colors.white),
-                    ),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  labelText: 'Credit Hours',
-                  labelStyle: TextStyle(
+                DropdownButtonFormField<int>(
+                  dropdownColor:
+                      isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+                  style: TextStyle(
                       color: isLightMode ? Colors.black : Colors.white),
+                  value: selectedCreditHours,
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedCreditHours = newValue!;
+                    });
+                  },
+                  items: creditHoursList.map((creditHours) {
+                    return DropdownMenuItem<int>(
+                      value: creditHours,
+                      child: Text(
+                        creditHours.toString(),
+                        style: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                      ),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'Credit Hours',
+                    labelStyle: TextStyle(
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
                 ),
-              ),
-              DropdownButtonFormField<String>(
-                dropdownColor:
-                    isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-                style:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
-                value: selectedExpectedGrade,
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedExpectedGrade = newValue!;
-                  });
-                },
-                items: expectedGradesList.map((grade) {
-                  return DropdownMenuItem<String>(
-                    value: grade,
-                    child: Text(
-                      grade,
-                      style: TextStyle(
-                          color: isLightMode ? Colors.black : Colors.white),
-                    ),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  labelText: 'Expected Grade',
-                  labelStyle: TextStyle(
+                DropdownButtonFormField<String>(
+                  dropdownColor:
+                      isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+                  style: TextStyle(
                       color: isLightMode ? Colors.black : Colors.white),
+                  value: selectedExpectedGrade,
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedExpectedGrade = newValue!;
+                    });
+                  },
+                  items: expectedGradesList.map((grade) {
+                    return DropdownMenuItem<String>(
+                      value: grade,
+                      child: Text(
+                        grade,
+                        style: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                      ),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'Expected Grade',
+                    labelStyle: TextStyle(
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: <Widget>[
             TextButton(
@@ -410,28 +415,29 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
                     updateData();
                   });
                   Navigator.pop(context);
-                }
-                if (!isSnackBarVisible) {
-                  setState(() {
-                    isSnackBarVisible = true;
-                  });
-                  final snackBar = SnackBar(
-                    elevation: 0,
-                    backgroundColor: Colors.transparent,
-                    content: AwesomeSnackbarContent(
-                      title: '',
-                      message: "Incorrect name",
-                      contentType: ContentType.warning,
-                    ),
-                  );
-
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(snackBar).closed.then((_) {
-                      setState(() {
-                        isSnackBarVisible = false;
-                      });
+                } else {
+                  if (!isSnackBarVisible) {
+                    setState(() {
+                      isSnackBarVisible = true;
                     });
+                    final snackBar = SnackBar(
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: '',
+                        message: "Incorrect name",
+                        contentType: ContentType.warning,
+                      ),
+                    );
+
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar).closed.then((_) {
+                        setState(() {
+                          isSnackBarVisible = false;
+                        });
+                      });
+                  }
                 }
               },
             ),

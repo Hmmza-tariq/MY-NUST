@@ -96,29 +96,29 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
                     });
                     Navigator.pop(context);
                   }
-                }
-
-                if (!isSnackBarVisible) {
-                  setState(() {
-                    isSnackBarVisible = true;
-                  });
-                  final snackBar = SnackBar(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                    content: AwesomeSnackbarContent(
-                      title: 'Error',
-                      message: "Incorrect name",
-                      contentType: ContentType.warning,
-                    ),
-                  );
-
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(snackBar).closed.then((_) {
-                      setState(() {
-                        isSnackBarVisible = false;
-                      });
+                } else {
+                  if (!isSnackBarVisible) {
+                    setState(() {
+                      isSnackBarVisible = true;
                     });
+                    final snackBar = SnackBar(
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error',
+                        message: "Incorrect name",
+                        contentType: ContentType.warning,
+                      ),
+                    );
+
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar).closed.then((_) {
+                        setState(() {
+                          isSnackBarVisible = false;
+                        });
+                      });
+                  }
                 }
               },
             ),

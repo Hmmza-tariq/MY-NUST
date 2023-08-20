@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:mynust/Core/internet_manager.dart';
 import '../../Components/clipboard_widget.dart';
 import '../../Components/webview.dart';
 
@@ -13,7 +12,8 @@ class LmsScreen extends StatefulWidget {
 }
 
 class _LmsScreenState extends State<LmsScreen> with TickerProviderStateMixin {
-  var initialUrl = 'https://lms.nust.edu.pk/portal/my/';
+  var initialUrl =
+      'https://lms.nust.edu.pk/portal/calendar/view.php?view=month';
   AnimationController? animationController;
   bool showCopyButton = true;
   bool forwardAnimation = true;
@@ -24,10 +24,6 @@ class _LmsScreenState extends State<LmsScreen> with TickerProviderStateMixin {
     animationController = AnimationController(
         duration: const Duration(milliseconds: 2000), vsync: this);
 
-    if (!isConnected) {
-      showCopyButton = false;
-      forwardAnimation = false;
-    }
     _timer = Timer(Duration(seconds: _duration), () {
       if (mounted) {
         setState(() {

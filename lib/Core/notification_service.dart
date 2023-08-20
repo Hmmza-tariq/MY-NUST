@@ -41,6 +41,7 @@ class NotificationService {
       String? body,
       String? payLoad,
       required DateTime scheduledNotificationDateTime}) async {
+    requestNotificationPermission();
     return _notification.zonedSchedule(
         id,
         title,

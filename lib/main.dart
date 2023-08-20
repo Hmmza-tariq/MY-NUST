@@ -6,12 +6,14 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:mynust/Core/internet_provider.dart';
 import 'package:mynust/Core/notice_board_provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Components/error_widget.dart';
 import 'Components/hex_color.dart';
+import 'Core/app_Theme.dart';
 import 'Core/assessment_provider.dart';
 import 'Core/gpa_provider.dart';
 import 'Core/notification_service.dart';
@@ -63,6 +65,9 @@ Future<void> main() async {
           ),
           ChangeNotifierProvider<AssessmentProvider>(
             create: (_) => AssessmentProvider(),
+          ),
+          ChangeNotifierProvider<InternetProvider>(
+            create: (_) => InternetProvider(),
           ),
         ],
         child: const MyApp(),
@@ -139,12 +144,20 @@ class _MyAppState extends State<MyApp> {
       statusBarIconBrightness: isLightMode ? Brightness.dark : Brightness.light,
       statusBarBrightness:
           !kIsWeb && Platform.isAndroid ? Brightness.dark : Brightness.light,
-      systemNavigationBarColor: Colors.white,
+      systemNavigationBarColor:
+          isLightMode ? AppTheme.white : AppTheme.nearlyBlack,
       systemNavigationBarDividerColor: Colors.transparent,
-      systemNavigationBarIconBrightness: Brightness.dark,
+      systemNavigationBarIconBrightness:
+          isLightMode ? Brightness.dark : Brightness.light,
     ));
+
     return MaterialApp(
-      // showPerformanceOverlay: true,
+      builder: (BuildContext context, Widget? child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+          child: child!,
+        );
+      },
       title: 'My Nust',
       debugShowCheckedModeBanner: false,
       theme: ThemeProvider.theme,
