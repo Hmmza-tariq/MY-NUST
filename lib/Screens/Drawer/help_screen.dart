@@ -5,7 +5,7 @@ import '../../Core/app_theme.dart';
 import 'package:flutter/material.dart';
 
 import '../../Core/email.dart';
-import '../../Core/theme_provider.dart';
+import '../../Provider/theme_provider.dart';
 
 class HelpScreen extends StatefulWidget {
   const HelpScreen({super.key});

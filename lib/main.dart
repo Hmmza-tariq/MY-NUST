@@ -6,18 +6,18 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:mynust/Core/internet_provider.dart';
-import 'package:mynust/Core/notice_board_provider.dart';
+import 'package:mynust/Provider/internet_provider.dart';
+import 'package:mynust/Provider/notice_board_provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Components/error_widget.dart';
 import 'Components/hex_color.dart';
 import 'Core/app_Theme.dart';
-import 'Core/assessment_provider.dart';
-import 'Core/gpa_provider.dart';
+import 'Provider/assessment_provider.dart';
+import 'Provider/gpa_provider.dart';
 import 'Core/notification_service.dart';
-import 'Core/theme_provider.dart';
+import 'Provider/theme_provider.dart';
 import 'Screens/Home/home_drawer_list.dart';
 
 Future<void> main() async {

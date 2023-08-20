@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../Components/webview.dart';
-import '../../Core/notice_board_provider.dart';
+import '../../Provider/notice_board_provider.dart';
 
 class NoticeBoardScreen extends StatefulWidget {
   const NoticeBoardScreen({super.key});

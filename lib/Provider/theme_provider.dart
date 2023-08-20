@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'app_theme.dart';
+import '../Core/app_theme.dart';
 
 class ThemeProvider with ChangeNotifier {
   bool? isLightMode;

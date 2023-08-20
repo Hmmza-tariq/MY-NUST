@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../Core/app_Theme.dart';
-import '../Core/theme_provider.dart';
+import '../Provider/theme_provider.dart';
 import 'large_slider_items.dart';
 
 class LargeSlider extends StatelessWidget {

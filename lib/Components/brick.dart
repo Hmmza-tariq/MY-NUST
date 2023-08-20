@@ -1,19 +1,19 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:mynust/Core/app_theme.dart';
-import 'package:mynust/Core/theme_provider.dart';
+import 'package:mynust/Provider/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:vector_math/vector_math.dart' as vector;
 
-class WaveView extends StatefulWidget {
+class BrickView extends StatefulWidget {
   final String grade;
 
-  const WaveView({Key? key, required this.grade}) : super(key: key);
+  const BrickView({Key? key, required this.grade}) : super(key: key);
   @override
-  WaveViewState createState() => WaveViewState();
+  BrickViewState createState() => BrickViewState();
 }
 
-class WaveViewState extends State<WaveView> with TickerProviderStateMixin {
+class BrickViewState extends State<BrickView> with TickerProviderStateMixin {
   AnimationController? animationController;
   AnimationController? waveAnimationController;
   Offset bottleOffset1 = const Offset(0, 0);
@@ -130,7 +130,7 @@ class WaveViewState extends State<WaveView> with TickerProviderStateMixin {
   }
 
   @override
-  void didUpdateWidget(WaveView oldWidget) {
+  void didUpdateWidget(BrickView oldWidget) {
     if (oldWidget.grade != widget.grade) {
       getData();
     }

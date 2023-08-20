@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../Core/theme_provider.dart';
+import '../Provider/theme_provider.dart';
 
 class RoundedButton extends StatefulWidget {
   final String title;

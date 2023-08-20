@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:mynust/Core/internet_provider.dart';
+import 'package:mynust/Provider/internet_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../Components/hex_color.dart';
@@ -11,13 +11,13 @@ class InternetManager {
   static late ConnectivityResult result;
   static late StreamSubscription subscription;
   static void checkInternet(context, {int count = 2}) async {
-    InternetProvider IP = Provider.of<InternetProvider>(context, listen: false);
+    InternetProvider ip = Provider.of<InternetProvider>(context, listen: false);
     result = await Connectivity().checkConnectivity();
     if (result != ConnectivityResult.none) {
-      IP.setConnection(true);
+      ip.setConnection(true);
       count = 0;
     } else {
-      IP.setConnection(false);
+      ip.setConnection(false);
       count--;
       showDialogBox(context, count);
     }

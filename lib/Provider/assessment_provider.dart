@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'assessments.dart';
+import '../Core/assessments.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AssessmentProvider extends ChangeNotifier {

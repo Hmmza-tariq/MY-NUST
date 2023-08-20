@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../Components/hex_color.dart';
 import '../Core/app_theme.dart';
-import '../Core/theme_provider.dart';
+import '../Provider/theme_provider.dart';
 import 'brick.dart';
 
 class Card2Widget extends StatefulWidget {
@@ -270,7 +270,7 @@ class Card2WidgetState extends State<Card2Widget>
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 16, right: 14),
-                child: WaveView(
+                child: BrickView(
                   grade: grade,
                 ),
               )

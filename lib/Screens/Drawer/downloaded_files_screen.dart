@@ -9,7 +9,7 @@ import 'package:swipeable_tile/swipeable_tile.dart';
 
 import '../../Components/hex_color.dart';
 import '../../Core/app_Theme.dart';
-import '../../Core/theme_provider.dart';
+import '../../Provider/theme_provider.dart';
 
 class DownloadedFilesScreen extends StatefulWidget {
   const DownloadedFilesScreen({super.key});

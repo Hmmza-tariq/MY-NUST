@@ -10,7 +10,7 @@ import '../../Components/action_button.dart';
 import '../../Components/result_screen.dart';
 import '../../Core/assessments.dart';
 import '../../Core/app_theme.dart';
-import '../../Core/theme_provider.dart';
+import '../../Provider/theme_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CalcAbsoluteScreen extends StatefulWidget {

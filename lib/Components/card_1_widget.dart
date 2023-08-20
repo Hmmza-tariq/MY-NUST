@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'dart:math' as math;
 
 import '../../Components/hex_color.dart';
-import '../Core/theme_provider.dart';
+import '../Provider/theme_provider.dart';
 
 class Card1Widget extends StatelessWidget {
   final AnimationController? animationController;

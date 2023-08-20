@@ -8,8 +8,8 @@ import '../../Components/card_2_widget.dart';
 import '../../Components/result_screen.dart';
 import '../../Core/semester.dart';
 import '../../Core/app_theme.dart';
-import '../../Core/gpa_provider.dart';
-import '../../Core/theme_provider.dart';
+import '../../Provider/gpa_provider.dart';
+import '../../Provider/theme_provider.dart';
 
 class CalcSgpaScreen extends StatefulWidget {
   final Semester semester;

@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../Core/app_Theme.dart';
 
-class ResultDialog {
+class ErrorResultDialog {
   static void showError(
       {required context,
       required String description,

@@ -16,7 +16,7 @@ import '../../Components/small_slider.dart';
 import '../../Components/small_slider_items.dart';
 import '../../Core/app_theme.dart';
 import '../../Components/large_slider_items.dart';
-import '../../Core/theme_provider.dart';
+import '../../Provider/theme_provider.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);

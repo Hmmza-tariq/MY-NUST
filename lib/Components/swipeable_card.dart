@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 
 import '../Core/app_Theme.dart';
-import '../Core/theme_provider.dart';
+import '../Provider/theme_provider.dart';
 
 class SwipeCard extends StatefulWidget {
   const SwipeCard({super.key, required this.func1, required this.child});
