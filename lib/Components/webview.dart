@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../Core/app_Theme.dart';
-import '../Core/internet_provider.dart';
+import '../Provider/internet_provider.dart';
 import '../Screens/Web view/online_file_screen.dart';
 import 'hex_color.dart';
 import '../Core/internet_manager.dart';
@@ -73,7 +73,6 @@ class _WebsiteViewState extends State<WebsiteView> {
           },
           onNavigationRequest: (NavigationRequest request) async {
             String url = request.url;
-            print('downloading: $url');
             List<String> downloadableExtensions = [
               '.pdf',
               '.docx',

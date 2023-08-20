@@ -7,12 +7,12 @@ import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/card_1_widget.dart';
 import '../../Components/result_screen.dart';
 import '../../Core/app_theme.dart';
-import '../../Core/theme_provider.dart';
+import '../../Provider/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Components/action_button.dart';
 import '../../Core/semester.dart';
-import '../../Core/gpa_provider.dart';
+import '../../Provider/gpa_provider.dart';
 import 'calc_sgpa_screen.dart.dart';
 
 class CalcGpaScreen extends StatefulWidget {
@@ -255,8 +255,6 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
         semesterCreditHours += subject.creditHours;
       }
 
-      print(
-          'semesterSGPA: $semesterSGPA,semesterCreditHours: $semesterCreditHours');
       totalQualityPoints += (semesterSGPA * semesterCreditHours);
       totalCreditHours += semesterCreditHours;
     }

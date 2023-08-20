@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mynust/Components/webview.dart';
 import 'package:provider/provider.dart';
 import '../../Core/app_theme.dart';
-import '../../Core/theme_provider.dart';
+import '../../Provider/theme_provider.dart';
 
 class AboutScreen extends StatefulWidget {
   static String id = "About_Screen";

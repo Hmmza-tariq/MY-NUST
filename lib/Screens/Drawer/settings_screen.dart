@@ -1,6 +1,6 @@
 import 'package:info_popup/info_popup.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:mynust/Core/notice_board_provider.dart';
+import 'package:mynust/Provider/notice_board_provider.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,7 +8,7 @@ import 'package:group_radio_button/group_radio_button.dart';
 import '../../Core/app_theme.dart';
 import 'package:flutter/material.dart';
 
-import '../../Core/theme_provider.dart';
+import '../../Provider/theme_provider.dart';
 import 'downloaded_files_screen.dart';
 
 class SettingsScreen extends StatefulWidget {

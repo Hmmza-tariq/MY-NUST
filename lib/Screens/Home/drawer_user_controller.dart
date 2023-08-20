@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../Core/app_theme.dart';
 import 'package:flutter/material.dart';
 
-import '../../Core/theme_provider.dart';
+import '../../Provider/theme_provider.dart';
 
 class DrawerUserController extends StatefulWidget {
   const DrawerUserController({

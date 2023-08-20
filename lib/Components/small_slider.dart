@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../Components/hex_color.dart';
 import '../Core/app_theme.dart';
-import '../Core/theme_provider.dart';
+import '../Provider/theme_provider.dart';
 
 class SmallSlider extends StatefulWidget {
   const SmallSlider(

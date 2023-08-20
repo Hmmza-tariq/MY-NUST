@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'semester.dart';
+import '../Core/semester.dart';
 
 class GpaProvider with ChangeNotifier {
   List<Semester> semesters = [];

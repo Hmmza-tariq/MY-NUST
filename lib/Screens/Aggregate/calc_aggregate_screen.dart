@@ -5,7 +5,7 @@ import 'package:mynust/Components/action_button.dart';
 import 'package:page_transition/page_transition.dart';
 import '../../Components/result_screen.dart';
 import '../../Core/app_theme.dart';
-import '../../Core/theme_provider.dart';
+import '../../Provider/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class CalcAggregateScreen extends StatefulWidget {

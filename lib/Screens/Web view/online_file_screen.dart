@@ -1,14 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
-import 'dart:isolate';
-import 'dart:ui';
 
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mynust/Core/notification_service.dart';
 import 'package:open_file/open_file.dart';
@@ -25,44 +22,25 @@ class OnlineFileScreen extends StatefulWidget {
 }
 
 class _OnlineFileScreenState extends State<OnlineFileScreen> {
-  final ReceivePort _port = ReceivePort();
-  late var taskId;
-
-  bool fileExists = false;
-  bool isDownloading = false;
-  bool isDownloaded = false;
-  String title = "";
-  late String filePath;
-  late CancelToken cancelToken;
-  bool isPermission = false;
-  bool permissionGranted = false;
-  double progress = 0.0;
-  bool isPDF = false;
+  bool _fileExists = false;
+  bool _isDownloading = false;
+  bool _isDownloaded = false;
+  String _title = "";
+  late String _filePath;
+  late CancelToken _cancelToken;
+  bool _permissionGranted = false;
+  double _progress = 0.0;
+  bool _isPDF = false;
 
   @override
   void initState() {
     super.initState();
-    CheckPermission();
-    IsolateNameServer.registerPortWithName(
-        _port.sendPort, 'downloader_send_port');
-    _port.listen((dynamic data) {
-      String id = data[0];
-      DownloadTaskStatus status = data[1];
-      progress = data[2];
-      if (kDebugMode) {
-        print("Download progress: $progress%, id $id");
-      }
+    checkPermission();
 
-      if (status == DownloadTaskStatus.complete) {
-      } else {
-        FlutterDownloader.remove(taskId: taskId);
-      }
-    });
-    FlutterDownloader.registerCallback(downloadCallback);
     Uri uri = Uri.parse(widget.url);
-    title = uri.pathSegments.isNotEmpty ? uri.pathSegments.last : 'download';
+    _title = uri.pathSegments.isNotEmpty ? uri.pathSegments.last : 'download';
     if (widget.url.toLowerCase().endsWith(".pdf")) {
-      isPDF = true;
+      _isPDF = true;
     } else {
       startDownload(widget.url);
     }
@@ -70,64 +48,24 @@ class _OnlineFileScreenState extends State<OnlineFileScreen> {
 
   @override
   void dispose() {
-    IsolateNameServer.removePortNameMapping('downloader_send_port');
+    //IsolateNameServer.removePortNameMapping('downloader_send_port');
     // isDownloading ? cancelDownload() : null;
     super.dispose();
   }
 
   openFile() {
-    OpenFile.open(filePath);
+    OpenFile.open(_filePath);
   }
 
-  @pragma('vm:entry-point')
-  static void downloadCallback(
-      String id, DownloadTaskStatus status, int progress) {
-    final SendPort? send =
-        IsolateNameServer.lookupPortByName('downloader_send_port');
-    send?.send([id, status, progress]);
-  }
-
-  void CheckPermission() async {
+  void checkPermission() async {
     var hasStoragePermission = await Permission.storage.isGranted;
     if (!hasStoragePermission) {
       final status = await Permission.storage.request();
       hasStoragePermission = status.isGranted;
     }
     setState(() {
-      permissionGranted = hasStoragePermission;
+      _permissionGranted = hasStoragePermission;
     });
-  }
-
-  Future<void> downloadFile(String url, [String? filename]) async {
-    filePath = (await getTemporaryDirectory()).path;
-    var hasStoragePermission = await Permission.storage.isGranted;
-    if (!hasStoragePermission) {
-      final status = await Permission.storage.request();
-      hasStoragePermission = status.isGranted;
-    }
-    // print('downloadFile: $url');
-    if (hasStoragePermission) {
-      taskId = await FlutterDownloader.enqueue(
-          url: url,
-          headers: {},
-          savedDir: filePath,
-          saveInPublicStorage: true,
-          fileName: filename);
-      final snackBar = SnackBar(
-        elevation: 0,
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.transparent,
-        content: AwesomeSnackbarContent(
-          title: 'Downloading in progress',
-          message: "Check notification",
-          contentType: ContentType.help,
-        ),
-      );
-
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(snackBar);
-    }
   }
 
   Future<String> getPath() async {
@@ -143,49 +81,50 @@ class _OnlineFileScreenState extends State<OnlineFileScreen> {
 
   startDownload(String url) async {
     checkFileExit();
-    cancelToken = CancelToken();
-    var storePath = await getPath();
-    filePath = '$storePath/$title';
-    setState(() {
-      isDownloading = true;
-      NotificationService().showNotification(title: 'Downloading', body: title);
-      progress = 0;
-    });
 
     try {
-      if (!fileExists) {
-        await Dio().download(url, filePath, onReceiveProgress: (count, total) {
+      if (!_fileExists && _permissionGranted) {
+        _cancelToken = CancelToken();
+        var storePath = await getPath();
+        _filePath = '$storePath/$_title';
+        setState(() {
+          _isDownloading = true;
+          NotificationService()
+              .showNotification(title: 'Downloading', body: _title);
+          _progress = 0;
+        });
+        await Dio().download(url, _filePath, onReceiveProgress: (count, total) {
           setState(() {
-            progress = (count / total);
+            _progress = (count / total);
           });
-        }, cancelToken: cancelToken);
+        }, cancelToken: _cancelToken);
       } else {
-        progress = 1;
+        _progress = 1;
       }
       setState(() {
-        isDownloading = false;
-        isDownloaded = true;
-        fileExists = true;
+        _isDownloading = false;
+        _isDownloaded = true;
+        _fileExists = true;
         // openFile();
       });
     } catch (e) {
       setState(() {
-        isDownloading = false;
+        _isDownloading = false;
       });
     }
   }
 
   checkFileExit() async {
     var storePath = await getPath();
-    filePath = '$storePath/$title';
-    bool fileExistCheck = await File(filePath).exists();
+    _filePath = '$storePath/$_title';
+    bool fileExistCheck = await File(_filePath).exists();
     setState(() {
-      fileExists = fileExistCheck;
+      _fileExists = fileExistCheck;
     });
   }
 
   cancelDownload() {
-    cancelToken.cancel();
+    _cancelToken.cancel();
   }
 
   @override
@@ -195,9 +134,9 @@ class _OnlineFileScreenState extends State<OnlineFileScreen> {
         child: Scaffold(
             backgroundColor: AppTheme.white,
             appBar: AppBar(
-              title: Text(title),
+              title: Text(_title),
               actions: [
-                isDownloading
+                _isDownloading
                     ? Stack(
                         alignment: Alignment.center,
                         children: [
@@ -206,22 +145,22 @@ class _OnlineFileScreenState extends State<OnlineFileScreen> {
                             color: AppTheme.darkGrey,
                           ),
                           Text(
-                            '${(progress * 100).toStringAsFixed(0)}%',
+                            '${(_progress * 100).toStringAsFixed(0)}%',
                             style: const TextStyle(fontSize: 10),
                             textAlign: TextAlign.center,
                           )
                         ],
                       )
                     : IconButton(
-                        onPressed: () => isDownloaded
+                        onPressed: () => _isDownloaded
                             ? openFile()
                             : startDownload(widget.url),
-                        icon: Icon(isDownloaded
+                        icon: Icon(_isDownloaded
                             ? Icons.file_open_rounded
                             : Icons.download_rounded))
               ],
             ),
-            body: isPDF
+            body: _isPDF
                 ? SfPdfViewer.network(
                     widget.url,
                     onDocumentLoadFailed: (details) {
@@ -259,7 +198,7 @@ class _OnlineFileScreenState extends State<OnlineFileScreen> {
                       Padding(
                         padding: const EdgeInsets.all(24.0),
                         child: Text(
-                          'Downloading: $title',
+                          'Downloading: $_title',
                           textAlign: TextAlign.center,
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
@@ -268,3 +207,62 @@ class _OnlineFileScreenState extends State<OnlineFileScreen> {
                   ))));
   }
 }
+
+  // final ReceivePort _port = ReceivePort();
+  // late var taskId;
+  
+  // Future<void> downloadFile(String url, [String? filename]) async {
+  //   filePath = (await getTemporaryDirectory()).path;
+  //   var hasStoragePermission = await Permission.storage.isGranted;
+  //   if (!hasStoragePermission) {
+  //     final status = await Permission.storage.request();
+  //     hasStoragePermission = status.isGranted;
+  //   }
+  //   // print('downloadFile: $url');
+  //   if (hasStoragePermission) {
+  //     taskId = await FlutterDownloader.enqueue(
+  //         url: url,
+  //         headers: {},
+  //         savedDir: filePath,
+  //         saveInPublicStorage: true,
+  //         fileName: filename);
+  //     final snackBar = SnackBar(
+  //       elevation: 0,
+  //       behavior: SnackBarBehavior.floating,
+  //       backgroundColor: Colors.transparent,
+  //       content: AwesomeSnackbarContent(
+  //         title: 'Downloading in progress',
+  //         message: "Check notification",
+  //         contentType: ContentType.help,
+  //       ),
+  //     );
+  //     ScaffoldMessenger.of(context)
+  //       ..hideCurrentSnackBar()
+  //       ..showSnackBar(snackBar);
+  //   }
+  // }
+
+  // @pragma('vm:entry-point')
+  // static void downloadCallback(
+  //     String id, DownloadTaskStatus status, int progress) {
+  //   final SendPort? send =
+  //       IsolateNameServer.lookupPortByName('downloader_send_port');
+  //   send?.send([id, status, progress]);
+  // }
+
+
+    // IsolateNameServer.registerPortWithName(
+    //     _port.sendPort, 'downloader_send_port');
+    // _port.listen((dynamic data) {
+    //   String id = data[0];
+    //   DownloadTaskStatus status = data[1];
+    //   progress = data[2];
+    //   if (kDebugMode) {
+    //     print("Download progress: $progress%, id $id");
+    //   }
+    //   if (status == DownloadTaskStatus.complete) {
+    //   } else {
+    //     FlutterDownloader.remove(taskId: taskId);
+    //   }
+    // });
+    // FlutterDownloader.registerCallback(downloadCallback);

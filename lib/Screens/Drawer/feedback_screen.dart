@@ -3,7 +3,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import '../../Core/app_theme.dart';
 import '../../Core/email.dart';
-import '../../Core/theme_provider.dart';
+import '../../Provider/theme_provider.dart';
 
 class FeedbackScreen extends StatefulWidget {
   const FeedbackScreen({super.key});

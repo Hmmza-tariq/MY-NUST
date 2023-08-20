@@ -11,7 +11,7 @@ import '../../Components/card_1_widget.dart';
 import '../../Components/result_screen.dart';
 import '../../Core/app_theme.dart';
 import '../../Core/semester.dart';
-import '../../Core/theme_provider.dart';
+import '../../Provider/theme_provider.dart';
 
 class CalcCgpaScreen extends StatefulWidget {
   const CalcCgpaScreen({super.key});
@@ -369,8 +369,6 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
     for (var semester in semesters) {
       double semesterSGPA = semester.sgpa;
       int semesterCreditHours = semester.credits;
-      print(
-          'semesterSGPA: $semesterSGPA,semesterCreditHours: $semesterCreditHours');
 
       totalQualityPoints += (semesterSGPA * semesterCreditHours);
       totalCreditHours += semesterCreditHours;

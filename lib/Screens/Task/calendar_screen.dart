@@ -10,7 +10,7 @@ import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/action_button.dart';
 import '../../Core/app_Theme.dart';
 import '../../Core/notification_service.dart';
-import '../../Core/theme_provider.dart';
+import '../../Provider/theme_provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../../Core/events.dart';
 
