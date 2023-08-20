@@ -1,40 +1,51 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:mynust/Core/internet_provider.dart';
+import 'package:provider/provider.dart';
 
-late ConnectivityResult result;
-late StreamSubscription subscription;
-bool isConnected = true;
-checkInternet(context) async {
-  result = await Connectivity().checkConnectivity();
-  if (result != ConnectivityResult.none) {
-    isConnected = true;
-  } else {
-    isConnected = false;
-    showDialogBox(context);
+import '../Components/hex_color.dart';
+
+class InternetManager {
+  static late ConnectivityResult result;
+  static late StreamSubscription subscription;
+  static void checkInternet(context, {int count = 2}) async {
+    InternetProvider IP = Provider.of<InternetProvider>(context, listen: false);
+    result = await Connectivity().checkConnectivity();
+    if (result != ConnectivityResult.none) {
+      IP.setConnection(true);
+      count = 0;
+    } else {
+      IP.setConnection(false);
+      count--;
+      showDialogBox(context, count);
+    }
   }
-}
 
-showDialogBox(context) {
-  showDialog(
+  static void showDialogBox(BuildContext context, int count) {
+    showDialog(
       context: context,
-      builder: (context) => CupertinoAlertDialog(
-            title: const Text("No Internet"),
-            content: const Text("Please check your internet connection"),
-            actions: [
-              CupertinoButton.filled(
-                  child: const Text("Retry"),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    checkInternet(context);
-                  })
-            ],
-          ));
-}
+      builder: (context) {
+        if (count != 0) {
+          Future.delayed(const Duration(seconds: 3), () {
+            checkInternet(context, count: count);
+            Navigator.of(context).pop();
+          });
+        } else {
+          Navigator.of(context).pop();
+        }
+        return LoadingAnimationWidget.hexagonDots(
+          size: 40,
+          color: HexColor('#0F6FC5'),
+        );
+      },
+    );
+  }
 
-startStreaming(context) {
-  subscription = Connectivity().onConnectivityChanged.listen((event) async {
-    checkInternet(context);
-  });
+  static void startStreaming(context) {
+    subscription = Connectivity().onConnectivityChanged.listen((event) async {
+      checkInternet(context);
+    });
+  }
 }

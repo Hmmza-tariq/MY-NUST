@@ -1,9 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:mynust/Core/app_theme.dart';
 import 'package:share_files_and_screenshot_widgets/share_files_and_screenshot_widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Core/semester.dart';
 import 'action_button.dart';
@@ -55,16 +53,9 @@ class ResultScreen extends StatefulWidget {
 class _ResultScreenState extends State<ResultScreen> {
   final GlobalKey previewContainer = GlobalKey();
   bool isLightMode = false;
-  final adUnitId = 'ca-app-pub-8875342677218505/9904823569';
-  RewardedInterstitialAd? _rewardedInterstitialAd;
-  bool isAdLoaded = false;
-  bool adBlock = true;
-  int counter = 0;
 
   @override
   void initState() {
-    //_loadAdBlocker();
-    loadAd();
     super.initState();
     isLightMode = widget.isLightMode;
   }
@@ -75,42 +66,6 @@ class _ResultScreenState extends State<ResultScreen> {
         text:
             "Hey! Check this out. I calculated my expected $type using 'My NUST' app.");
     return true;
-  }
-
-  void loadAd() {
-    RewardedInterstitialAd.load(
-      adUnitId: adUnitId,
-      request: const AdRequest(),
-      rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          debugPrint('$ad loaded.,counter: $counter 1511');
-          setState(() {
-            isAdLoaded = true;
-            _rewardedInterstitialAd = ad;
-          });
-        },
-        onAdFailedToLoad: (LoadAdError error) {
-          debugPrint(
-              'RewardedInterstitialAd failed to load: $error,counter: $counter  1511');
-          setState(() {
-            isAdLoaded = false;
-          });
-        },
-      ),
-    );
-    (isAdLoaded && (counter == 0))
-        ? _rewardedInterstitialAd!.show(
-            onUserEarnedReward: (AdWithoutView ad, RewardItem rewardItem) {})
-        : null;
-  }
-
-  Future<void> _loadAdBlocker() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int value = prefs.getInt('adBlock') ?? 5;
-    await prefs.setInt('adBlock', (value == 0) ? 0 : (value--));
-    setState(() {
-      counter = value;
-    });
   }
 
   @override
@@ -234,34 +189,27 @@ class _ResultScreenState extends State<ResultScreen> {
                         ],
                       ),
                     ),
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(top: 10.0, right: 20, left: 20),
-                      child: Chart(
-                        marksObtained: widget.marksObtained,
-                        marksTotal: widget.marksTotal,
-                        isLightMode: isLightMode,
-                        defaultPadding: defaultPadding,
-                        isAbsolutes: widget.isAbsolutes,
-                        isAggregate: widget.isAggregate,
-                        isCGPA: widget.isCGPA,
-                        isGPA: widget.isGPA,
-                        isSGPA: widget.isSGPA,
-                        semesters: widget.semesters,
-                        sems: widget.sems,
-                        subjects: widget.subjects,
-                        color: widget.color,
-                      ),
+                    Chart(
+                      marksObtained: widget.marksObtained,
+                      marksTotal: widget.marksTotal,
+                      isLightMode: isLightMode,
+                      defaultPadding: defaultPadding,
+                      isAbsolutes: widget.isAbsolutes,
+                      isAggregate: widget.isAggregate,
+                      isCGPA: widget.isCGPA,
+                      isGPA: widget.isGPA,
+                      isSGPA: widget.isSGPA,
+                      semesters: widget.semesters,
+                      sems: widget.sems,
+                      subjects: widget.subjects,
+                      color: widget.color,
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
                 (widget.isAbsolutes || widget.isAggregate)
                     ? Container()
-                    : ConstrainedBox(
-                        constraints: BoxConstraints(
-                            minHeight: 0,
-                            maxHeight: (items * (55 + defaultPadding))),
+                    : Expanded(
                         child: ListView.builder(
                           itemCount: items,
                           itemBuilder: (context, index) {

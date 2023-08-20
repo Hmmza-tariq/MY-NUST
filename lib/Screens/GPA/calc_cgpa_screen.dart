@@ -65,52 +65,55 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
                 fontWeight: FontWeight.bold,
                 color: isLightMode ? Colors.black : Colors.white),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                keyboardType: TextInputType.number,
-                style:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
-                onChanged: (value) {
-                  semesterNo = int.parse(value);
-                },
-                decoration: InputDecoration(
-                  labelText: 'Semester no',
-                  labelStyle: TextStyle(
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(
                       color: isLightMode ? Colors.black : Colors.white),
+                  onChanged: (value) {
+                    semesterNo = int.parse(value);
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Semester no',
+                    labelStyle: TextStyle(
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
+                  controller:
+                      TextEditingController(text: semesterNo.toString()),
                 ),
-                controller: TextEditingController(text: semesterNo.toString()),
-              ),
-              TextField(
-                keyboardType: TextInputType.number,
-                style:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
-                onChanged: (value) {
-                  sgpa = double.parse(value);
-                },
-                decoration: InputDecoration(
-                  labelText: 'SGPA',
-                  labelStyle: TextStyle(
+                TextField(
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(
                       color: isLightMode ? Colors.black : Colors.white),
+                  onChanged: (value) {
+                    sgpa = double.parse(value);
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'SGPA',
+                    labelStyle: TextStyle(
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
+                  controller: TextEditingController(text: sgpa.toString()),
                 ),
-                controller: TextEditingController(text: sgpa.toString()),
-              ),
-              TextField(
-                keyboardType: TextInputType.number,
-                style:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
-                onChanged: (value) {
-                  credits = int.parse(value);
-                },
-                decoration: InputDecoration(
-                  labelText: 'Credit hours',
-                  labelStyle: TextStyle(
+                TextField(
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(
                       color: isLightMode ? Colors.black : Colors.white),
+                  onChanged: (value) {
+                    credits = int.parse(value);
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Credit hours',
+                    labelStyle: TextStyle(
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
+                  controller: TextEditingController(text: credits.toString()),
                 ),
-                controller: TextEditingController(text: credits.toString()),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: <Widget>[
             TextButton(
@@ -134,28 +137,29 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
                   });
                   _saveSemesters();
                   Navigator.pop(context);
-                }
-                if (!isSnackBarVisible) {
-                  setState(() {
-                    isSnackBarVisible = true;
-                  });
-                  final snackBar = SnackBar(
-                    elevation: 0,
-                    backgroundColor: Colors.transparent,
-                    content: AwesomeSnackbarContent(
-                      title: 'Error',
-                      message: "Incorrect Data",
-                      contentType: ContentType.warning,
-                    ),
-                  );
-
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(snackBar).closed.then((_) {
-                      setState(() {
-                        isSnackBarVisible = false;
-                      });
+                } else {
+                  if (!isSnackBarVisible) {
+                    setState(() {
+                      isSnackBarVisible = true;
                     });
+                    final snackBar = SnackBar(
+                      elevation: 0,
+                      backgroundColor: Colors.transparent,
+                      content: AwesomeSnackbarContent(
+                        title: 'Error',
+                        message: "Incorrect Data",
+                        contentType: ContentType.warning,
+                      ),
+                    );
+
+                    ScaffoldMessenger.of(context)
+                      ..hideCurrentSnackBar()
+                      ..showSnackBar(snackBar).closed.then((_) {
+                        setState(() {
+                          isSnackBarVisible = false;
+                        });
+                      });
+                  }
                 }
               },
             ),
@@ -207,55 +211,57 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
                 fontWeight: FontWeight.bold,
                 color: isLightMode ? Colors.black : Colors.white),
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                keyboardType: TextInputType.number,
-                style:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
-                onChanged: (value) {
-                  setState(() {
-                    semesterNo = int.parse(value);
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'Semester No',
-                  labelStyle: TextStyle(
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(
                       color: isLightMode ? Colors.black : Colors.white),
+                  onChanged: (value) {
+                    setState(() {
+                      semesterNo = int.parse(value);
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Semester No',
+                    labelStyle: TextStyle(
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
                 ),
-              ),
-              TextField(
-                keyboardType: TextInputType.number,
-                style:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
-                onChanged: (value) {
-                  setState(() {
-                    sgpa = double.parse(value);
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'SGPA',
-                  labelStyle: TextStyle(
+                TextField(
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(
                       color: isLightMode ? Colors.black : Colors.white),
+                  onChanged: (value) {
+                    setState(() {
+                      sgpa = double.parse(value);
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'SGPA',
+                    labelStyle: TextStyle(
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
                 ),
-              ),
-              TextField(
-                keyboardType: TextInputType.number,
-                style:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
-                onChanged: (value) {
-                  setState(() {
-                    credits = int.parse(value);
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'Credit Hours',
-                  labelStyle: TextStyle(
+                TextField(
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(
                       color: isLightMode ? Colors.black : Colors.white),
+                  onChanged: (value) {
+                    setState(() {
+                      credits = int.parse(value);
+                    });
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'Credit Hours',
+                    labelStyle: TextStyle(
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           actions: <Widget>[
             TextButton(
