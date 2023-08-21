@@ -10,6 +10,7 @@
         "pdfviewer",
         "PNEC",
         "prefs",
+        "Roboto",
         "SCME",
         "SEECS",
         "sems",
@@ -17,6 +18,7 @@
         "SMME",
         "swipeable",
         "syncfusion",
+        "upgrader",
         "weightage"
     ]
 }
