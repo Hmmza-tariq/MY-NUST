@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class ResultAd {
@@ -11,12 +12,16 @@ class ResultAd {
       request: const AdRequest(),
       rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
         onAdLoaded: (ad) {
-          print('$ad loaded.');
+          if (kDebugMode) {
+            print('$ad loaded.');
+          }
           isAdLoaded = true;
           _rewardedInterstitialAd = ad;
         },
         onAdFailedToLoad: (LoadAdError error) {
-          print('RewardedInterstitialAd failed to load: $error');
+          if (kDebugMode) {
+            print('RewardedInterstitialAd failed to load: $error');
+          }
           isAdLoaded = false;
         },
       ),

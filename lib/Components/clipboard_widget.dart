@@ -88,7 +88,7 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                               dismissTriggerBehavior:
                                   PopupDismissTriggerBehavior.anyWhere,
                               contentTitle:
-                                  'Your ID and password are saved locally on your device.',
+                                  'Your ID and password is saved locally on your device.',
                               child: Icon(
                                 Icons.info_outline,
                                 color: Colors.grey,

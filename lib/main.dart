@@ -15,6 +15,7 @@ import 'package:upgrader/upgrader.dart';
 import 'Components/error_widget.dart';
 import 'Components/hex_color.dart';
 import 'Core/app_Theme.dart';
+import 'Core/firebase_api.dart';
 import 'Provider/assessment_provider.dart';
 import 'Provider/gpa_provider.dart';
 import 'Core/notification_service.dart';
@@ -36,7 +37,8 @@ Future<void> main() async {
   NotificationService().initNotification();
   tz.initializeTimeZones();
 
-  // await FirebaseApi().initNotification();
+  await FirebaseApi().initNotification();
+
   final sp = await SharedPreferences.getInstance();
 
   final String? noticeBoard = sp.getString('noticeBoard');
