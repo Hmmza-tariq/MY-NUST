@@ -11,6 +11,7 @@ import 'package:mynust/Provider/notice_board_provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:upgrader/upgrader.dart';
 import 'Components/error_widget.dart';
 import 'Components/hex_color.dart';
 import 'Core/app_Theme.dart';
@@ -152,29 +153,35 @@ class _MyAppState extends State<MyApp> {
     ));
 
     return MaterialApp(
-      builder: (BuildContext context, Widget? child) {
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-          child: child!,
-        );
-      },
-      title: 'My Nust',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeProvider.theme,
-      home: locked
-          ? Scaffold(
-              backgroundColor: HexColor('#0263B5'),
-              body: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(30.0),
-                  child: SizedBox(
-                    height: 300,
-                    child: Image.asset('assets/images/appLogo.png'),
+        builder: (BuildContext context, Widget? child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+            child: child!,
+          );
+        },
+        title: 'My Nust',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeProvider.theme,
+        home: UpgradeAlert(
+          upgrader: Upgrader(
+              shouldPopScope: () => true,
+              canDismissDialog: true,
+              durationUntilAlertAgain: const Duration(days: 1),
+              dialogStyle: UpgradeDialogStyle.cupertino),
+          child: locked
+              ? Scaffold(
+                  backgroundColor: HexColor('#0263B5'),
+                  body: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(30.0),
+                      child: SizedBox(
+                        height: 300,
+                        child: Image.asset('assets/images/appLogo.png'),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            )
-          : const NavigationHomeScreen(),
-    );
+                )
+              : const NavigationHomeScreen(),
+        ));
   }
 }
