@@ -2,7 +2,7 @@ name: mynust
 description: Nust unofficial Student app
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.2.3+1
 
 environment:
   sdk: '>=3.0.6 <4.0.0'
@@ -48,6 +48,7 @@ dependencies:
   flutter_svg: ^1.1.6
   open_file: ^3.3.2
   dio: ^5.3.2
+  upgrader: ^8.1.0
 
 
 

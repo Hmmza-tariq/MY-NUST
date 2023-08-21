@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:mynust/Components/rewarded_ad.dart';
 import 'package:mynust/Core/app_theme.dart';
 import 'package:share_files_and_screenshot_widgets/share_files_and_screenshot_widgets.dart';
 
@@ -56,26 +56,12 @@ class ResultScreen extends StatefulWidget {
 class _ResultScreenState extends State<ResultScreen> {
   final GlobalKey previewContainer = GlobalKey();
   bool isLightMode = false;
-  Timer? _timer;
-  final adUnitId = 'ca-app-pub-8875342677218505/9904823569';
-  RewardedInterstitialAd? _rewardedInterstitialAd;
-  bool isAdLoaded = false;
+
   @override
   void initState() {
-    loadAd();
     super.initState();
+    ResultAd.playAd();
     isLightMode = widget.isLightMode;
-    _timer = Timer(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          (isAdLoaded)
-              ? _rewardedInterstitialAd!.show(
-                  onUserEarnedReward:
-                      (AdWithoutView ad, RewardItem rewardItem) {})
-              : null;
-        });
-      }
-    });
   }
 
   Future<bool> captureScreenShot(String type) async {
@@ -88,30 +74,7 @@ class _ResultScreenState extends State<ResultScreen> {
 
   @override
   void dispose() {
-    _timer!.cancel();
     super.dispose();
-  }
-
-  void loadAd() {
-    RewardedInterstitialAd.load(
-      adUnitId: adUnitId,
-      request: const AdRequest(),
-      rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          debugPrint('$ad loaded.');
-          setState(() {
-            isAdLoaded = true;
-            _rewardedInterstitialAd = ad;
-          });
-        },
-        onAdFailedToLoad: (LoadAdError error) {
-          debugPrint('RewardedInterstitialAd failed to load: $error');
-          setState(() {
-            isAdLoaded = false;
-          });
-        },
-      ),
-    );
   }
 
   @override
