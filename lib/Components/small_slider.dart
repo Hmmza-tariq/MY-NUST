@@ -212,7 +212,7 @@ class SliderView extends StatelessWidget {
                                 style: const TextStyle(
                                   fontFamily: AppTheme.fontName,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  fontSize: 12,
                                   letterSpacing: 0.2,
                                   color: AppTheme.white,
                                 ),
@@ -229,7 +229,7 @@ class SliderView extends StatelessWidget {
                                       style: const TextStyle(
                                         fontFamily: AppTheme.fontName,
                                         fontWeight: FontWeight.w500,
-                                        fontSize: 10,
+                                        fontSize: 8,
                                         letterSpacing: 0.2,
                                         color: AppTheme.white,
                                       ),

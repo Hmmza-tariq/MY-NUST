@@ -9,7 +9,7 @@ import '../../Core/app_theme.dart';
 import 'package:flutter/material.dart';
 
 import '../../Provider/theme_provider.dart';
-import 'downloaded_files_screen.dart';
+import '../Web view/downloaded_files_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

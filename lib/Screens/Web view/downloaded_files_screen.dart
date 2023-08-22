@@ -167,64 +167,70 @@ class DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
                       style: TextStyle(
                           color: isLightMode ? Colors.black : Colors.white)));
             }
-            return ListView.builder(
-              itemCount: fileList.length,
-              itemBuilder: (context, index) {
-                final file = fileList[index];
-                return SwipeableTile.card(
-                    color: Colors.transparent,
-                    shadow: const BoxShadow(
+            return Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Wrap(
+                spacing: 16.0,
+                runSpacing: 16.0,
+                children: List.generate(
+                  fileList.length,
+                  (index) {
+                    final file = fileList[index];
+                    return SwipeableTile.card(
                       color: Colors.transparent,
-                      blurRadius: 0,
-                      offset: Offset(2, 2),
-                    ),
-                    horizontalPadding: 0,
-                    verticalPadding: 0,
-                    direction: SwipeDirection.horizontal,
-                    onSwiped: (direction) => deleteFile(file.path),
-                    backgroundBuilder: (context, direction, progress) {
-                      return AnimatedBuilder(
-                        animation: progress,
-                        builder: (context, child) {
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 400),
-                            color: progress.value > 0.4
-                                ? const Color(0xFFed7474)
-                                : isLightMode
-                                    ? AppTheme.white
-                                    : AppTheme.nearlyBlack,
-                          );
-                        },
-                      );
-                    },
-                    key: UniqueKey(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: themeProvider.primaryColor.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                              color: isLightMode
-                                  ? AppTheme.grey
-                                  : themeProvider.primaryColor.withOpacity(0.8),
-                              width: 3),
-                        ),
-                        child: ListTile(
-                          onTap: () => OpenFile.open(file.path),
-                          title: Text(' ${file.uri.pathSegments.last}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  color: isLightMode
-                                      ? Colors.black
-                                      : Colors.white)),
-                          leading: Icon(Icons.open_in_new_rounded,
-                              color: isLightMode ? Colors.black : Colors.white),
+                      shadow: const BoxShadow(
+                        color: Colors.transparent,
+                        blurRadius: 0,
+                        offset: Offset(2, 2),
+                      ),
+                      horizontalPadding: 0,
+                      verticalPadding: 0,
+                      direction: SwipeDirection.horizontal,
+                      onSwiped: (direction) => deleteFile(file.path),
+                      backgroundBuilder: (context, direction, progress) {
+                        return AnimatedBuilder(
+                          animation: progress,
+                          builder: (context, child) {
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 400),
+                              color: progress.value > 0.4
+                                  ? const Color(0xFFed7474)
+                                  : isLightMode
+                                      ? AppTheme.white
+                                      : AppTheme.nearlyBlack,
+                            );
+                          },
+                        );
+                      },
+                      key: UniqueKey(),
+                      child: GestureDetector(
+                        onTap: () => OpenFile.open(file.path),
+                        child: SizedBox(
+                          width: 100,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset('assets/images/file.png'),
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Text(
+                                  ' ${file.uri.pathSegments.last}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 8,
+                                      color: isLightMode
+                                          ? Colors.black
+                                          : Colors.white),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ));
-              },
+                    );
+                  },
+                ),
+              ),
             );
           }
         },

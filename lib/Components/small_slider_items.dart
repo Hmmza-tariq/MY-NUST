@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mynust/Screens/Absolutes/calc_absolute_screen.dart';
+import 'package:mynust/Screens/Web%20view/downloaded_files_screen.dart';
 import 'package:mynust/Screens/GPA/calc_gpa_screen.dart';
 import 'package:mynust/Screens/Task/calendar_screen.dart';
 import 'package:mynust/Screens/Task/todo_screen.dart';
 
 import '../Screens/Aggregate/calc_aggregate_screen.dart';
 import '../Screens/GPA/calc_cgpa_screen.dart';
+import '../Screens/Gallery/gallery_screen.dart';
 
 class SmallSliderListData {
   SmallSliderListData({
@@ -25,6 +27,22 @@ class SmallSliderListData {
   Widget page;
 
   static List<SmallSliderListData> tabIconsList = <SmallSliderListData>[
+    SmallSliderListData(
+      title: 'Downloaded',
+      subtitle: <String>['Files'],
+      startColor: '#8BC34A', // Lime Green
+      endColor: '#689F38', // Olive Green
+      icon: Icons.calculate,
+      page: const DownloadedFilesScreen(),
+    ),
+    SmallSliderListData(
+      title: 'Study',
+      subtitle: <String>['Notes'],
+      startColor: '#A9A9A9', // Dark Gray
+      endColor: '#808080', // Gray
+      icon: Icons.calculate,
+      page: const GalleryScreen(),
+    ),
     SmallSliderListData(
       title: 'Calculate',
       subtitle: <String>['SGPA'],

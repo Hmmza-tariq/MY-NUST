@@ -342,15 +342,18 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         count: itemCount,
                       ),
                     ),
-                    SmallSlider(
-                      mainScreenAnimation: Tween<double>(begin: 0.0, end: 1.0)
-                          .animate(CurvedAnimation(
-                              parent: animationController!,
-                              curve: Interval(
-                                  (1 / itemCount) * currentPageIndex, 1.0,
-                                  curve: Curves.fastEaseInToSlowEaseOut))),
-                      mainScreenAnimationController: animationController,
-                      isWrap: isWrap,
+                    SizedBox(
+                      height: isWrap ? 450 : 150,
+                      child: SmallSlider(
+                        mainScreenAnimation: Tween<double>(begin: 0.0, end: 1.0)
+                            .animate(CurvedAnimation(
+                                parent: animationController!,
+                                curve: Interval(
+                                    (1 / itemCount) * currentPageIndex, 1.0,
+                                    curve: Curves.fastEaseInToSlowEaseOut))),
+                        mainScreenAnimationController: animationController,
+                        isWrap: isWrap,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Visibility(
