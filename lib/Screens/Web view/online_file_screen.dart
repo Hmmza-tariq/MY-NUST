@@ -22,7 +22,6 @@ class OnlineFileScreen extends StatefulWidget {
 }
 
 class _OnlineFileScreenState extends State<OnlineFileScreen> {
-  bool _fileExists = false;
   bool _isDownloading = false;
   bool _isDownloaded = false;
   String _title = "";
@@ -80,10 +79,8 @@ class _OnlineFileScreenState extends State<OnlineFileScreen> {
   }
 
   startDownload(String url) async {
-    checkFileExit();
-
     try {
-      if (!_fileExists && _permissionGranted) {
+      if (_permissionGranted) {
         _cancelToken = CancelToken();
         var storePath = await getPath();
         _filePath = '$storePath/$_title';
@@ -104,23 +101,12 @@ class _OnlineFileScreenState extends State<OnlineFileScreen> {
       setState(() {
         _isDownloading = false;
         _isDownloaded = true;
-        _fileExists = true;
-        // openFile();
       });
     } catch (e) {
       setState(() {
         _isDownloading = false;
       });
     }
-  }
-
-  checkFileExit() async {
-    var storePath = await getPath();
-    _filePath = '$storePath/$_title';
-    bool fileExistCheck = await File(_filePath).exists();
-    setState(() {
-      _fileExists = fileExistCheck;
-    });
   }
 
   cancelDownload() {
