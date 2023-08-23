@@ -38,6 +38,9 @@ Future<void> main() async {
 
   // await FirebaseApi().initNotification();
 
+  // if (runWebViewTitleBarWidget(args)) {
+  //   return;
+  // }
   final sp = await SharedPreferences.getInstance();
 
   final String? noticeBoard = sp.getString('noticeBoard');
@@ -90,7 +93,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late final LocalAuthentication auth;
-  bool locked = true;
+  bool locked = false;
   late SharedPreferences prefs;
   @override
   void initState() {
@@ -120,7 +123,7 @@ class _MyAppState extends State<MyApp> {
       bool authenticated = await auth.authenticate(
           localizedReason: 'Biometric authentication is enabled',
           options: const AuthenticationOptions(
-              stickyAuth: false, biometricOnly: false));
+              stickyAuth: false, biometricOnly: true));
       if (authenticated) {
         setState(() {
           locked = false;
