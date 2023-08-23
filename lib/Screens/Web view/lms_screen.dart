@@ -80,7 +80,7 @@ class _LmsScreenState extends State<LmsScreen> with TickerProviderStateMixin {
             initialUrl: initialUrl,
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 15),
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
             child: AnimatedBuilder(
                 animation: animationController!,
                 builder: (BuildContext context, Widget? child) {
@@ -93,18 +93,15 @@ class _LmsScreenState extends State<LmsScreen> with TickerProviderStateMixin {
                               0,
                               0,
                             ),
-                            child: const ClipboardWidget(
-                              name: 'LMS',
-                            ),
+                            child: const ClipboardWidget(),
                           ),
                         )
                       : Visibility(
                           visible: showCopyButton,
                           child: ScaleTransition(
+                            alignment: Alignment.centerRight,
                             scale: scaleAnimation,
-                            child: const ClipboardWidget(
-                              name: 'LMS',
-                            ),
+                            child: const ClipboardWidget(),
                           ),
                         );
                 }),

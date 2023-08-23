@@ -1,7 +1,6 @@
 import 'package:info_popup/info_popup.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:mynust/Provider/notice_board_provider.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:group_radio_button/group_radio_button.dart';
@@ -9,7 +8,6 @@ import '../../Core/app_theme.dart';
 import 'package:flutter/material.dart';
 
 import '../../Provider/theme_provider.dart';
-import '../Web view/downloaded_files_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -312,6 +310,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
+            actionsAlignment: MainAxisAlignment.spaceBetween,
             actions: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -344,6 +343,15 @@ class SettingsScreenState extends State<SettingsScreen> {
                     color: Colors.grey,
                   ),
                 ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Back',
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: isLightMode ? Colors.black : Colors.white)),
               ),
             ],
           );
@@ -503,70 +511,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ],
-              ),
-            ),
-            SizedBox(
-              width: 330,
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(
-                      'Show Downloaded\nFiles',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: isLightMode ? Colors.black : Colors.white),
-                    ),
-                    Container(
-                      width: 100,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: isLightMode ? Colors.blue : Colors.white,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(4.0)),
-                        boxShadow: !isLightMode
-                            ? null
-                            : <BoxShadow>[
-                                BoxShadow(
-                                    color: Colors.grey.withOpacity(0.6),
-                                    offset: const Offset(1, 1),
-                                    blurRadius: 2.0),
-                              ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => Navigator.push<dynamic>(
-                              context,
-                              PageTransition(
-                                  duration: const Duration(milliseconds: 500),
-                                  type: PageTransitionType.rightToLeft,
-                                  alignment: Alignment.bottomCenter,
-                                  child: const DownloadedFilesScreen(),
-                                  inheritTheme: true,
-                                  ctx: context)),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Text(
-                                'Files',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color:
-                                      isLightMode ? Colors.white : Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
             Padding(

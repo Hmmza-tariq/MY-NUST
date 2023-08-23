@@ -316,6 +316,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             );
                           },
                           options: CarouselOptions(
+                              initialPage: currentPageIndex,
                               viewportFraction: .6,
                               autoPlay: true,
                               enableInfiniteScroll: true,

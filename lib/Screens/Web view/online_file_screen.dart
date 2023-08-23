@@ -27,7 +27,7 @@ class _OnlineFileScreenState extends State<OnlineFileScreen> {
   String _title = "";
   late String _filePath;
   late CancelToken _cancelToken;
-  bool _permissionGranted = false;
+  bool _permissionGranted = true;
   double _progress = 0.0;
   bool _isPDF = false;
 
@@ -86,6 +86,7 @@ class _OnlineFileScreenState extends State<OnlineFileScreen> {
         _filePath = '$storePath/$_title';
         setState(() {
           _isDownloading = true;
+
           NotificationService()
               .showNotification(title: 'Downloading', body: _title);
           _progress = 0;
@@ -103,6 +104,7 @@ class _OnlineFileScreenState extends State<OnlineFileScreen> {
         _isDownloaded = true;
       });
     } catch (e) {
+      print(e);
       setState(() {
         _isDownloading = false;
       });

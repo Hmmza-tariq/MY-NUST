@@ -5,7 +5,6 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:swipeable_tile/swipeable_tile.dart';
 
 import '../../Components/hex_color.dart';
 import '../../Core/app_Theme.dart';
@@ -68,7 +67,8 @@ class DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
     }
   }
 
-  void _deleteDialog(BuildContext context, bool isLightMode) async {
+  void _deleteDialog(BuildContext context, bool isLightMode, bool all,
+      {String filePath = ''}) async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -82,7 +82,10 @@ class DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
                 fontWeight: FontWeight.bold,
                 color: isLightMode ? Colors.black : Colors.white),
           ),
-          content: Text('Are you sure you want to delete all files?',
+          content: Text(
+              all
+                  ? 'Are you sure you want to delete all files?'
+                  : 'Are you sure you want to delete this files?',
               style: TextStyle(
                   fontSize: 14,
                   color: isLightMode ? Colors.black : Colors.white)),
@@ -98,7 +101,7 @@ class DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
             ),
             TextButton(
               onPressed: () {
-                deleteAllFilesInDirectory();
+                all ? deleteAllFilesInDirectory() : deleteFile(filePath);
                 Navigator.of(context).pop();
               },
               child: const Text('Delete',
@@ -114,6 +117,9 @@ class DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
     final file = File(filePath);
     if (await file.exists()) {
       await file.delete();
+      setState(() {
+        fileList.removeWhere((item) => item.path == filePath);
+      });
     }
   }
 
@@ -142,7 +148,7 @@ class DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
         ),
         actions: [
           IconButton(
-              onPressed: () => _deleteDialog(context, isLightMode),
+              onPressed: () => _deleteDialog(context, isLightMode, true),
               icon: const Icon(Icons.delete_rounded))
         ],
       ),
@@ -176,55 +182,33 @@ class DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
                   fileList.length,
                   (index) {
                     final file = fileList[index];
-                    return SwipeableTile.card(
-                      color: Colors.transparent,
-                      shadow: const BoxShadow(
-                        color: Colors.transparent,
-                        blurRadius: 0,
-                        offset: Offset(2, 2),
-                      ),
-                      horizontalPadding: 0,
-                      verticalPadding: 0,
-                      direction: SwipeDirection.horizontal,
-                      onSwiped: (direction) => deleteFile(file.path),
-                      backgroundBuilder: (context, direction, progress) {
-                        return AnimatedBuilder(
-                          animation: progress,
-                          builder: (context, child) {
-                            return AnimatedContainer(
-                              duration: const Duration(milliseconds: 400),
-                              color: progress.value > 0.4
-                                  ? const Color(0xFFed7474)
-                                  : isLightMode
-                                      ? AppTheme.white
-                                      : AppTheme.nearlyBlack,
-                            );
-                          },
-                        );
-                      },
-                      key: UniqueKey(),
-                      child: GestureDetector(
-                        onTap: () => OpenFile.open(file.path),
-                        child: SizedBox(
-                          width: 100,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Image.asset('assets/images/file.png'),
-                              Padding(
-                                padding: const EdgeInsets.all(2.0),
-                                child: Text(
-                                  ' ${file.uri.pathSegments.last}',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 8,
-                                      color: isLightMode
-                                          ? Colors.black
-                                          : Colors.white),
-                                ),
+                    return GestureDetector(
+                      onTap: () => OpenFile.open(file.path),
+                      onDoubleTap: () => _deleteDialog(
+                          context, isLightMode, false,
+                          filePath: file.path),
+                      onLongPress: () => _deleteDialog(
+                          context, isLightMode, false,
+                          filePath: file.path),
+                      child: SizedBox(
+                        width: 100,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset('assets/images/file.png'),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Text(
+                                ' ${file.uri.pathSegments.last}',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 8,
+                                    color: isLightMode
+                                        ? Colors.black
+                                        : Colors.white),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     );

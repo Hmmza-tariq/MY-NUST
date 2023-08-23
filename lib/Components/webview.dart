@@ -36,6 +36,12 @@ class _WebsiteViewState extends State<WebsiteView> {
   void initializeWebView() async {
     webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..runJavaScript(
+          "navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';")
+      ..runJavaScriptReturningResult(
+          "navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';")
+      ..setUserAgent(
+          "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101  Firefox/40.1")
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -55,22 +61,7 @@ class _WebsiteViewState extends State<WebsiteView> {
               _isLoading = false;
             });
           },
-          onWebResourceError: (WebResourceError error) {
-            final snackBar = SnackBar(
-              elevation: 0,
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.transparent,
-              content: AwesomeSnackbarContent(
-                title: 'Error!',
-                message: 'Check Internet connection',
-                contentType: ContentType.failure,
-              ),
-            );
-
-            ScaffoldMessenger.of(context)
-              ..hideCurrentSnackBar()
-              ..showSnackBar(snackBar);
-          },
+          onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest request) async {
             String url = request.url;
             List<String> downloadableExtensions = [
@@ -138,13 +129,6 @@ class _WebsiteViewState extends State<WebsiteView> {
         ),
       )
       ..loadRequest(Uri.parse(widget.initialUrl));
-    webViewController.runJavaScript(
-        "navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';");
-    webViewController.runJavaScriptReturningResult(
-        "navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';");
-    webViewController.setUserAgent(
-        "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101  Firefox/40.1");
-    webViewController.setJavaScriptMode(JavaScriptMode.unrestricted);
   }
 
   @override
