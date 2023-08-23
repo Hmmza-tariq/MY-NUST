@@ -7,7 +7,6 @@ import 'package:mynust/Components/action_button.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:swipeable_tile/swipeable_tile.dart';
 
 import '../../Components/hex_color.dart';
 import '../../Core/app_Theme.dart';
@@ -52,15 +51,14 @@ class GalleryScreenState extends State<GalleryScreen> {
       final folders = await directory.list().toList();
 
       for (var folder in folders) {
-        // Changed variable name
         if (folder is Directory) {
-          // Changed data type
           await folder.delete(recursive: true);
         }
       }
       setState(() {
         folderList.clear();
       });
+      folderList = await getFoldersInDirectory();
     }
   }
 
@@ -74,7 +72,8 @@ class GalleryScreenState extends State<GalleryScreen> {
     }
   }
 
-  void _deleteDialog(BuildContext context, bool isLightMode) async {
+  void _deleteDialog(BuildContext context, bool isLightMode, bool all,
+      {String folderPath = ''}) async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -88,7 +87,10 @@ class GalleryScreenState extends State<GalleryScreen> {
                 fontWeight: FontWeight.bold,
                 color: isLightMode ? Colors.black : Colors.white),
           ),
-          content: Text('Are you sure you want to delete all folders?',
+          content: Text(
+              all
+                  ? 'Are you sure you want to delete all folders?'
+                  : 'Are you sure you want to delete this folders?',
               style: TextStyle(
                   fontSize: 14,
                   color: isLightMode ? Colors.black : Colors.white)),
@@ -104,7 +106,7 @@ class GalleryScreenState extends State<GalleryScreen> {
             ),
             TextButton(
               onPressed: () {
-                deleteAllFoldersInDirectory();
+                all ? deleteAllFoldersInDirectory() : deleteFolder(folderPath);
                 Navigator.of(context).pop();
               },
               child: const Text('Delete',
@@ -119,7 +121,10 @@ class GalleryScreenState extends State<GalleryScreen> {
   Future<void> deleteFolder(String folderPath) async {
     final folder = Directory(folderPath);
     if (await folder.exists()) {
-      await folder.delete(recursive: true); // Added recursive deletion
+      await folder.delete(recursive: true);
+      setState(() {
+        folderList.removeWhere((item) => item.path == folderPath);
+      });
     }
   }
 
@@ -157,18 +162,29 @@ class GalleryScreenState extends State<GalleryScreen> {
                       fontSize: 12,
                       color: isLightMode ? Colors.black : Colors.white)),
               onPressed: () async {
+                bool error = false;
                 if (newFolderName.isNotEmpty) {
                   final galleryPath = Directory("${tempDir!.path}/gallery");
-
                   if (await galleryPath.exists()) {
                     final newFolderPath = "${galleryPath.path}/$newFolderName";
                     final newFolder = Directory(newFolderPath);
-                    await newFolder.create(recursive: true);
-
-                    setState(() {
-                      folderList.add(newFolder);
-                    });
+                    if (!folderList.toString().contains(newFolder.path)) {
+                      print(
+                          'not exists $folderList,, $newFolder ,, ${folderList.contains(newFolder) == false}');
+                      await newFolder.create(recursive: true);
+                      setState(() {
+                        folderList.add(newFolder);
+                      });
+                    } else {
+                      error = true;
+                    }
+                  } else {
+                    error = true;
                   }
+                } else {
+                  error = true;
+                }
+                if (!error) {
                   Navigator.pop(context);
                 } else {
                   if (!isSnackBarVisible) {
@@ -180,7 +196,7 @@ class GalleryScreenState extends State<GalleryScreen> {
                       elevation: 0,
                       content: AwesomeSnackbarContent(
                         title: 'Error',
-                        message: "Incorrect name",
+                        message: "Incorrect name or folder already exists",
                         contentType: ContentType.warning,
                       ),
                     );
@@ -200,6 +216,26 @@ class GalleryScreenState extends State<GalleryScreen> {
         );
       },
     );
+  }
+
+  List<String> getImagesFromFolder(FileSystemEntity folder) {
+    List<String> imagePaths = [];
+
+    if (folder is Directory) {
+      final directory = folder;
+      final imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp'];
+
+      for (var entity in directory.listSync()) {
+        if (entity is File) {
+          final extension = entity.path.toLowerCase().split('.').last;
+          if (imageExtensions.contains('.$extension')) {
+            imagePaths.add(entity.path);
+          }
+        }
+      }
+    }
+
+    return imagePaths;
   }
 
   @override
@@ -227,7 +263,7 @@ class GalleryScreenState extends State<GalleryScreen> {
         ),
         actions: [
           IconButton(
-              onPressed: () => _deleteDialog(context, isLightMode),
+              onPressed: () => _deleteDialog(context, isLightMode, true),
               icon: const Icon(Icons.delete_rounded))
         ],
       ),
@@ -242,7 +278,6 @@ class GalleryScreenState extends State<GalleryScreen> {
               ),
             );
           } else if (snapshot.hasError) {
-            print(snapshot.error);
             return const Center(
                 child: Text('Error!', style: TextStyle(color: Colors.red)));
           } else {
@@ -256,76 +291,60 @@ class GalleryScreenState extends State<GalleryScreen> {
             return Padding(
               padding: const EdgeInsets.all(12.0),
               child: Wrap(
-                spacing: 16.0,
+                spacing: 12.0,
                 runSpacing: 16.0,
                 children: List.generate(
                   folderList.length,
                   (index) {
                     final folder = folderList[index];
                     String name = folder.path.split('/').last;
-                    return SwipeableTile.card(
-                      color: Colors.transparent,
-                      shadow: const BoxShadow(
-                        color: Colors.transparent,
-                        blurRadius: 0,
-                        offset: Offset(2, 2),
-                      ),
-                      horizontalPadding: 0,
-                      verticalPadding: 0,
-                      direction: SwipeDirection.horizontal,
-                      onSwiped: (direction) => deleteFolder(folder.path),
-                      backgroundBuilder: (context, direction, progress) {
-                        return AnimatedBuilder(
-                          animation: progress,
-                          builder: (context, child) {
-                            return AnimatedContainer(
-                              duration: const Duration(milliseconds: 400),
-                              color: progress.value > 0.4
-                                  ? const Color(0xFFed7474)
-                                  : isLightMode
-                                      ? AppTheme.white
-                                      : AppTheme.nearlyBlack,
-                            );
-                          },
-                        );
-                      },
-                      key: UniqueKey(),
-                      child: GestureDetector(
-                        onTap: () async {
-                          await Navigator.push(
-                              context,
-                              PageTransition(
-                                  duration: const Duration(milliseconds: 500),
-                                  type: PageTransitionType.rightToLeft,
-                                  alignment: Alignment.bottomCenter,
-                                  child: FolderScreen(
-                                    folder: name,
-                                  ),
-                                  inheritTheme: true,
-                                  ctx: context));
-                        },
-                        child: SizedBox(
-                          width: 100,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Image.asset('assets/images/gallery.png'),
-                              Padding(
-                                padding: const EdgeInsets.all(2.0),
-                                child: Text(
-                                  name,
-                                  textAlign: TextAlign.center,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: isLightMode
-                                          ? Colors.black
-                                          : Colors.white),
+                    return GestureDetector(
+                      onLongPress: () => _deleteDialog(
+                          context, isLightMode, false,
+                          folderPath: folderList[index].path),
+                      onDoubleTap: () => _deleteDialog(
+                          context, isLightMode, false,
+                          folderPath: folderList[index].path),
+                      onTap: () async {
+                        await Navigator.push(
+                            context,
+                            PageTransition(
+                                duration: const Duration(milliseconds: 500),
+                                type: PageTransitionType.rightToLeft,
+                                alignment: Alignment.bottomCenter,
+                                child: FolderScreen(
+                                  folder: name,
                                 ),
+                                inheritTheme: true,
+                                ctx: context));
+                        setState(() {
+                          folders = getFoldersInDirectory();
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/images/gallery.png',
+                              scale: .5,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Text(
+                                name,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: isLightMode
+                                        ? Colors.black
+                                        : Colors.white),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     );

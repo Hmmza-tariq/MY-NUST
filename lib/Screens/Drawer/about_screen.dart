@@ -66,7 +66,7 @@ class AboutScreenState extends State<AboutScreen> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
-                              "Hey there, I'm Hamza Tariq (CE-43, CEME), the brain behind this app. Flutter fanatic, app aficionado, and your friendly neighborhood developer. I cooked up this app with a pinch of code, a sprinkle of passion, and a massive 10,000 lines of \"are we there yet?\" code. Hope it rocks your phone and brings a smile. Enjoy the adventure",
+                              "Hey there, I'm Hamza Tariq (CE-43, CEME), the brain behind this app, Flutter fanatic, app aficionado, and your friendly neighborhood developer. I cooked up this app with a pinch of code, a sprinkle of passion, and a massive 15,000 lines of \"are we there yet?\" code. Hope it rocks your phone and brings a smile. Enjoy the adventure",
                               style: TextStyle(
                                   fontSize: 16,
                                   color: isLightMode
