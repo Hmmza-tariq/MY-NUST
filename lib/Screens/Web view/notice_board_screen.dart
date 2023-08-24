@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../Components/webview.dart';
+import 'webview.dart';
 import '../../Provider/notice_board_provider.dart';
 
 class NoticeBoardScreen extends StatefulWidget {

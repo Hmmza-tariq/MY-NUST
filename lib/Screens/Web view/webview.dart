@@ -6,11 +6,11 @@ import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import '../Core/app_Theme.dart';
-import '../Provider/internet_provider.dart';
-import '../Screens/Web view/online_file_screen.dart';
-import 'hex_color.dart';
-import '../Core/internet_manager.dart';
+import '../../Core/app_Theme.dart';
+import '../../Provider/internet_provider.dart';
+import 'online_file_screen.dart';
+import '../../Components/hex_color.dart';
+import '../../Core/internet_manager.dart';
 
 class WebsiteView extends StatefulWidget {
   const WebsiteView({super.key, required this.initialUrl});
@@ -41,7 +41,7 @@ class _WebsiteViewState extends State<WebsiteView> {
       ..runJavaScriptReturningResult(
           "navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';")
       ..setUserAgent(
-          "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101  Firefox/40.1")
+          "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Mobile Safari/537.36")
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -129,6 +129,7 @@ class _WebsiteViewState extends State<WebsiteView> {
         ),
       )
       ..loadRequest(Uri.parse(widget.initialUrl));
+    webViewController.enableZoom(false);
   }
 
   @override

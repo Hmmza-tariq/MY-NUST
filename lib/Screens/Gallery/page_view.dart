@@ -34,7 +34,7 @@ class _PageViewScreenState extends State<PageViewScreen> {
     return SafeArea(
       child: Center(
         child: PhotoViewGallery.builder(
-            customSize: Size(MediaQuery.of(context).size.width,
+            customSize: Size(MediaQuery.of(context).size.width - 50,
                 MediaQuery.of(context).size.height / .5),
             backgroundDecoration: const BoxDecoration(
               color: Color.fromARGB(170, 0, 0, 0),

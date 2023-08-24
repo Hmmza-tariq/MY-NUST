@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
-import 'package:mynust/Screens/Web%20view/lms_screen.dart';
 import 'package:mynust/Screens/Web%20view/notice_board_screen.dart';
-import 'package:mynust/Screens/Web%20view/qalam_screen.dart';
+import 'package:mynust/Screens/Web%20view/portal_screen.dart';
 
 class LargeSliderListData {
   LargeSliderListData({
@@ -21,12 +20,17 @@ class LargeSliderListData {
     LargeSliderListData(
       imagePath: 'assets/images/lms.png',
       name: 'LMS',
-      navigateScreen: const LmsScreen(),
+      navigateScreen: const PortalScreen(
+        initialUrl:
+            'https://lms.nust.edu.pk/portal/calendar/view.php?view=month',
+      ),
     ),
     LargeSliderListData(
       imagePath: 'assets/images/qalam.png',
       name: 'Qalam',
-      navigateScreen: const QalamScreen(),
+      navigateScreen: const PortalScreen(
+        initialUrl: 'https://qalam.nust.edu.pk/',
+      ),
     ),
     LargeSliderListData(
       imagePath: 'assets/images/noticeBoard.png',
