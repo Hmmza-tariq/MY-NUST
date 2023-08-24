@@ -2,34 +2,33 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import '../../Components/clipboard_widget.dart';
-import '../../Components/webview.dart';
+import 'webview.dart';
 
-class LmsScreen extends StatefulWidget {
-  const LmsScreen({super.key});
+class PortalScreen extends StatefulWidget {
+  const PortalScreen({super.key, required this.initialUrl});
+  final String initialUrl;
 
   @override
-  State<LmsScreen> createState() => _LmsScreenState();
+  State<PortalScreen> createState() => _PortalScreenState();
 }
 
-class _LmsScreenState extends State<LmsScreen> with TickerProviderStateMixin {
-  var initialUrl =
-      'https://lms.nust.edu.pk/portal/calendar/view.php?view=month';
+class _PortalScreenState extends State<PortalScreen>
+    with TickerProviderStateMixin {
   AnimationController? animationController;
   bool showCopyButton = true;
   bool forwardAnimation = true;
   Timer? _timer;
-  int _duration = 50;
   @override
   void initState() {
     animationController = AnimationController(
         duration: const Duration(milliseconds: 2000), vsync: this);
 
-    _timer = Timer(Duration(seconds: _duration), () {
+    Timer(const Duration(seconds: 10), () {
       if (mounted) {
         setState(() {
           animationController!.repeat();
           forwardAnimation = false;
-          Timer(const Duration(milliseconds: 700), () {
+          _timer = Timer(const Duration(milliseconds: 700), () {
             if (mounted) {
               setState(() {
                 animationController!.stop();
@@ -47,9 +46,8 @@ class _LmsScreenState extends State<LmsScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _duration = 0;
-    _timer!.cancel();
     animationController?.dispose();
+    _timer!.cancel();
     super.dispose();
   }
 
@@ -74,13 +72,15 @@ class _LmsScreenState extends State<LmsScreen> with TickerProviderStateMixin {
     return Scaffold(
       body: SafeArea(
           child: Stack(
-        alignment: AlignmentDirectional.topEnd,
+        alignment: AlignmentDirectional.topStart,
         children: [
           WebsiteView(
-            initialUrl: initialUrl,
+            initialUrl: widget.initialUrl,
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.height / 5,
+            ),
             child: AnimatedBuilder(
                 animation: animationController!,
                 builder: (BuildContext context, Widget? child) {
@@ -89,7 +89,7 @@ class _LmsScreenState extends State<LmsScreen> with TickerProviderStateMixin {
                           opacity: fadeAnimation,
                           child: Transform(
                             transform: Matrix4.translationValues(
-                              50 * (1.0 - fadeAnimation.value),
+                              -50 * (1.0 - fadeAnimation.value),
                               0,
                               0,
                             ),
@@ -99,7 +99,7 @@ class _LmsScreenState extends State<LmsScreen> with TickerProviderStateMixin {
                       : Visibility(
                           visible: showCopyButton,
                           child: ScaleTransition(
-                            alignment: Alignment.centerRight,
+                            alignment: Alignment.centerLeft,
                             scale: scaleAnimation,
                             child: const ClipboardWidget(),
                           ),

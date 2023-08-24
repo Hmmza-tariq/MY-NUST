@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mynust/Components/webview.dart';
+import 'package:mynust/Screens/Web%20view/webview.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../Core/app_theme.dart';
 import '../../Provider/theme_provider.dart';
 
@@ -66,7 +67,7 @@ class AboutScreenState extends State<AboutScreen> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
-                              "Hey there, I'm Hamza Tariq (CE-43, CEME), the brain behind this app, Flutter fanatic, app aficionado, and your friendly neighborhood developer. I cooked up this app with a pinch of code, a sprinkle of passion, and a massive 15,000 lines of \"are we there yet?\" code. Hope it rocks your phone and brings a smile. Enjoy the adventure",
+                              "Hey, I'm Hamza Tariq (CE-43, CEME), the brain behind this app. I'm a Flutter fanatic and app aficionado. I've cooked up this app with passion and around 15,000 lines of code. I hope it rocks!",
                               style: TextStyle(
                                   fontSize: 16,
                                   color: isLightMode
@@ -162,7 +163,7 @@ class AboutScreenState extends State<AboutScreen> {
                                       MaterialPageRoute(
                                           builder: (context) => const WebsiteView(
                                               initialUrl:
-                                                  "https://sites.google.com/view/mynust-privacy-policy/home")),
+                                                  "https://sites.google.com/view/my-nust-privacy-policy/home")),
                                     );
                                   },
                                   child: const Row(
@@ -193,7 +194,7 @@ class AboutScreenState extends State<AboutScreen> {
                                       MaterialPageRoute(
                                           builder: (context) => const WebsiteView(
                                               initialUrl:
-                                                  "https://sites.google.com/view/mynust-terms-and-conditions/home")),
+                                                  "https://sites.google.com/view/my-nust-terms-and-conditions/home")),
                                     );
                                   },
                                   child: const Row(
@@ -249,19 +250,16 @@ class AboutScreenState extends State<AboutScreen> {
                             Row(
                               children: [
                                 TextButton(
-                                  onPressed: () async {
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => const WebsiteView(
-                                              initialUrl:
-                                                  "https://github.com/Hmmza-tariq/My-NUST-request-")),
-                                    );
+                                  onPressed: () {
+                                    launchUrl(
+                                        mode: LaunchMode.externalApplication,
+                                        Uri.parse(
+                                            "https://github.com/Hmmza-tariq/My-NUST-request-"));
                                   },
                                   child: const Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.link_rounded),
+                                      Icon(Icons.open_in_new_rounded),
                                       SizedBox(
                                         width: 5,
                                       ),

@@ -7,6 +7,7 @@ import 'package:mynust/Components/action_button.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:swipeable_tile/swipeable_tile.dart';
 
 import '../../Components/hex_color.dart';
 import '../../Core/app_Theme.dart';
@@ -169,8 +170,6 @@ class GalleryScreenState extends State<GalleryScreen> {
                     final newFolderPath = "${galleryPath.path}/$newFolderName";
                     final newFolder = Directory(newFolderPath);
                     if (!folderList.toString().contains(newFolder.path)) {
-                      print(
-                          'not exists $folderList,, $newFolder ,, ${folderList.contains(newFolder) == false}');
                       await newFolder.create(recursive: true);
                       setState(() {
                         folderList.add(newFolder);
@@ -288,69 +287,122 @@ class GalleryScreenState extends State<GalleryScreen> {
                       style: TextStyle(
                           color: isLightMode ? Colors.black : Colors.white)));
             }
-            return Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Wrap(
-                spacing: 12.0,
-                runSpacing: 16.0,
-                children: List.generate(
-                  folderList.length,
-                  (index) {
-                    final folder = folderList[index];
-                    String name = folder.path.split('/').last;
-                    return GestureDetector(
-                      onLongPress: () => _deleteDialog(
-                          context, isLightMode, false,
-                          folderPath: folderList[index].path),
-                      onDoubleTap: () => _deleteDialog(
-                          context, isLightMode, false,
-                          folderPath: folderList[index].path),
-                      onTap: () async {
-                        await Navigator.push(
-                            context,
-                            PageTransition(
-                                duration: const Duration(milliseconds: 500),
-                                type: PageTransitionType.rightToLeft,
-                                alignment: Alignment.bottomCenter,
-                                child: FolderScreen(
-                                  folder: name,
-                                ),
-                                inheritTheme: true,
-                                ctx: context));
-                        setState(() {
-                          folders = getFoldersInDirectory();
-                        });
+            return ListView.builder(
+              scrollDirection: Axis.vertical,
+              itemCount: folderList.length,
+              itemBuilder: (context, index) {
+                final folder = folderList[index];
+                String name = folder.path.split('/').last;
+                int files = getImagesFromFolder(folder).length;
+                return SwipeableTile.card(
+                  color: Colors.transparent,
+                  shadow: const BoxShadow(
+                    color: Colors.transparent,
+                    blurRadius: 0,
+                    offset: Offset(2, 2),
+                  ),
+                  horizontalPadding: 0,
+                  verticalPadding: 0,
+                  direction: SwipeDirection.horizontal,
+                  onSwiped: (direction) {
+                    _deleteDialog(context, isLightMode, false,
+                        folderPath: folderList[index].path);
+                  },
+                  backgroundBuilder: (context, direction, progress) {
+                    return AnimatedBuilder(
+                      animation: progress,
+                      builder: (context, child) {
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 400),
+                          color: progress.value > 0.4
+                              ? const Color(0xFFed7474)
+                              : isLightMode
+                                  ? AppTheme.white
+                                  : AppTheme.nearlyBlack,
+                        );
                       },
+                    );
+                  },
+                  key: UniqueKey(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color:
+                            isLightMode ? AppTheme.white : AppTheme.nearlyBlack,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                            color: isLightMode
+                                ? AppTheme.notWhite
+                                : themeProvider.primaryColor,
+                            width: 3),
+                        boxShadow: !isLightMode
+                            ? null
+                            : <BoxShadow>[
+                                BoxShadow(
+                                    color: Colors.grey.withOpacity(0.6),
+                                    offset: const Offset(4, 4),
+                                    blurRadius: 8.0),
+                              ],
+                      ),
                       child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(
-                              'assets/images/gallery.png',
-                              scale: .5,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Text(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: ListTile(
+                          onTap: () async {
+                            await Navigator.push(
+                                context,
+                                PageTransition(
+                                    duration: const Duration(milliseconds: 500),
+                                    type: PageTransitionType.rightToLeft,
+                                    alignment: Alignment.bottomCenter,
+                                    child: FolderScreen(
+                                      folder: name,
+                                    ),
+                                    inheritTheme: true,
+                                    ctx: context));
+                            setState(() {
+                              folders = getFoldersInDirectory();
+                            });
+                          },
+                          leading: Image.asset(
+                            'assets/images/gallery.png',
+                            filterQuality: FilterQuality.high,
+                            scale: .3,
+                          ),
+                          trailing: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
                                 name,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24,
+                                    color: isLightMode
+                                        ? AppTheme.nearlyBlack
+                                        : Colors.white),
+                              ),
+                              Text(
+                                (files > 1) ? '$files Images' : '$files Image',
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                     fontSize: 12,
                                     color: isLightMode
-                                        ? Colors.black
+                                        ? AppTheme.nearlyBlack
                                         : Colors.white),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
-                    );
-                  },
-                ),
-              ),
+                    ),
+                  ),
+                );
+              },
             );
           }
         },

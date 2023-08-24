@@ -104,7 +104,6 @@ class _OnlineFileScreenState extends State<OnlineFileScreen> {
         _isDownloaded = true;
       });
     } catch (e) {
-      print(e);
       setState(() {
         _isDownloading = false;
       });

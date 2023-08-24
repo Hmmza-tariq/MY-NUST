@@ -133,9 +133,7 @@ class FolderScreenState extends State<FolderScreen> {
       } else {
         await saveImage(image);
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
   }
 
   void takeImage() async {
@@ -146,9 +144,7 @@ class FolderScreenState extends State<FolderScreen> {
       } else {
         await saveImage(image);
       }
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
   }
 
   Future<void> saveImage(XFile pickedImage) async {

@@ -537,23 +537,18 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
                               );
                             },
                             key: UniqueKey(),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 4.0),
-                              child: GestureDetector(
-                                onTap: () => _editSemester(index, isLightMode),
-                                child: Card1Widget(
-                                  animation: Tween<double>(begin: 0.0, end: 1.0)
-                                      .animate(CurvedAnimation(
-                                          parent: animationController!,
-                                          curve: const Interval(
-                                              (1 / 9) * 1, 1.0,
-                                              curve: Curves.fastOutSlowIn))),
-                                  animationController: animationController!,
-                                  credits: semesters[index].credits,
-                                  gpa: semesters[index].sgpa,
-                                  name: semesters[index].name.toString(),
-                                ),
+                            child: GestureDetector(
+                              onTap: () => _editSemester(index, isLightMode),
+                              child: Card1Widget(
+                                animation: Tween<double>(begin: 0.0, end: 1.0)
+                                    .animate(CurvedAnimation(
+                                        parent: animationController!,
+                                        curve: const Interval((1 / 9) * 1, 1.0,
+                                            curve: Curves.fastOutSlowIn))),
+                                animationController: animationController!,
+                                credits: semesters[index].credits,
+                                gpa: semesters[index].sgpa,
+                                name: semesters[index].name.toString(),
                               ),
                             ),
                           ))),

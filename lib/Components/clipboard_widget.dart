@@ -1,5 +1,6 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
+import 'package:encrypt/encrypt.dart' as ec;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:info_popup/info_popup.dart';
@@ -17,11 +18,10 @@ class ClipboardWidget extends StatefulWidget {
 
 class _ClipboardWidgetState extends State<ClipboardWidget> {
   TextEditingController idTextController = TextEditingController();
-
   TextEditingController passTextController = TextEditingController();
-
   final CustomPopupMenuController _controller = CustomPopupMenuController();
-
+  final key = ec.Key.fromLength(32);
+  final iv = ec.IV.fromLength(16);
   @override
   void initState() {
     super.initState();
@@ -31,15 +31,24 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
   Future<void> loadTextValues() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      idTextController.text = prefs.getString('ID') ?? '';
-      passTextController.text = prefs.getString('PASS') ?? '';
+      final encrypter = ec.Encrypter(ec.AES(key));
+      final encryptedID = ec.Encrypted.fromBase64(prefs.getString('ID') ?? '');
+      final encryptedPass =
+          ec.Encrypted.fromBase64(prefs.getString('PASS') ?? '');
+      idTextController.text = encrypter.decrypt(encryptedID, iv: iv);
+      passTextController.text = encrypter.decrypt(encryptedPass, iv: iv);
     });
   }
 
   Future<void> saveTextValues() async {
+    final encrypter = ec.Encrypter(ec.AES(key));
+    final encryptedID = encrypter.encrypt(idTextController.text, iv: iv);
+    final encryptedPass = encrypter.encrypt(passTextController.text, iv: iv);
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('ID', idTextController.text);
-    await prefs.setString('PASS', passTextController.text);
+    print(
+        'encryptedID.base64: ${encryptedID.base64},encryptedPass.base64: ${encryptedPass.base64} ');
+    await prefs.setString('ID', encryptedID.base64);
+    await prefs.setString('PASS', encryptedPass.base64);
   }
 
   @override
@@ -92,7 +101,7 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                                     dismissTriggerBehavior:
                                         PopupDismissTriggerBehavior.anyWhere,
                                     contentTitle:
-                                        'Your ID and password is saved locally on your device.',
+                                        'Your ID and password is saved locally on your device in  encrypted form.',
                                     child: Icon(
                                       Icons.info_outline,
                                       color: Colors.grey,
@@ -217,19 +226,19 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
             verticalMargin: -10,
             controller: _controller,
             child: Container(
-              alignment: Alignment.centerLeft,
+              alignment: Alignment.centerRight,
               width: 70,
               height: 50,
               decoration: BoxDecoration(
                 color: HexColor('#0F6FC5'),
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(15),
-                  bottomLeft: Radius.circular(15),
+                  topRight: Radius.circular(15),
+                  bottomRight: Radius.circular(15),
                 ),
               ),
               child: const Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Icon(Icons.assignment_sharp, color: Colors.white),
+                child: Icon(Icons.assignment_rounded, color: Colors.white),
               ),
             ),
           )
