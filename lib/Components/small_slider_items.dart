@@ -26,14 +26,15 @@ class SmallSliderListData {
   List<String>? subtitle;
   IconData icon;
   Widget page;
-
-  static List<SmallSliderListData> tabIconsList = <SmallSliderListData>[
-    SmallSliderListData(
+static List<SmallSliderListData> ssl2 = [];
+    static List<SmallSliderListData> tabIconsList = <SmallSliderListData>[
+  
+    SmallSliderL=istData(
       title: 'Calculate',
       subtitle: <String>['SGPA'],
       startColor: '#FFB24E',
       endColor: '#FF5733',
-      icon: Icons.calculate_rounded,
+      icon: Icons.Calculate_rounded,
       page: const CalcGpaScreen(),
     ),
     SmallSliderListData(
