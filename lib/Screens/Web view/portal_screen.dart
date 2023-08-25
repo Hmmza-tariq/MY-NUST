@@ -18,12 +18,13 @@ class _PortalScreenState extends State<PortalScreen>
   bool showCopyButton = true;
   bool forwardAnimation = true;
   Timer? _timer;
+  int time = 50;
   @override
   void initState() {
     animationController = AnimationController(
         duration: const Duration(milliseconds: 2000), vsync: this);
 
-    Timer(const Duration(seconds: 10), () {
+    Timer(Duration(seconds: time), () {
       if (mounted) {
         setState(() {
           animationController!.repeat();
@@ -47,6 +48,7 @@ class _PortalScreenState extends State<PortalScreen>
   @override
   void dispose() {
     animationController?.dispose();
+    time = 0;
     _timer!.cancel();
     super.dispose();
   }
