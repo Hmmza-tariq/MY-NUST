@@ -1,7 +1,7 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:mynust/Components/toasts.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -77,21 +77,8 @@ class _WebsiteViewState extends State<WebsiteView> {
             bool isDownloadable = downloadableExtensions
                 .any((ext) => url.toLowerCase().endsWith(ext));
             if (Uri.parse(url).host != (Uri.parse(widget.initialUrl).host)) {
-              final snackBar = SnackBar(
-                elevation: 0,
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: Colors.transparent,
-                content: AwesomeSnackbarContent(
-                  title: 'Error',
-                  message:
-                      'Cannot move outside the current domain, Navigation blocked!',
-                  contentType: ContentType.warning,
-                ),
-              );
-
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(snackBar);
+              Toast().errorToast(
+                  context, 'Cannot move outside the current domain');
               return NavigationDecision.prevent;
             } else if (isDownloadable) {
               Navigator.push<dynamic>(
@@ -106,21 +93,8 @@ class _WebsiteViewState extends State<WebsiteView> {
 
               return NavigationDecision.prevent;
             } else if (url.contains("lms.nust.edu.pk/portal/pluginfile.php")) {
-              final snackBar = SnackBar(
-                elevation: 0,
-                behavior: SnackBarBehavior.floating,
-                backgroundColor: Colors.transparent,
-                content: AwesomeSnackbarContent(
-                  title: 'Error',
-                  message: 'Cannot open file due to LMS privacy!',
-                  contentType: ContentType.warning,
-                ),
-              );
-
-              ScaffoldMessenger.of(context)
-                ..hideCurrentSnackBar()
-                ..showSnackBar(snackBar);
-
+              Toast()
+                  .errorToast(context, 'Cannot open file due to LMS privacy!');
               return NavigationDecision.prevent;
             } else {
               return NavigationDecision.navigate;

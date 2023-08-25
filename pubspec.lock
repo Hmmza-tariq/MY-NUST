@@ -33,14 +33,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
-  awesome_snackbar_content:
-    dependency: "direct main"
-    description:
-      name: awesome_snackbar_content
-      sha256: dc63adf86eadb0a4e9e1d9994c3fe09a7b0552076e87152fc292705ec506c80e
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -342,14 +334,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.15"
-  flutter_svg:
-    dependency: transitive
-    description:
-      name: flutter_svg
-      sha256: "6ff9fa12892ae074092de2fa6a9938fb21dbabfdaa2ff57dc697ff912fc8d4b2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.6"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -492,10 +476,10 @@ packages:
     dependency: transitive
     description:
       name: intl
-      sha256: "3bc132a9dbce73a7e4a21a17d06e1878839ffbf975568bc875c60537824b0c4d"
+      sha256: a3715e3bc90294e971cb7dc063fbf3cd9ee0ebf8604ffeafabd9e6f16abbdbe6
       url: "https://pub.dev"
     source: hosted
-    version: "0.18.1"
+    version: "0.18.0"
   io:
     dependency: transitive
     description:
@@ -616,6 +600,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.4"
+  motion_toast:
+    dependency: "direct main"
+    description:
+      name: motion_toast
+      sha256: f27cfcd39c6a0c433670fb20e4add55c42f925a5382b25f58e917c054d47a624
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.7.8"
   nested:
     dependency: transitive
     description:
@@ -688,22 +680,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.3"
-  path_drawing:
-    dependency: transitive
-    description:
-      name: path_drawing
-      sha256: bbb1934c0cbb03091af082a6389ca2080345291ef07a5fa6d6e078ba8682f977
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.1"
-  path_parsing:
-    dependency: transitive
-    description:
-      name: path_parsing
-      sha256: e3e67b1629e6f7e8100b367d3db6ba6af4b1f0bb80f64db18ef1fbabd2fa9ccf
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.1"
   path_provider:
     dependency: "direct main"
     description:

@@ -169,7 +169,11 @@ class AboutScreenState extends State<AboutScreen> {
                                   child: const Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.link_rounded),
+                                      Icon(
+                                        Icons.link_rounded,
+                                        size: 16,
+                                        color: Colors.blue,
+                                      ),
                                       SizedBox(
                                         width: 5,
                                       ),
@@ -200,7 +204,11 @@ class AboutScreenState extends State<AboutScreen> {
                                   child: const Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.link_rounded),
+                                      Icon(
+                                        Icons.link_rounded,
+                                        size: 16,
+                                        color: Colors.blue,
+                                      ),
                                       SizedBox(
                                         width: 5,
                                       ),
@@ -259,7 +267,11 @@ class AboutScreenState extends State<AboutScreen> {
                                   child: const Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.open_in_new_rounded),
+                                      Icon(
+                                        Icons.open_in_new_rounded,
+                                        size: 16,
+                                        color: Colors.blue,
+                                      ),
                                       SizedBox(
                                         width: 5,
                                       ),

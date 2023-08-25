@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/card_1_widget.dart';
 import '../../Components/result_screen.dart';
+import '../../Components/toasts.dart';
 import '../../Core/app_theme.dart';
 import '../../Provider/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +28,6 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
     with TickerProviderStateMixin {
   List<Semester> semesters = [];
   int credits = 0;
-  late SnackBar snackBar;
   bool _showUndoButton = false;
   late Semester deletedSemester;
   AnimationController? animationController;
@@ -51,7 +50,6 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
   /// *********************************************************
 
   void addSemester(bool isLightMode) {
-    bool isSnackBarVisible = false;
     var gpaProvider = Provider.of<GpaProvider>(context, listen: false);
     showDialog(
       context: context,
@@ -97,28 +95,7 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
                     Navigator.pop(context);
                   }
                 } else {
-                  if (!isSnackBarVisible) {
-                    setState(() {
-                      isSnackBarVisible = true;
-                    });
-                    final snackBar = SnackBar(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      content: AwesomeSnackbarContent(
-                        title: 'Error',
-                        message: "Incorrect name",
-                        contentType: ContentType.warning,
-                      ),
-                    );
-
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(snackBar).closed.then((_) {
-                        setState(() {
-                          isSnackBarVisible = false;
-                        });
-                      });
-                  }
+                  Toast().errorToast(context, 'Incorrect name');
                 }
               },
             ),
