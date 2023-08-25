@@ -2,7 +2,6 @@
 
 import 'dart:io';
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +10,7 @@ import 'package:mynust/Core/notification_service.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../../Components/toasts.dart';
 import '../../Core/app_Theme.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
@@ -154,22 +154,8 @@ class _OnlineFileScreenState extends State<OnlineFileScreen> {
                       if (kDebugMode) {
                         print('ERROR: ${details.description}');
                       }
-                      final snackBar = SnackBar(
-                        elevation: 0,
-                        behavior: SnackBarBehavior.floating,
-                        backgroundColor: Colors.transparent,
-                        content: AwesomeSnackbarContent(
-                          title: 'Error',
-                          message:
-                              "Navigation blocked due to current sites privacy",
-                          contentType: ContentType.failure,
-                        ),
-                      );
-
-                      ScaffoldMessenger.of(context)
-                        ..hideCurrentSnackBar()
-                        ..showSnackBar(snackBar);
-                      Navigator.pop(context);
+                      Toast().errorToast(context,
+                          'Navigation blocked due to current sites privacy');
                     },
                   )
                 : Center(

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +7,7 @@ import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart'
     as picker;
 import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/action_button.dart';
+import '../../Components/toasts.dart';
 import '../../Core/app_Theme.dart';
 import '../../Core/notification_service.dart';
 import '../../Provider/theme_provider.dart';
@@ -106,7 +106,6 @@ class CalendarScreenState extends State<CalendarScreen> {
   void _showAddEventDialog(bool isLightMode) {
     bool notificationAllowed = false;
     DateTime selectedTime = DateTime.now();
-    bool isSnackBarVisible = false;
     showDialog(
       context: context,
       builder: (context) {
@@ -256,29 +255,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                   _taskController.clear();
                   Navigator.pop(context);
                 } else {
-                  if (!isSnackBarVisible) {
-                    setState(() {
-                      isSnackBarVisible = true;
-                    });
-                    final snackBar = SnackBar(
-                      elevation: 0,
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      content: AwesomeSnackbarContent(
-                        title: 'Error',
-                        message: "Incorrect Event",
-                        contentType: ContentType.warning,
-                      ),
-                    );
-
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(snackBar).closed.then((_) {
-                        setState(() {
-                          isSnackBarVisible = false;
-                        });
-                      });
-                  }
+                  Toast().errorToast(context, 'Incorrect Event');
                 }
               },
             ),
@@ -290,7 +267,6 @@ class CalendarScreenState extends State<CalendarScreen> {
 
   void _showEditEventDialog(Event event, bool isLightMode) {
     String title = event.title;
-    bool isSnackBarVisible = false;
     showDialog(
       context: context,
       builder: (context) {
@@ -344,29 +320,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                   _saveEvents();
                   Navigator.pop(context);
                 } else {
-                  if (!isSnackBarVisible) {
-                    setState(() {
-                      isSnackBarVisible = true;
-                    });
-                    final snackBar = SnackBar(
-                      elevation: 0,
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      content: AwesomeSnackbarContent(
-                        title: 'Error',
-                        message: "Incorrect Event",
-                        contentType: ContentType.warning,
-                      ),
-                    );
-
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(snackBar).closed.then((_) {
-                        setState(() {
-                          isSnackBarVisible = false;
-                        });
-                      });
-                  }
+                  Toast().errorToast(context, 'Incorrect Event');
                 }
               },
             ),

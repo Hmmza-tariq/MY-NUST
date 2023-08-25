@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:info_popup/info_popup.dart';
@@ -8,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/action_button.dart';
 import '../../Components/result_screen.dart';
+import '../../Components/toasts.dart';
 import '../../Core/assessments.dart';
 import '../../Core/app_theme.dart';
 import '../../Provider/theme_provider.dart';
@@ -35,7 +35,6 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
   double labAbsoluteMarks = 0;
   bool _showUndoButton = false;
   bool error = false;
-  bool _isSnackBarVisible = false;
   List<TextEditingController> _obtainedMarksControllers = [
     TextEditingController()
   ];
@@ -259,7 +258,7 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                 : AppTheme.ace;
 
     (error)
-        ? showError('Total Weightage exceed 100')
+        ? Toast().errorToast(context, 'Total Weightage exceed 100')
         : await Navigator.push(
             context,
             PageTransition(
@@ -286,22 +285,6 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                     isLightMode: isLightMode),
                 inheritTheme: true,
                 ctx: context));
-  }
-
-  void showError(String message) {
-    final snackBar = SnackBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      content: AwesomeSnackbarContent(
-        title: 'Error',
-        message: message,
-        contentType: ContentType.failure,
-      ),
-    );
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(snackBar);
   }
 
   void _editAssessment(Assessment assessment, int index, bool isLightMode) {
@@ -431,29 +414,8 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                     editedAssessmentTotalMarks != null) {
                   if (editedAssessmentObtainedMarks! <
                       editedAssessmentTotalMarks!) {
-                    if (!_isSnackBarVisible) {
-                      setState(() {
-                        _isSnackBarVisible = true;
-                      });
-                      final snackBar = SnackBar(
-                        elevation: 0,
-                        backgroundColor: Colors.transparent,
-                        content: AwesomeSnackbarContent(
-                          title: 'Error',
-                          message:
-                              'Obtained marks cannot be more than total marks.',
-                          contentType: ContentType.warning,
-                        ),
-                      );
-
-                      ScaffoldMessenger.of(context)
-                        ..hideCurrentSnackBar()
-                        ..showSnackBar(snackBar).closed.then((_) {
-                          setState(() {
-                            _isSnackBarVisible = false;
-                          });
-                        });
-                    }
+                    Toast().errorToast(context,
+                        'Obtained marks cannot be more than total marks.');
                   } else {
                     setState(() {
                       if (assessment.section == 'Lecture') {
@@ -496,11 +458,15 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
     double finalObtainedMarks = 0;
     double finalMaxMarks = 0;
     String section = 'Lecture';
+    String? newAssessmentName;
+    double? newAssessmentWeightage;
+    setState(() {
+      _obtainedMarksControllers.first.text = '';
+      _totalMarksControllers.first.text = '';
+    });
     showDialog(
       context: context,
       builder: (context) {
-        String? newAssessmentName;
-        double? newAssessmentWeightage;
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
@@ -549,7 +515,7 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                       style: TextStyle(
                           color: isLightMode ? Colors.black : Colors.white),
                       onChanged: (value) {
-                        newAssessmentName = value;
+                        setState(() => newAssessmentName = value);
                       },
                       decoration: InputDecoration(
                         labelText: 'Assessment Name',
@@ -562,6 +528,8 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                           color: isLightMode ? Colors.black : Colors.white),
                       onChanged: (value) {
                         if (value.isNotEmpty) {
+                          setState(() =>
+                              newAssessmentWeightage = double.tryParse(value));
                           newAssessmentWeightage = double.tryParse(value);
                         } else {
                           newAssessmentWeightage = null;
@@ -718,31 +686,12 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                         Navigator.pop(context);
                       });
                     } else {
-                      if (!_isSnackBarVisible) {
-                        setState(() {
-                          _isSnackBarVisible = true;
-                        });
-                        final snackBar = SnackBar(
-                          elevation: 0,
-                          backgroundColor: Colors.transparent,
-                          content: AwesomeSnackbarContent(
-                            title: 'Error',
-                            message: (newAssessmentName == null ||
-                                    newAssessmentWeightage == null)
-                                ? 'Incomplete Data'
-                                : 'Obtained marks cannot be more than total marks.',
-                            contentType: ContentType.warning,
-                          ),
-                        );
-
-                        ScaffoldMessenger.of(context)
-                          ..hideCurrentSnackBar()
-                          ..showSnackBar(snackBar).closed.then((_) {
-                            setState(() {
-                              _isSnackBarVisible = false;
-                            });
-                          });
-                      }
+                      Toast().errorToast(
+                          context,
+                          (newAssessmentName == null ||
+                                  newAssessmentWeightage == null)
+                              ? 'Incomplete Data'
+                              : 'Obtained marks cannot be more than total marks.');
                     }
                   },
                 ),

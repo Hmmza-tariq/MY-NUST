@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +8,7 @@ import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/action_button.dart';
 import '../../Components/card_1_widget.dart';
 import '../../Components/result_screen.dart';
+import '../../Components/toasts.dart';
 import '../../Core/app_theme.dart';
 import '../../Core/semester.dart';
 import '../../Provider/theme_provider.dart';
@@ -50,8 +50,6 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
     int semesterNo = semester.name;
     int credits = semester.credits;
     double sgpa = semester.sgpa;
-    bool isSnackBarVisible = false;
-
     showDialog(
       context: context,
       builder: (context) {
@@ -138,28 +136,7 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
                   _saveSemesters();
                   Navigator.pop(context);
                 } else {
-                  if (!isSnackBarVisible) {
-                    setState(() {
-                      isSnackBarVisible = true;
-                    });
-                    final snackBar = SnackBar(
-                      elevation: 0,
-                      backgroundColor: Colors.transparent,
-                      content: AwesomeSnackbarContent(
-                        title: 'Error',
-                        message: "Incorrect Data",
-                        contentType: ContentType.warning,
-                      ),
-                    );
-
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(snackBar).closed.then((_) {
-                        setState(() {
-                          isSnackBarVisible = false;
-                        });
-                      });
-                  }
+                  Toast().errorToast(context, 'Incorrect Data');
                 }
               },
             ),
@@ -197,7 +174,6 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
     double sgpa = 0.0;
     int credits = 0;
     int semesterNo = 1;
-    bool isSnackBarVisible = false;
     showDialog(
       context: context,
       builder: (context) {
@@ -284,29 +260,7 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
                   _saveSemesters();
                   Navigator.pop(context);
                 } else {
-                  if (!isSnackBarVisible) {
-                    setState(() {
-                      isSnackBarVisible = true;
-                    });
-
-                    final snackBar = SnackBar(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      content: AwesomeSnackbarContent(
-                        title: 'Error',
-                        message: "Incorrect Data",
-                        contentType: ContentType.warning,
-                      ),
-                    );
-
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(snackBar).closed.then((_) {
-                        setState(() {
-                          isSnackBarVisible = false;
-                        });
-                      });
-                  }
+                  Toast().errorToast(context, 'Incorrect Data');
                 }
               },
             ),

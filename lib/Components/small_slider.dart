@@ -25,7 +25,12 @@ class SmallSlider extends StatefulWidget {
 class SmallSliderState extends State<SmallSlider>
     with TickerProviderStateMixin {
   AnimationController? animationController;
-  List<SmallSliderListData> sliderListData = SmallSliderListData.tabIconsList;
+  List<SmallSliderListData> sliderListData0 =
+      SmallSliderListData.smallSliderList0;
+  List<SmallSliderListData> sliderListData1 =
+      SmallSliderListData.smallSliderList1;
+  List<SmallSliderListData> sliderListData2 =
+      SmallSliderListData.smallSliderList2;
 
   @override
   void initState() {
@@ -56,7 +61,7 @@ class SmallSliderState extends State<SmallSlider>
             transform: Matrix4.translationValues(
                 0.0, 30 * (1.0 - widget.mainScreenAnimation!.value), 0.0),
             child: SizedBox(
-              height: widget.isWrap ? 300 : 160,
+              height: widget.isWrap ? 300 : 200,
               width: double.infinity,
               child: widget.isWrap
                   ? Center(
@@ -64,11 +69,11 @@ class SmallSliderState extends State<SmallSlider>
                         spacing: 8,
                         runSpacing: 8,
                         children: List.generate(
-                          sliderListData.length,
+                          sliderListData0.length,
                           (index) {
-                            final int count = sliderListData.length > 10
+                            final int count = sliderListData0.length > 10
                                 ? 10
-                                : sliderListData.length;
+                                : sliderListData0.length;
                             final Animation<double> animation =
                                 Tween<double>(begin: 0.0, end: 1.0).animate(
                               CurvedAnimation(
@@ -80,7 +85,7 @@ class SmallSliderState extends State<SmallSlider>
                             animationController?.forward();
 
                             return SliderView(
-                              sliderListData: sliderListData[index],
+                              sliderListData: sliderListData0[index],
                               animation: animation,
                               animationController: animationController!,
                               isWrap: widget.isWrap,
@@ -89,31 +94,65 @@ class SmallSliderState extends State<SmallSlider>
                         ),
                       ),
                     )
-                  : ListView.builder(
-                      padding: const EdgeInsets.only(right: 16, left: 16),
-                      itemCount: sliderListData.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (BuildContext context, int index) {
-                        final int count = sliderListData.length > 10
-                            ? 10
-                            : sliderListData.length;
-                        final Animation<double> animation =
-                            Tween<double>(begin: 0.0, end: 1.0).animate(
-                          CurvedAnimation(
-                            parent: animationController!,
-                            curve: Interval((1 / count) * index, 1.0,
-                                curve: Curves.fastOutSlowIn),
-                          ),
-                        );
-                        animationController?.forward();
+                  : Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            padding: const EdgeInsets.only(right: 16, left: 16),
+                            itemCount: sliderListData1.length,
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (BuildContext context, int index) {
+                              final int count = sliderListData1.length > 10
+                                  ? 10
+                                  : sliderListData1.length;
+                              final Animation<double> animation =
+                                  Tween<double>(begin: 0.0, end: 1.0).animate(
+                                CurvedAnimation(
+                                  parent: animationController!,
+                                  curve: Interval((1 / count) * index, 1.0,
+                                      curve: Curves.fastOutSlowIn),
+                                ),
+                              );
+                              animationController?.forward();
 
-                        return SliderView(
-                          sliderListData: sliderListData[index],
-                          animation: animation,
-                          animationController: animationController!,
-                          isWrap: widget.isWrap,
-                        );
-                      },
+                              return SliderView(
+                                sliderListData: sliderListData1[index],
+                                animation: animation,
+                                animationController: animationController!,
+                                isWrap: widget.isWrap,
+                              );
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                            padding: const EdgeInsets.only(right: 16, left: 16),
+                            itemCount: sliderListData2.length,
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (BuildContext context, int index) {
+                              final int count = sliderListData2.length > 10
+                                  ? 10
+                                  : sliderListData2.length;
+                              final Animation<double> animation =
+                                  Tween<double>(begin: 0.0, end: 1.0).animate(
+                                CurvedAnimation(
+                                  parent: animationController!,
+                                  curve: Interval((1 / count) * index, 1.0,
+                                      curve: Curves.fastOutSlowIn),
+                                ),
+                              );
+                              animationController?.forward();
+
+                              return SliderView(
+                                sliderListData: sliderListData2[index],
+                                animation: animation,
+                                animationController: animationController!,
+                                isWrap: widget.isWrap,
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
             ),
           ),

@@ -36,7 +36,8 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   late NativeAd? _nativeAd_1;
   late NativeAd? _nativeAd_2;
   bool _isAdLoaded = false;
-  List<SmallSliderListData> sliderListData = SmallSliderListData.tabIconsList;
+  List<SmallSliderListData> sliderListData =
+      SmallSliderListData.smallSliderList0;
   bool _isLightMode = false;
   var adStyle = NativeTemplateTextStyle(
       textColor: AppTheme.notWhite,
@@ -82,9 +83,9 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   widget: ConstrainedBox(
                     constraints: const BoxConstraints(
                       minWidth: 180,
-                      minHeight: 160,
+                      minHeight: 180,
                       maxWidth: 220,
-                      maxHeight: 200,
+                      maxHeight: 220,
                     ),
                     child: AdWidget(ad: _nativeAd_1!),
                   ),
@@ -344,7 +345,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                       ),
                     ),
                     SizedBox(
-                      height: isWrap ? 450 : 150,
+                      height: isWrap ? 450 : 300,
                       child: SmallSlider(
                         mainScreenAnimation: Tween<double>(begin: 0.0, end: 1.0)
                             .animate(CurvedAnimation(

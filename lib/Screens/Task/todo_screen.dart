@@ -1,7 +1,7 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/action_button.dart';
+import '../../Components/toasts.dart';
 import '../../Core/app_theme.dart';
 import '../../Provider/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -74,7 +74,6 @@ class TodoListPageState extends State<ScheduleTaskScreen> {
 
   void _showEditTaskDialog(int index, bool isLightMode) {
     String task = '';
-    bool isSnackBarVisible = false;
 
     showDialog(
       context: context,
@@ -129,29 +128,7 @@ class TodoListPageState extends State<ScheduleTaskScreen> {
                   _saveTasks();
                   Navigator.pop(context);
                 } else {
-                  if (!isSnackBarVisible) {
-                    setState(() {
-                      isSnackBarVisible = true;
-                    });
-                    final snackBar = SnackBar(
-                      elevation: 0,
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      content: AwesomeSnackbarContent(
-                        title: 'Error',
-                        message: "Incorrect Task",
-                        contentType: ContentType.warning,
-                      ),
-                    );
-
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(snackBar).closed.then((_) {
-                        setState(() {
-                          isSnackBarVisible = false;
-                        });
-                      });
-                  }
+                  Toast().errorToast(context, 'Incorrect task');
                 }
               },
             ),
@@ -162,7 +139,6 @@ class TodoListPageState extends State<ScheduleTaskScreen> {
   }
 
   void addTask(bool isLightMode) {
-    bool isSnackBarVisible = false;
     showDialog(
       context: context,
       builder: (context) {
@@ -201,29 +177,7 @@ class TodoListPageState extends State<ScheduleTaskScreen> {
                   _addTask(newTask);
                   Navigator.pop(context);
                 } else {
-                  if (!isSnackBarVisible) {
-                    setState(() {
-                      isSnackBarVisible = true;
-                    });
-                    final snackBar = SnackBar(
-                      elevation: 0,
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.transparent,
-                      content: AwesomeSnackbarContent(
-                        title: 'Error',
-                        message: "Incorrect Task",
-                        contentType: ContentType.warning,
-                      ),
-                    );
-
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(snackBar).closed.then((_) {
-                        setState(() {
-                          isSnackBarVisible = false;
-                        });
-                      });
-                  }
+                  Toast().errorToast(context, 'Incorrect task');
                 }
               },
             ),

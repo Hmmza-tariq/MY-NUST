@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mynust/Components/action_button.dart';
@@ -10,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 
 import '../../Components/hex_color.dart';
+import '../../Components/toasts.dart';
 import '../../Core/app_Theme.dart';
 import '../../Provider/theme_provider.dart';
 import 'folder_screen.dart';
@@ -130,7 +130,6 @@ class GalleryScreenState extends State<GalleryScreen> {
   }
 
   void addFolder(bool isLightMode) {
-    bool isSnackBarVisible = false;
     showDialog(
       context: context,
       builder: (context) {
@@ -186,28 +185,8 @@ class GalleryScreenState extends State<GalleryScreen> {
                 if (!error) {
                   Navigator.pop(context);
                 } else {
-                  if (!isSnackBarVisible) {
-                    setState(() {
-                      isSnackBarVisible = true;
-                    });
-                    final snackBar = SnackBar(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                      content: AwesomeSnackbarContent(
-                        title: 'Error',
-                        message: "Incorrect name or folder already exists",
-                        contentType: ContentType.warning,
-                      ),
-                    );
-
-                    ScaffoldMessenger.of(context)
-                      ..hideCurrentSnackBar()
-                      ..showSnackBar(snackBar).closed.then((_) {
-                        setState(() {
-                          isSnackBarVisible = false;
-                        });
-                      });
-                  }
+                  Toast().errorToast(
+                      context, 'Incorrect name or folder already exists');
                 }
               },
             ),

@@ -197,7 +197,11 @@ class LinkWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          const Icon(Icons.open_in_new),
+          const Icon(
+            Icons.open_in_new,
+            size: 16,
+            color: Colors.blue,
+          ),
           const SizedBox(
             width: 5,
           ),

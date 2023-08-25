@@ -1,9 +1,9 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:info_popup/info_popup.dart';
 import 'package:mynust/Components/action_button.dart';
 import 'package:page_transition/page_transition.dart';
 import '../../Components/result_screen.dart';
+import '../../Components/toasts.dart';
 import '../../Core/app_theme.dart';
 import '../../Provider/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -23,30 +23,37 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
       netPercentageController = TextEditingController(),
       sscController = TextEditingController(),
       hsscController = TextEditingController(),
-      netController = TextEditingController();
+      netController = TextEditingController(),
+      sscTotalController = TextEditingController(),
+      hsscTotalController = TextEditingController(),
+      netTotalController = TextEditingController();
   double ssc = 0.0,
       hssc = 0.0,
       net = 0.0,
       sscPercentage = 10,
       hsscPercentage = 15,
       netPercentage = 75;
+  int sscTotal = 1100, hsscTotal = 1100, netTotal = 200;
   bool _marks = false, _isEditing = false;
   @override
   void initState() {
     sscPercentageController.text = '10';
     hsscPercentageController.text = '15';
     netPercentageController.text = '75';
+    sscTotalController.text = '1100';
+    hsscTotalController.text = '1100';
+    netTotalController.text = '200';
     super.initState();
   }
 
   double calculateAggregate() {
     return _marks
-        ? ((ssc / 1100) * sscPercentage +
-            (hssc / 1100) * hsscPercentage +
-            (net / 200) * netPercentage)
+        ? ((ssc / sscTotal) * sscPercentage +
+            (hssc / hsscTotal) * hsscPercentage +
+            (net / netTotal) * netPercentage)
         : ((ssc / 100 * sscPercentage) +
             (hssc / 100 * hsscPercentage) +
-            ((net / 200) * netPercentage));
+            ((net / netTotal) * netPercentage));
   }
 
   void resultDialog(bool isLightMode) async {
@@ -55,6 +62,9 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
     bool error1 = (ssc == 0 || hssc == 0 || net == 0);
     bool error2 = ((sscPercentage + hsscPercentage + netPercentage) != 100);
     bool error3 = (aggregate > 100);
+    bool error4 = (net > netTotal || _marks
+        ? (ssc > sscTotal || hssc > hsscTotal)
+        : (ssc > 100 || hssc > 100));
 
     if (aggregate < 50) {
       aggregateColor = Colors.red;
@@ -66,12 +76,14 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
       aggregateColor = AppTheme.ace;
     }
 
-    (error1 || error2 || error3)
-        ? showError(error1
-            ? 'Incomplete Data'
-            : error2
-                ? 'Total percentage is not equal to 100'
-                : 'Incorrect Data')
+    (error1 || error2 || error3 || error4)
+        ? Toast().errorToast(
+            context,
+            error1
+                ? 'Incomplete Data'
+                : error2
+                    ? 'Total percentage is not equal to 100'
+                    : 'Incorrect Data')
         : await Navigator.push(
             context,
             PageTransition(
@@ -105,22 +117,6 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
                 ),
                 inheritTheme: true,
                 ctx: context));
-  }
-
-  void showError(String message) {
-    final snackBar = SnackBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      content: AwesomeSnackbarContent(
-        title: 'Error',
-        message: message,
-        contentType: ContentType.failure,
-      ),
-    );
-
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(snackBar);
   }
 
   @override
@@ -182,64 +178,134 @@ class CalcAggregateScreenState extends State<CalcAggregateScreen> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextField(
-                        decoration: InputDecoration(
-                          label: const Text('SSC weightage:'),
-                          labelStyle: TextStyle(
-                              color: isLightMode ? Colors.black : Colors.white),
-                        ),
-                        controller: sscPercentageController,
-                        style: TextStyle(
-                            color: isLightMode ? Colors.black : Colors.white),
-                        keyboardType: TextInputType.number,
-                        onChanged: (value) {
-                          setState(() {
-                            sscPercentage = double.parse(value);
-                          });
-                        },
-                      ),
-                      TextField(
-                        decoration: InputDecoration(
-                          label: const Text(
-                            'HSSC weightage:',
+                  child: StatefulBuilder(builder: (context, setState) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          decoration: InputDecoration(
+                            label: const Text('SSC weightage:'),
+                            labelStyle: TextStyle(
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
                           ),
-                          labelStyle: TextStyle(
+                          controller: sscPercentageController,
+                          style: TextStyle(
                               color: isLightMode ? Colors.black : Colors.white),
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) {
+                            setState(() {
+                              sscPercentage = double.parse(value);
+                            });
+                          },
                         ),
-                        controller: hsscPercentageController,
-                        style: TextStyle(
-                            color: isLightMode ? Colors.black : Colors.white),
-                        keyboardType: TextInputType.number,
-                        onChanged: (value) {
-                          setState(() {
-                            hsscPercentage = double.parse(value);
-                          });
-                        },
-                      ),
-                      TextField(
-                        decoration: InputDecoration(
-                          label: const Text(
-                            'NET Score weightage:',
+                        TextField(
+                          decoration: InputDecoration(
+                            label: const Text(
+                              'HSSC weightage:',
+                            ),
+                            labelStyle: TextStyle(
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
                           ),
-                          labelStyle: TextStyle(
+                          controller: hsscPercentageController,
+                          style: TextStyle(
                               color: isLightMode ? Colors.black : Colors.white),
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) {
+                            setState(() {
+                              hsscPercentage = double.parse(value);
+                            });
+                          },
                         ),
-                        controller: netPercentageController,
-                        style: TextStyle(
-                            color: isLightMode ? Colors.black : Colors.white),
-                        keyboardType: TextInputType.number,
-                        onChanged: (value) {
-                          setState(() {
-                            netPercentage = double.parse(value);
-                          });
-                        },
-                      ),
-                    ],
-                  ),
+                        TextField(
+                          decoration: InputDecoration(
+                            label: const Text(
+                              'NET Score weightage:',
+                            ),
+                            labelStyle: TextStyle(
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                          ),
+                          controller: netPercentageController,
+                          style: TextStyle(
+                              color: isLightMode ? Colors.black : Colors.white),
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) {
+                            setState(() {
+                              netPercentage = double.parse(value);
+                            });
+                          },
+                        ),
+                        _marks
+                            ? TextField(
+                                controller: sscTotalController,
+                                decoration: InputDecoration(
+                                  label: const Text('SSC total:'),
+                                  labelStyle: TextStyle(
+                                      color: isLightMode
+                                          ? Colors.black
+                                          : Colors.white),
+                                ),
+                                style: TextStyle(
+                                    color: isLightMode
+                                        ? Colors.black
+                                        : Colors.white),
+                                keyboardType: TextInputType.number,
+                                onChanged: (value) {
+                                  setState(() {
+                                    sscTotal = int.parse(value);
+                                  });
+                                },
+                              )
+                            : Container(),
+                        _marks
+                            ? TextField(
+                                controller: hsscTotalController,
+                                decoration: InputDecoration(
+                                  label: const Text(
+                                    'HSSC total:',
+                                  ),
+                                  labelStyle: TextStyle(
+                                      color: isLightMode
+                                          ? Colors.black
+                                          : Colors.white),
+                                ),
+                                style: TextStyle(
+                                    color: isLightMode
+                                        ? Colors.black
+                                        : Colors.white),
+                                keyboardType: TextInputType.number,
+                                onChanged: (value) {
+                                  setState(() {
+                                    hsscTotal = int.parse(value);
+                                  });
+                                },
+                              )
+                            : Container(),
+                        TextField(
+                          controller: netTotalController,
+                          decoration: InputDecoration(
+                            label: const Text(
+                              'NET total Score:',
+                            ),
+                            labelStyle: TextStyle(
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                          ),
+                          style: TextStyle(
+                              color: isLightMode ? Colors.black : Colors.white),
+                          keyboardType: TextInputType.number,
+                          onChanged: (value) {
+                            setState(() {
+                              netTotal = int.parse(value);
+                            });
+                          },
+                        ),
+                      ],
+                    );
+                  }),
                 ),
               ),
               child: const Icon(
