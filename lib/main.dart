@@ -37,7 +37,6 @@ Future<void> main() async {
   tz.initializeTimeZones();
 
   // await FirebaseApi().initNotification();
-
   // if (runWebViewTitleBarWidget(args)) {
   //   return;
   // }

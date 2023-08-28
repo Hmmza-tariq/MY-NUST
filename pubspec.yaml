@@ -44,13 +44,11 @@ dependencies:
   open_file: ^3.3.2
   dio: ^5.3.2
   upgrader: ^8.1.0
-  image_picker: ^1.0.2
+  image_picker: ^1.0.2<>
   photo_view: ^0.14.0
   encrypt: ^5.0.1
   url_launcher: ^6.1.12
   motion_toast: ^2.7.8
-
-
 
 dev_dependencies:
   flutter_test:
