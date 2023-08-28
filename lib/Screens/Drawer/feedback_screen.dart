@@ -143,7 +143,7 @@ class FeedbackScreenState extends State<FeedbackScreen> {
                                 padding: const EdgeInsets.all(4.0),
                                 child: isLoading
                                     ? LoadingAnimationWidget.hexagonDots(
-                                        size: 40,
+                                        size: 20,
                                         color: isLightMode
                                             ? AppTheme.white
                                             : AppTheme.grey,
