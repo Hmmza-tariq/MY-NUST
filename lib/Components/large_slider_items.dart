@@ -21,8 +21,7 @@ class LargeSliderListData {
       imagePath: 'assets/images/lms.png',
       name: 'LMS',
       navigateScreen: const PortalScreen(
-        initialUrl:
-            'https://lms.nust.edu.pk/portal/calendar/view.php?view=month',
+        initialUrl: 'https://lms.nust.edu.pk/portal/my/',
       ),
     ),
     LargeSliderListData(

@@ -61,7 +61,9 @@ class _WebsiteViewState extends State<WebsiteView> {
               _isLoading = false;
             });
           },
-          onWebResourceError: (WebResourceError error) {},
+          onWebResourceError: (WebResourceError error) {
+            Navigator.pop(context);
+          },
           onNavigationRequest: (NavigationRequest request) async {
             String url = request.url;
             List<String> downloadableExtensions = [
@@ -113,8 +115,9 @@ class _WebsiteViewState extends State<WebsiteView> {
       systemNavigationBarColor: AppTheme.white,
       systemNavigationBarIconBrightness: Brightness.dark,
     ));
-    return Provider.of<InternetProvider>(context).isConnected
-        ? WillPopScope(
+    return Stack(
+      children: [
+        WillPopScope(
             onWillPop: () async {
               if (await webViewController.canGoBack()) {
                 webViewController.goBack();
@@ -148,42 +151,47 @@ class _WebsiteViewState extends State<WebsiteView> {
                   ],
                 ),
               ),
-            ))
-        : Container(
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Waiting for internet connection...',
-                  style: TextStyle(
-                    decoration: TextDecoration.none,
-                    fontFamily: AppTheme.fontName,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+            )),
+        Visibility(
+            visible: !Provider.of<InternetProvider>(context, listen: true)
+                .isConnected,
+            child: Container(
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Waiting for internet connection...',
+                    style: TextStyle(
+                      decoration: TextDecoration.none,
+                      fontFamily: AppTheme.fontName,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                SizedBox(
-                  child: Image.asset('assets/images/Error.png'),
-                ),
-                ElevatedButton(
-                    onPressed: () {
-                      InternetManager.checkInternet(context);
-                    },
-                    child: const Text(
-                      'Retry',
-                      style: TextStyle(
-                        decoration: TextDecoration.none,
-                        fontFamily: AppTheme.fontName,
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ))
-              ],
-            ),
-          );
+                  SizedBox(
+                    child: Image.asset('assets/images/error.png'),
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        InternetManager.checkInternet(context);
+                      },
+                      child: const Text(
+                        'Retry',
+                        style: TextStyle(
+                          decoration: TextDecoration.none,
+                          fontFamily: AppTheme.fontName,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ))
+                ],
+              ),
+            ))
+      ],
+    );
   }
 }

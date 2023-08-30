@@ -14,7 +14,7 @@ Key Features:
 
 4. GPA Calculator: Calculate your GPA accurately using the built-in GPA calculator. Stay on top of your grades and monitor your academic achievements effortlessly.
 
-5. Absoltes and Aggregate: Plan your academic journey effectively by calculating absolutes and aggregates with ease. Make informed decisions about your course selections and future goals.
+5. Absolutes and Aggregate: Plan your academic journey effectively by calculating absolutes and aggregates with ease. Make informed decisions about your course selections and future goals.
 
 6. To-Do Tasks and Calendar: Keep track of your tasks and events with the app's intuitive To-Do and Calendar features. Stay organized and manage your time efficiently, ensuring a balanced academic and personal life.
 

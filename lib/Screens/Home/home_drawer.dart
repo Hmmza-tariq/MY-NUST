@@ -162,36 +162,6 @@ class HomeDrawerState extends State<HomeDrawer> {
               },
             ),
           ),
-          // Divider(
-          //   height: 1,
-          //   color: AppTheme.grey.withOpacity(0.6),
-          // ),
-          // Column(
-          //   children: <Widget>[
-          //     ListTile(
-          //       title: const Text(
-          //         'Settings',
-          //         style: TextStyle(
-          //           fontFamily: AppTheme.fontName,
-          //           fontWeight: FontWeight.w600,
-          //           fontSize: 16,
-          //           color: AppTheme.darkText,
-          //         ),
-          //         textAlign: TextAlign.left,
-          //       ),
-          //       trailing: const Icon(
-          //         Icons.settings,
-          //         color: AppTheme.nearlyBlack,
-          //       ),
-          //       onTap: () {
-          //         onTapped();
-          //       },
-          //     ),
-          //     SizedBox(
-          //       height: MediaQuery.of(context).padding.bottom,
-          //     )
-          //   ],
-          // ),
         ],
       ),
     );
