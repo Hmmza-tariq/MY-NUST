@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -118,7 +118,7 @@ class _MyAppState extends State<MyApp> {
       bool authenticated = await auth.authenticate(
           localizedReason: 'Biometric authentication is enabled',
           options: const AuthenticationOptions(
-              stickyAuth: true, biometricOnly: true));
+              useErrorDialogs: false, stickyAuth: false, biometricOnly: false));
       if (authenticated) {
         setState(() {
           locked = false;
@@ -127,11 +127,7 @@ class _MyAppState extends State<MyApp> {
       } else {
         SystemNavigator.pop();
       }
-    } on PlatformException catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-    }
+    } on PlatformException {}
   }
 
   @override
@@ -171,12 +167,10 @@ class _MyAppState extends State<MyApp> {
               ? Scaffold(
                   backgroundColor: HexColor('#0263B5'),
                   body: SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.all(30.0),
+                    child: Center(
                       child: SizedBox(
-                        height: 300,
-                        child: Image.asset('assets/images/appLogo.png'),
-                      ),
+                          width: MediaQuery.of(context).size.width / 1.6,
+                          child: Image.asset('assets/images/appLogoLarge.png')),
                     ),
                   ),
                 )

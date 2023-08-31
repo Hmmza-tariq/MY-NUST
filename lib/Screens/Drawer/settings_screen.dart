@@ -42,8 +42,9 @@ class SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     auth = LocalAuthentication();
-    auth.isDeviceSupported().then((bool isSupported) => setState(() {
-          _supportState = isSupported;
+
+    auth.isDeviceSupported().then((bool isSupported) => setState(() async {
+          _supportState = isSupported || await auth.canCheckBiometrics;
         }));
     _loadBiometricPreference().then((value) {
       setState(() {
