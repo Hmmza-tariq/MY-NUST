@@ -160,9 +160,8 @@ class GalleryScreenState extends State<GalleryScreen> {
                   if (await folderPath!.exists()) {
                     final newFolderPath =
                         "${folderPath!.path}/${controller.text.toUpperCase()}";
-                    if (!folderList
-                        .toString()
-                        .contains(Directory(newFolderPath).path)) {
+                    if (!folderList.any((folder) =>
+                        folder.path == Directory(newFolderPath).path)) {
                       final newFolder = Directory(newFolderPath);
                       await newFolder.create(recursive: true);
                       setState(() {
