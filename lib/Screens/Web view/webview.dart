@@ -35,13 +35,13 @@ class _WebsiteViewState extends State<WebsiteView> {
   void initializeWebView() async {
     InternetProvider ip = Provider.of<InternetProvider>(context, listen: false);
     ip.webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..runJavaScript(
-          "navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';")
-      ..runJavaScriptReturningResult(
-          "navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';")
-      ..setUserAgent(
-          "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Mobile Safari/537.36")
+      // ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      // ..runJavaScript(
+      //     "navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';")
+      // ..runJavaScriptReturningResult(
+      //     "navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';")
+      // ..setUserAgent(
+      //     "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Mobile Safari/537.36")
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -62,7 +62,7 @@ class _WebsiteViewState extends State<WebsiteView> {
             });
           },
           onWebResourceError: (WebResourceError error) {
-            Navigator.pop(context);
+            Toast().errorToast(context, '');
           },
           onNavigationRequest: (NavigationRequest request) async {
             String url = request.url;
@@ -104,8 +104,8 @@ class _WebsiteViewState extends State<WebsiteView> {
           },
         ),
       )
+      ..enableZoom(true)
       ..loadRequest(Uri.parse(widget.initialUrl));
-    ip.webViewController.enableZoom(false);
   }
 
   @override

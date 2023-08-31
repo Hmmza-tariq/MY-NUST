@@ -28,22 +28,6 @@ class SmallSliderListData {
   Widget page;
   static List<SmallSliderListData> smallSliderList1 = [
     SmallSliderListData(
-      title: 'Calendar',
-      subtitle: <String>['Events'],
-      startColor: '#FE95B6',
-      endColor: '#FF5287',
-      icon: Icons.calendar_month_rounded,
-      page: const CalendarScreen(),
-    ),
-    SmallSliderListData(
-      title: 'Downloaded',
-      subtitle: <String>['Files'],
-      startColor: '#FFB295',
-      endColor: '#FA7D82',
-      icon: Icons.download_for_offline_rounded,
-      page: const DownloadedFilesScreen(),
-    ),
-    SmallSliderListData(
       title: 'To Do',
       subtitle: <String>['Tasks'],
       startColor: '#8BC34A',
@@ -58,6 +42,22 @@ class SmallSliderListData {
       endColor: '#0C3A5D',
       icon: Icons.filter_rounded,
       page: const GalleryScreen(),
+    ),
+    SmallSliderListData(
+      title: 'Calendar',
+      subtitle: <String>['Events'],
+      startColor: '#FE95B6',
+      endColor: '#FF5287',
+      icon: Icons.calendar_month_rounded,
+      page: const CalendarScreen(),
+    ),
+    SmallSliderListData(
+      title: 'Downloaded',
+      subtitle: <String>['Files'],
+      startColor: '#FFB295',
+      endColor: '#FA7D82',
+      icon: Icons.download_for_offline_rounded,
+      page: const DownloadedFilesScreen(),
     ),
     SmallSliderListData(
       title: 'Helping',
