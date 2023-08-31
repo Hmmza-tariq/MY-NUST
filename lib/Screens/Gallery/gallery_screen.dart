@@ -24,7 +24,7 @@ class GalleryScreen extends StatefulWidget {
 class GalleryScreenState extends State<GalleryScreen> {
   late Future<List<FileSystemEntity>> folders;
   List<FileSystemEntity> folderList = [];
-  Directory? tempDir;
+  Directory? folderPath;
   @override
   void initState() {
     super.initState();
@@ -32,14 +32,13 @@ class GalleryScreenState extends State<GalleryScreen> {
   }
 
   Future<List<FileSystemEntity>> getFoldersInDirectory() async {
-    tempDir = await getExternalStorageDirectory();
+    Directory? tempDir = await getExternalStorageDirectory();
+    folderPath = Directory("${tempDir!.path}/gallery");
 
-    final folderPath = Directory("${tempDir!.path}/gallery");
-
-    if (await folderPath.exists()) {
-      return folderPath.listSync();
+    if (await folderPath!.exists()) {
+      return folderPath!.listSync();
     } else {
-      await folderPath.create(recursive: true);
+      await folderPath!.create(recursive: true);
       return [];
     }
   }
@@ -64,17 +63,15 @@ class GalleryScreenState extends State<GalleryScreen> {
   }
 
   Future<String> getPath() async {
-    final filePath = Directory("${tempDir!.path}/gallery");
-    if (await filePath.exists()) {
-      return filePath.path;
+    if (await folderPath!.exists()) {
+      return folderPath!.path;
     } else {
-      await filePath.create(recursive: true);
-      return filePath.path;
+      await folderPath!.create(recursive: true);
+      return folderPath!.path;
     }
   }
 
-  void _deleteDialog(BuildContext context, bool isLightMode, bool all,
-      {String folderPath = ''}) async {
+  void _deleteDialog(BuildContext context, bool isLightMode) async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -88,10 +85,7 @@ class GalleryScreenState extends State<GalleryScreen> {
                 fontWeight: FontWeight.bold,
                 color: isLightMode ? Colors.black : Colors.white),
           ),
-          content: Text(
-              all
-                  ? 'Are you sure you want to delete all folders?'
-                  : 'Are you sure you want to delete this folders?',
+          content: Text('Are you sure you want to delete all folders?',
               style: TextStyle(
                   fontSize: 14,
                   color: isLightMode ? Colors.black : Colors.white)),
@@ -107,7 +101,7 @@ class GalleryScreenState extends State<GalleryScreen> {
             ),
             TextButton(
               onPressed: () {
-                all ? deleteAllFoldersInDirectory() : deleteFolder(folderPath);
+                deleteAllFoldersInDirectory();
                 Navigator.of(context).pop();
               },
               child: const Text('Delete',
@@ -130,10 +124,10 @@ class GalleryScreenState extends State<GalleryScreen> {
   }
 
   void addFolder(bool isLightMode) {
+    TextEditingController controller = TextEditingController();
     showDialog(
       context: context,
       builder: (context) {
-        String newFolderName = '';
         return AlertDialog(
           backgroundColor:
               isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
@@ -145,10 +139,9 @@ class GalleryScreenState extends State<GalleryScreen> {
                 color: isLightMode ? Colors.black : Colors.white),
           ),
           content: TextField(
+            controller: controller,
             style: TextStyle(color: isLightMode ? Colors.black : Colors.white),
-            onChanged: (value) {
-              newFolderName = value;
-            },
+            onChanged: (value) {},
             decoration: InputDecoration(
                 labelText: 'Folder',
                 labelStyle: TextStyle(
@@ -163,12 +156,14 @@ class GalleryScreenState extends State<GalleryScreen> {
                       color: isLightMode ? Colors.black : Colors.white)),
               onPressed: () async {
                 bool error = false;
-                if (newFolderName.isNotEmpty) {
-                  final galleryPath = Directory("${tempDir!.path}/gallery");
-                  if (await galleryPath.exists()) {
-                    final newFolderPath = "${galleryPath.path}/$newFolderName";
-                    final newFolder = Directory(newFolderPath);
-                    if (!folderList.toString().contains(newFolder.path)) {
+                if (controller.text.isNotEmpty) {
+                  if (await folderPath!.exists()) {
+                    final newFolderPath =
+                        "${folderPath!.path}/${controller.text.toUpperCase()}";
+                    if (!folderList
+                        .toString()
+                        .contains(Directory(newFolderPath).path)) {
+                      final newFolder = Directory(newFolderPath);
                       await newFolder.create(recursive: true);
                       setState(() {
                         folderList.add(newFolder);
@@ -183,8 +178,10 @@ class GalleryScreenState extends State<GalleryScreen> {
                   error = true;
                 }
                 if (!error) {
+                  // ignore: use_build_context_synchronously
                   Navigator.pop(context);
                 } else {
+                  // ignore: use_build_context_synchronously
                   Toast().errorToast(
                       context, 'Incorrect name or folder already exists');
                 }
@@ -241,7 +238,7 @@ class GalleryScreenState extends State<GalleryScreen> {
         ),
         actions: [
           IconButton(
-              onPressed: () => _deleteDialog(context, isLightMode, true),
+              onPressed: () => _deleteDialog(context, isLightMode),
               icon: const Icon(Icons.delete_rounded))
         ],
       ),
@@ -284,8 +281,7 @@ class GalleryScreenState extends State<GalleryScreen> {
                   verticalPadding: 0,
                   direction: SwipeDirection.horizontal,
                   onSwiped: (direction) {
-                    _deleteDialog(context, isLightMode, false,
-                        folderPath: folderList[index].path);
+                    deleteFolder(folderList[index].path);
                   },
                   backgroundBuilder: (context, direction, progress) {
                     return AnimatedBuilder(
