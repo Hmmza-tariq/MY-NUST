@@ -21,7 +21,6 @@ class WebsiteView extends StatefulWidget {
 
 class _WebsiteViewState extends State<WebsiteView> {
   final GlobalKey webViewKey = GlobalKey();
-  late WebViewController webViewController;
   double progress = 0.0;
   bool _isLoading = false;
 
@@ -34,7 +33,8 @@ class _WebsiteViewState extends State<WebsiteView> {
   }
 
   void initializeWebView() async {
-    webViewController = WebViewController()
+    InternetProvider ip = Provider.of<InternetProvider>(context, listen: false);
+    ip.webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..runJavaScript(
           "navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';")
@@ -105,7 +105,7 @@ class _WebsiteViewState extends State<WebsiteView> {
         ),
       )
       ..loadRequest(Uri.parse(widget.initialUrl));
-    webViewController.enableZoom(false);
+    ip.webViewController.enableZoom(false);
   }
 
   @override
@@ -115,12 +115,14 @@ class _WebsiteViewState extends State<WebsiteView> {
       systemNavigationBarColor: AppTheme.white,
       systemNavigationBarIconBrightness: Brightness.dark,
     ));
+    InternetProvider ip = Provider.of<InternetProvider>(context, listen: false);
+
     return Stack(
       children: [
         WillPopScope(
             onWillPop: () async {
-              if (await webViewController.canGoBack()) {
-                webViewController.goBack();
+              if (await ip.webViewController.canGoBack()) {
+                ip.webViewController.goBack();
                 return false;
               } else {
                 return true;
@@ -136,9 +138,10 @@ class _WebsiteViewState extends State<WebsiteView> {
                       children: [
                         SizedBox(
                             child: GestureDetector(
-                                onDoubleTap: () => webViewController.reload(),
+                                onDoubleTap: () =>
+                                    ip.webViewController.reload(),
                                 child: WebViewWidget(
-                                    controller: webViewController))),
+                                    controller: ip.webViewController))),
                         Visibility(
                           visible: (progress <= 0.8) ? _isLoading : false,
                           child: LoadingAnimationWidget.hexagonDots(
