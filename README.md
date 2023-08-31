@@ -1,5 +1,7 @@
 # My NUST - NUST Unofficial Student Portal
 
+![Screenshot 1](assets/screemshots/ss.png)
+
 ## About:
 
 'My NUST' is your ultimate companion for a seamless university experience. Designed exclusively for NUST students, this comprehensive app brings a range of features right to your fingertips, enhancing your academic journey and campus life like never before.
@@ -48,6 +50,6 @@ To request the source code of this project, please follow the guidelines mention
 
 |              |              |
 |--------------|--------------|
-| ![Screenshot 1](assets/images/ss.png) | ![Screenshot 2](assets/images/ss2.png) |
-| ![Screenshot 3](assets/images/ss1.png) | ![Screenshot 4](assets/images/ss3.png) |
-| ![Screenshot 5](assets/images/ss4.png) | ![Screenshot 6](assets/images/ss5.png) |
+| ![Screenshot 1](assets/screemshots/1.png) | ![Screenshot 2](assets/screemshots/2.png) |
+| ![Screenshot 3](assets/screemshots/3.png) | ![Screenshot 4](assets/screemshots/4.png) |
+| ![Screenshot 5](assets/screemshots/5.png) | ![Screenshot 6](assets/screemshots/6.png) |

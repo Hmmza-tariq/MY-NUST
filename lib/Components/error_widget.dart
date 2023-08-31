@@ -15,7 +15,6 @@ class ErrorScreen extends StatefulWidget {
 class _ErrorScreenState extends State<ErrorScreen> {
   @override
   Widget build(BuildContext context) {
-    // Provider.of<InternetProvider>(context).isConnected ? Navigator.pop(context) : null;
     return Container(
       color: Colors.white,
       child: Column(
@@ -33,7 +32,7 @@ class _ErrorScreenState extends State<ErrorScreen> {
             ),
           ),
           SizedBox(
-            child: Image.asset('assets/images/Error.png'),
+            child: Image.asset('assets/images/error.png'),
           ),
         ],
       ),
