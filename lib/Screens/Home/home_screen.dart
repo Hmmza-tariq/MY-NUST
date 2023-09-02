@@ -69,7 +69,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         size: 12.0);
     if (homeList.last.name != 'AD') {
       _nativeAd_1 = NativeAd(
-          adUnitId: 'ca-app-pub-8875342677218505/2644678007',
+          adUnitId: 'ca-app-pub-8875342677218505/8191563863',
           listener: NativeAdListener(
             onAdLoaded: (ad) {
               if (kDebugMode) {
@@ -127,7 +127,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         style: NativeTemplateFontStyle.normal,
         size: 12.0);
     _nativeAd_2 = NativeAd(
-        adUnitId: 'ca-app-pub-8875342677218505/3490855817',
+        adUnitId: 'ca-app-pub-8875342677218505/5565400523',
         listener: NativeAdListener(
           onAdLoaded: (ad) {
             if (kDebugMode) {
@@ -380,7 +380,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                         bottomRight: Radius.circular(22.0),
                                         bottomLeft: Radius.circular(22.0),
                                         topLeft: Radius.circular(4.0),
-                                        topRight: Radius.circular(4.0),
+                                        topRight: Radius.circular(0),
                                       ),
                                       border: Border.all(
                                           color: isLightMode
