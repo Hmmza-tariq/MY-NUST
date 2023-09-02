@@ -48,7 +48,7 @@
         </provider>
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-8875342677218505~3362615880"/>
+            android:value="ca-app-pub-8875342677218505~5014698195"/>
         <service
             android:name="com.dexterous.flutterlocalnotifications.ForegroundService"
             android:exported="false"

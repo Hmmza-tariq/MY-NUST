@@ -57,11 +57,6 @@ class NotificationService {
   }
 
   Future<void> cancelNotification(int id) async {
-    // final List<PendingNotificationRequest> pendingNotificationRequests =
-    //     await _notification.pendingNotificationRequests();
-    // for (var pendingRequest in pendingNotificationRequests) {
-    //   _notification.cancel(pendingRequest.id);
-    // }
     await _notification.cancel(id);
   }
 }

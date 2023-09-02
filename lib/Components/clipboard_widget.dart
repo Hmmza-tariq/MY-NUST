@@ -45,8 +45,6 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
     final encryptedID = encrypter.encrypt(idTextController.text, iv: iv);
     final encryptedPass = encrypter.encrypt(passTextController.text, iv: iv);
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print(
-        'encryptedID.base64: ${encryptedID.base64},encryptedPass.base64: ${encryptedPass.base64} ');
     await prefs.setString('ID', encryptedID.base64);
     await prefs.setString('PASS', encryptedPass.base64);
   }

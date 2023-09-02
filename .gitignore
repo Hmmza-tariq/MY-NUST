@@ -32,6 +32,7 @@ migrate_working_dir/
 .pub/
 /build/
 /symbol/
+/assets/temp/
 # Symbolication related
 app.*.symbols
 
