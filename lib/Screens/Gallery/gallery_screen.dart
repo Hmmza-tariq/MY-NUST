@@ -257,10 +257,20 @@ class GalleryScreenState extends State<GalleryScreen> {
           } else {
             folderList = snapshot.data ?? [];
             if (folderList.isEmpty) {
-              return Center(
-                  child: Text('No folder found.',
-                      style: TextStyle(
-                          color: isLightMode ? Colors.black : Colors.white)));
+              return const Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Center(
+                  child: Text(
+                    'No folder found.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              );
             }
             return ListView.builder(
               scrollDirection: Axis.vertical,

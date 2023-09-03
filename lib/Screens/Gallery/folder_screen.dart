@@ -216,10 +216,20 @@ class FolderScreenState extends State<FolderScreen> {
           } else {
             fileList = snapshot.data ?? [];
             if (fileList.isEmpty) {
-              return Center(
-                  child: Text('No image found.',
-                      style: TextStyle(
-                          color: isLightMode ? Colors.black : Colors.white)));
+              return const Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Center(
+                  child: Text(
+                    'No image found.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              );
             }
             return Padding(
               padding: const EdgeInsets.all(16.0),
