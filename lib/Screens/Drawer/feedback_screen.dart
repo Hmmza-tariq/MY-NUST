@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../Core/app_theme.dart';
 import '../../Core/email.dart';
 import '../../Provider/theme_provider.dart';
@@ -71,7 +72,8 @@ class FeedbackScreenState extends State<FeedbackScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isLightMode = Provider.of<ThemeProvider>(context).isLightMode ??
+    ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
+    bool isLightMode = themeProvider.isLightMode ??
         MediaQuery.of(context).platformBrightness == Brightness.light;
     return Container(
       color: isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
@@ -81,92 +83,152 @@ class FeedbackScreenState extends State<FeedbackScreen> {
           backgroundColor:
               isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
           body: SingleChildScrollView(
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    padding: EdgeInsets.only(
-                        top: MediaQuery.of(context).padding.top,
-                        left: 16,
-                        right: 16),
-                    child: Image.asset('assets/images/feedback.png'),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top,
+                      left: 16,
+                      right: 16),
+                  child: Image.asset('assets/images/feedback.png'),
+                ),
+                Container(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    'Your FeedBack',
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: isLightMode ? Colors.black : Colors.white),
                   ),
-                  Container(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      'Your FeedBack',
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: isLightMode ? Colors.black : Colors.white),
+                ),
+                Container(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Text(
+                    'Give your best time for this moment.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
+                Container(
+                  width: MediaQuery.of(context).size.width / 1.3,
+                  decoration: BoxDecoration(
+                    color: AppTheme.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: !isLightMode
+                        ? null
+                        : <BoxShadow>[
+                            BoxShadow(
+                                color: Colors.grey.withOpacity(0.8),
+                                offset: const Offset(4, 4),
+                                blurRadius: 8),
+                          ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextButton(
+                      onPressed: () {
+                        launchUrl(
+                            mode: LaunchMode.externalApplication,
+                            Uri.parse(
+                                "https://play.google.com/store/apps/details?id=com.hexagone.mynust&pcampaignid=web_share"));
+                      },
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Review on PlayStore',
+                            style: TextStyle(
+                              fontFamily: AppTheme.fontName,
+                              fontSize: 16,
+                              // fontWeight: FontWeight.w400,
+                              color: AppTheme.darkGrey,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Icon(Icons.rate_review_rounded,
+                              size: 16, color: AppTheme.darkGrey),
+                        ],
+                      ),
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Text(
-                      'Give your best time for this moment.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: isLightMode ? Colors.black : Colors.white),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Text(
+                    'OR',
+                    style: TextStyle(
+                      fontFamily: AppTheme.fontName,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isLightMode ? AppTheme.darkGrey : Colors.white,
                     ),
                   ),
-                  _buildComposer(isLightMode),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Center(
-                      child: Container(
-                        width: 120,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: isLightMode ? Colors.blue : Colors.white,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(4.0)),
-                          boxShadow: !isLightMode
+                ),
+                _buildComposer(isLightMode),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Center(
+                    child: Container(
+                      width: 120,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: isLightMode ? Colors.blue : Colors.white,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(4.0)),
+                        boxShadow: !isLightMode
+                            ? null
+                            : <BoxShadow>[
+                                BoxShadow(
+                                    color: Colors.grey.withOpacity(0.6),
+                                    offset: const Offset(4, 4),
+                                    blurRadius: 8.0),
+                              ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: isLoading
                               ? null
-                              : <BoxShadow>[
-                                  BoxShadow(
-                                      color: Colors.grey.withOpacity(0.6),
-                                      offset: const Offset(4, 4),
-                                      blurRadius: 8.0),
-                                ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: isLoading
-                                ? null
-                                : () => _handleSendButtonPressed(isLightMode),
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: isLoading
-                                    ? LoadingAnimationWidget.hexagonDots(
-                                        size: 20,
-                                        color: isLightMode
-                                            ? AppTheme.white
-                                            : AppTheme.grey,
-                                      )
-                                    : Text(buttonText,
-                                        style: isLightMode
-                                            ? const TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                color: AppTheme.notWhite,
-                                              )
-                                            : const TextStyle(
-                                                fontWeight: FontWeight.w500,
-                                                color: AppTheme.darkText,
-                                              )),
-                              ),
+                              : () => _handleSendButtonPressed(isLightMode),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: isLoading
+                                  ? LoadingAnimationWidget.hexagonDots(
+                                      size: 20,
+                                      color: isLightMode
+                                          ? AppTheme.white
+                                          : AppTheme.grey,
+                                    )
+                                  : Text(buttonText,
+                                      style: isLightMode
+                                          ? const TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              color: AppTheme.notWhite,
+                                            )
+                                          : const TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              color: AppTheme.darkText,
+                                            )),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  )
-                ],
-              ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
+              ],
             ),
           ),
         ),
@@ -176,7 +238,7 @@ class FeedbackScreenState extends State<FeedbackScreen> {
 
   Widget _buildComposer(bool isLightMode) {
     return Padding(
-      padding: const EdgeInsets.only(top: 16, left: 32, right: 32),
+      padding: const EdgeInsets.only(top: 10, left: 32, right: 32),
       child: Column(
         children: [
           Padding(

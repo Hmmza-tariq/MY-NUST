@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mynust/Screens/Web%20view/webview.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../Core/app_theme.dart';
 import '../../Provider/theme_provider.dart';
@@ -326,6 +327,47 @@ class AboutScreenState extends State<AboutScreen> {
                             ),
                           ),
                         ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: themeProvider.primaryColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: themeProvider.primaryColor.withOpacity(0.8),
+                          width: 3),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextButton(
+                        onPressed: () {
+                          Share.share(
+                            'Check out this cool NUST App available on PlayStore!🔥 \nDownload now: https://play.google.com/store/apps/details?id=com.hexagone.mynust&pcampaignid=web_share',
+                          );
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Share this app',
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: isLightMode
+                                      ? Colors.black
+                                      : Colors.white),
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Icon(Icons.share_rounded,
+                                size: 20,
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                          ],
+                        ),
                       ),
                     ),
                   ),
