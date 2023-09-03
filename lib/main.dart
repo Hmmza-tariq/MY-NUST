@@ -161,7 +161,7 @@ class _MyAppState extends State<MyApp> {
           upgrader: Upgrader(
               shouldPopScope: () => true,
               canDismissDialog: true,
-              durationUntilAlertAgain: const Duration(days: 1),
+              durationUntilAlertAgain: const Duration(days: 3),
               dialogStyle: UpgradeDialogStyle.cupertino),
           child: locked
               ? Scaffold(
