@@ -168,10 +168,20 @@ class DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
           } else {
             fileList = snapshot.data ?? [];
             if (fileList.isEmpty) {
-              return Center(
-                  child: Text('No files found.',
-                      style: TextStyle(
-                          color: isLightMode ? Colors.black : Colors.white)));
+              return const Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Center(
+                  child: Text(
+                    'No file found.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+              );
             }
             return Padding(
               padding: const EdgeInsets.all(12.0),
