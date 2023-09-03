@@ -223,53 +223,55 @@ class FolderScreenState extends State<FolderScreen> {
             }
             return Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Wrap(
-                spacing: 16.0,
-                runSpacing: 16.0,
-                children: List.generate(
-                  fileList.length,
-                  (index) {
-                    final file = fileList[index];
-                    return SizedBox(
-                      height: 150,
-                      width: 150,
-                      child: GestureDetector(
-                        onTap: () => showDialog(
-                          context: context,
-                          builder: (context) => PageViewScreen(
-                            fileList: fileList,
-                            index: index,
-                            name: widget.folder,
+              child: SingleChildScrollView(
+                child: Wrap(
+                  spacing: 16.0,
+                  runSpacing: 16.0,
+                  children: List.generate(
+                    fileList.length,
+                    (index) {
+                      final file = fileList[index];
+                      return SizedBox(
+                        height: 150,
+                        width: 150,
+                        child: GestureDetector(
+                          onTap: () => showDialog(
+                            context: context,
+                            builder: (context) => PageViewScreen(
+                              fileList: fileList,
+                              index: index,
+                              name: widget.folder,
+                            ),
                           ),
-                        ),
-                        onDoubleTap: () => _deleteDialog(
-                            context, isLightMode, false,
-                            filePath: file.path),
-                        onLongPress: () => _deleteDialog(
-                            context, isLightMode, false,
-                            filePath: file.path),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                                width: 3,
-                                color: isLightMode
-                                    ? AppTheme.nearlyBlack
-                                    : Colors.grey),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(24)),
-                          ),
-                          width: 100,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(20),
-                            child: Image.file(
-                              File(fileList[index].path),
-                              fit: BoxFit.fitWidth,
+                          onDoubleTap: () => _deleteDialog(
+                              context, isLightMode, false,
+                              filePath: file.path),
+                          onLongPress: () => _deleteDialog(
+                              context, isLightMode, false,
+                              filePath: file.path),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  width: 3,
+                                  color: isLightMode
+                                      ? AppTheme.nearlyBlack
+                                      : Colors.grey),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(24)),
+                            ),
+                            width: 100,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.file(
+                                File(fileList[index].path),
+                                fit: BoxFit.fitWidth,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
             );

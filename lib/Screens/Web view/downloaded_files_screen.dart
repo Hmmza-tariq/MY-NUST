@@ -175,44 +175,46 @@ class DownloadedFilesScreenState extends State<DownloadedFilesScreen> {
             }
             return Padding(
               padding: const EdgeInsets.all(12.0),
-              child: Wrap(
-                spacing: 16.0,
-                runSpacing: 16.0,
-                children: List.generate(
-                  fileList.length,
-                  (index) {
-                    final file = fileList[index];
-                    return GestureDetector(
-                      onTap: () => OpenFile.open(file.path),
-                      onDoubleTap: () => _deleteDialog(
-                          context, isLightMode, false,
-                          filePath: file.path),
-                      onLongPress: () => _deleteDialog(
-                          context, isLightMode, false,
-                          filePath: file.path),
-                      child: SizedBox(
-                        width: 100,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset('assets/images/file.png'),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Text(
-                                ' ${file.uri.pathSegments.last}',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 8,
-                                    color: isLightMode
-                                        ? Colors.black
-                                        : Colors.white),
+              child: SingleChildScrollView(
+                child: Wrap(
+                  spacing: 16.0,
+                  runSpacing: 16.0,
+                  children: List.generate(
+                    fileList.length,
+                    (index) {
+                      final file = fileList[index];
+                      return GestureDetector(
+                        onTap: () => OpenFile.open(file.path),
+                        onDoubleTap: () => _deleteDialog(
+                            context, isLightMode, false,
+                            filePath: file.path),
+                        onLongPress: () => _deleteDialog(
+                            context, isLightMode, false,
+                            filePath: file.path),
+                        child: SizedBox(
+                          width: 100,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Image.asset('assets/images/file.png'),
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Text(
+                                  ' ${file.uri.pathSegments.last}',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 8,
+                                      color: isLightMode
+                                          ? Colors.black
+                                          : Colors.white),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
               ),
             );
