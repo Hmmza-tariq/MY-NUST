@@ -122,31 +122,33 @@ class _LinksScreenState extends State<LinksScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            DepartmentWidget(
-              title: 'CEME-CE',
-              isLightMode: isLightMode,
-              listDpt: linksCE,
-            ),
-            DepartmentWidget(
-              title: 'CEME-EE',
-              isLightMode: isLightMode,
-              listDpt: linksEE,
-            ),
-            DepartmentWidget(
-              title: 'CEME-ME',
-              isLightMode: isLightMode,
-              listDpt: linksME,
-            ),
-            DepartmentWidget(
-              title: 'CEME-MTS',
-              isLightMode: isLightMode,
-              listDpt: linksMTS,
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DepartmentWidget(
+                title: 'CEME-CE',
+                isLightMode: isLightMode,
+                listDpt: linksCE,
+              ),
+              DepartmentWidget(
+                title: 'CEME-EE',
+                isLightMode: isLightMode,
+                listDpt: linksEE,
+              ),
+              DepartmentWidget(
+                title: 'CEME-ME',
+                isLightMode: isLightMode,
+                listDpt: linksME,
+              ),
+              DepartmentWidget(
+                title: 'CEME-MTS',
+                isLightMode: isLightMode,
+                listDpt: linksMTS,
+              ),
+            ],
+          ),
         ),
       ),
     );
