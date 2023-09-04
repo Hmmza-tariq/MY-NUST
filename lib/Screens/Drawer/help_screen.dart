@@ -1,6 +1,7 @@
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 
+import '../../Components/toasts.dart';
 import '../../Core/app_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -19,6 +20,7 @@ class HelpScreenState extends State<HelpScreen> {
   final TextEditingController _mailController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
   bool isLoading = false;
+  bool sent = false;
   String buttonText = 'Send';
 
   @override
@@ -35,49 +37,55 @@ class HelpScreenState extends State<HelpScreen> {
   }
 
   void _handleSendButtonPressed(bool isLightMode) async {
-    setState(() {
-      isLoading = true;
-      buttonText = '';
-    });
-    bool error = false;
-
-    final emailRegExp = RegExp(r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$');
-
-    bool success = (_messageController.text.isNotEmpty &&
-            _mailController.text.isNotEmpty &&
-            emailRegExp.hasMatch(_mailController.text))
-        ? await sendMail(
-            message: _messageController.text,
-            fromEmail: _mailController.text,
-            screen: 'Help',
-            fromName: _nameController.text,
-          )
-        : error = true;
-
-    setState(() {
-      isLoading = false;
-      buttonText = error
-          ? 'Invalid Data'
-          : success
-              ? 'Sent'
-              : 'Failed';
-      if (success && !error) {
-        _nameController.clear();
-        _mailController.clear();
-        _messageController.clear();
-      }
-    });
-
-    Future.delayed(const Duration(seconds: 3), () {
+    if (!sent) {
       setState(() {
-        error = false;
-        success = false;
-        buttonText = 'Send';
+        isLoading = true;
+        buttonText = '';
       });
-    });
+      bool success = false;
+      final emailPattern =
+          RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
 
-    // ignore: use_build_context_synchronously
-    FocusScope.of(context).requestFocus(FocusNode());
+      bool isValidEmail = _mailController.text.isNotEmpty &&
+          emailPattern.hasMatch(_mailController.text);
+      bool isValidMessage = _messageController.text.isNotEmpty;
+      bool error = !isValidEmail || !isValidMessage;
+      if (error) {
+        success = false;
+        Toast().errorToast(context, 'Invalid Email or Message');
+      } else {
+        success = await sendMail(
+          message: _messageController.text,
+          fromEmail: _mailController.text,
+          screen: 'Help',
+          fromName: _nameController.text,
+        );
+      }
+
+      setState(() {
+        isLoading = false;
+        buttonText = success ? 'Success' : 'Failed';
+        if (success) {
+          _mailController.clear();
+          _messageController.clear();
+        }
+      });
+
+      Future.delayed(const Duration(seconds: 3), () {
+        setState(() {
+          if (success) {
+            error = false;
+            sent = true;
+          } else {
+            sent = false;
+            buttonText = 'Send';
+          }
+        });
+      });
+
+      // ignore: use_build_context_synchronously
+      FocusScope.of(context).requestFocus(FocusNode());
+    }
   }
 
   @override

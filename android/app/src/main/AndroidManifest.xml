@@ -67,4 +67,10 @@
  android:name="com.google.firebase.messaging.default_notification_channel_id"
  android:value="@string/default_notification_channel_id"/> 
     </application>
+    <queries>
+     <intent>
+      <action android:name="android.intent.action.SENDTO" />
+      <data android:scheme="mailto" />
+     </intent>
+    </queries>
 </manifest>

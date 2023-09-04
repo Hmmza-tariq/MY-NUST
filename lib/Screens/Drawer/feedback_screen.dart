@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../Components/toasts.dart';
 import '../../Core/app_theme.dart';
-import '../../Core/email.dart';
 import '../../Provider/theme_provider.dart';
 
 class FeedbackScreen extends StatefulWidget {
@@ -16,9 +17,9 @@ class FeedbackScreen extends StatefulWidget {
 class FeedbackScreenState extends State<FeedbackScreen> {
   final TextEditingController _mailController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   bool isLoading = false;
   String buttonText = 'Send';
-
   @override
   void initState() {
     super.initState();
@@ -36,38 +37,54 @@ class FeedbackScreenState extends State<FeedbackScreen> {
       isLoading = true;
       buttonText = '';
     });
-    bool error = false;
-    bool success = _messageController.text.isNotEmpty
-        ? await sendMail(
-            message: _messageController.text,
-            fromEmail: _mailController.text,
-            screen: 'Feedback',
-            fromName: 'No name',
-          )
-        : error = true;
+    bool success = false;
+    final emailPattern =
+        RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
+
+    bool isValidEmail = _mailController.text.isNotEmpty &&
+        emailPattern.hasMatch(_mailController.text);
+    bool isValidMessage = _messageController.text.isNotEmpty;
+    bool error = !isValidEmail || !isValidMessage;
+    if (error) {
+      success = false;
+      Toast().errorToast(context, 'Invalid Email or Message');
+    } else {
+      final Email email = Email(
+        body:
+            'Name: ${_nameController.text}\nFeedback: ${_messageController.text}',
+        subject: 'Feedback',
+        recipients: ['hexagone.playstore@gmail.com'],
+        cc: [],
+        bcc: [],
+        attachmentPaths: [],
+        isHTML: false,
+      );
+
+      try {
+        await FlutterEmailSender.send(email);
+        success = true;
+      } catch (error) {
+        success = false;
+      }
+    }
 
     setState(() {
       isLoading = false;
-      buttonText = error
-          ? 'Enter Feedback'
-          : success
-              ? 'Success'
-              : 'Failed';
+      buttonText = success ? 'Success' : 'Failed';
       if (success) {
         _mailController.clear();
         _messageController.clear();
+        _nameController.clear();
       }
     });
 
     Future.delayed(const Duration(seconds: 3), () {
       setState(() {
         error = false;
+
         buttonText = 'Send';
       });
     });
-
-    // ignore: use_build_context_synchronously
-    FocusScope.of(context).requestFocus(FocusNode());
   }
 
   @override
@@ -267,6 +284,51 @@ class FeedbackScreenState extends State<FeedbackScreen> {
                     padding: const EdgeInsets.only(
                         left: 10, right: 10, top: 0, bottom: 0),
                     child: TextField(
+                      controller: _nameController,
+                      maxLines: null,
+                      keyboardType: TextInputType.name,
+                      onChanged: (String txt) {},
+                      style: const TextStyle(
+                        fontFamily: AppTheme.fontName,
+                        fontSize: 14,
+                        color: AppTheme.darkGrey,
+                      ),
+                      cursorColor: Colors.blue,
+                      decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'Enter your name (not mandatory)'),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.white,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: !isLightMode
+                    ? null
+                    : <BoxShadow>[
+                        BoxShadow(
+                            color: Colors.grey.withOpacity(0.8),
+                            offset: const Offset(4, 4),
+                            blurRadius: 8),
+                      ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: Container(
+                  padding: const EdgeInsets.all(4.0),
+                  constraints:
+                      const BoxConstraints(minHeight: 40, maxHeight: 160),
+                  color: AppTheme.white,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.only(
+                        left: 10, right: 10, top: 0, bottom: 0),
+                    child: TextField(
                       controller: _mailController,
                       maxLines: null,
                       keyboardType: TextInputType.emailAddress,
@@ -279,7 +341,7 @@ class FeedbackScreenState extends State<FeedbackScreen> {
                       cursorColor: Colors.blue,
                       decoration: const InputDecoration(
                           border: InputBorder.none,
-                          hintText: 'Enter your email (not mandatory)'),
+                          hintText: 'Enter your email'),
                     ),
                   ),
                 ),
