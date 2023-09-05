@@ -911,188 +911,196 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                 ],
                 border: Border.all(
                     color: isLightMode
-                        ? AppTheme.grey
+                        ? AppTheme.grey.withOpacity(0.8)
                         : themeProvider.primaryColor.withOpacity(0.8),
                     width: 3),
               ),
-              child: ExpansionTile(
-                title: Text(
-                  sectionName,
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color:
-                          isLightMode ? AppTheme.nearlyBlack : AppTheme.white),
-                ),
-                subtitle: GestureDetector(
-                  onTap: () => _editWeightage(
-                      sectionWeightage, sectionName, isLightMode),
-                  onLongPress: () => _editWeightage(
-                      sectionWeightage, sectionName, isLightMode),
-                  child: RichText(
-                    overflow: TextOverflow.clip,
-                    textAlign: TextAlign.start,
-                    textDirection: TextDirection.ltr,
-                    softWrap: true,
-                    maxLines: 1,
-                    textScaleFactor: 1,
-                    text: TextSpan(
-                      children: <TextSpan>[
-                        TextSpan(
-                          text: "Obtained Absolutes: ",
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: isLightMode
-                                  ? AppTheme.nearlyBlack
-                                  : AppTheme.white),
-                        ),
-                        TextSpan(
-                          text: sectionName == 'Lecture'
-                              ? "${(lectureWeightage * (lectureAbsolutes / 100)).toStringAsFixed(1)} "
-                              : "${(labWeightage * (labAbsolutes / 100)).toStringAsFixed(1)} ",
-                          style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: isLightMode ? Colors.black : Colors.white),
-                        ),
-                        TextSpan(
-                          text: ' / ${sectionWeightage.toStringAsFixed(1)}',
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: isLightMode
-                                  ? AppTheme.nearlyBlack
-                                  : AppTheme.white),
-                        ),
-                      ],
+              child: Theme(
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  title: Text(
+                    sectionName,
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: isLightMode
+                            ? AppTheme.nearlyBlack
+                            : AppTheme.white),
+                  ),
+                  subtitle: GestureDetector(
+                    onTap: () => _editWeightage(
+                        sectionWeightage, sectionName, isLightMode),
+                    onLongPress: () => _editWeightage(
+                        sectionWeightage, sectionName, isLightMode),
+                    child: RichText(
+                      overflow: TextOverflow.clip,
+                      textAlign: TextAlign.start,
+                      textDirection: TextDirection.ltr,
+                      softWrap: true,
+                      maxLines: 1,
+                      textScaleFactor: 1,
+                      text: TextSpan(
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: "Obtained Absolutes: ",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: isLightMode
+                                    ? AppTheme.nearlyBlack
+                                    : AppTheme.white),
+                          ),
+                          TextSpan(
+                            text: sectionName == 'Lecture'
+                                ? "${(lectureWeightage * (lectureAbsolutes / 100)).toStringAsFixed(1)} "
+                                : "${(labWeightage * (labAbsolutes / 100)).toStringAsFixed(1)} ",
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                          ),
+                          TextSpan(
+                            text: ' / ${sectionWeightage.toStringAsFixed(1)}',
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: isLightMode
+                                    ? AppTheme.nearlyBlack
+                                    : AppTheme.white),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                iconColor: Colors.grey,
-                collapsedIconColor: Colors.grey,
-                children: [
-                  SizedBox(
-                    height: 100.0 * sectionAssessments.length,
-                    child: ListView.builder(
-                      itemCount: sectionAssessments.length,
-                      itemBuilder: (context, index) {
-                        final assessment = sectionAssessments[index];
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: SwipeableTile.card(
-                            color: Colors.transparent,
-                            shadow: const BoxShadow(
+                  iconColor: Colors.grey,
+                  collapsedIconColor: Colors.grey,
+                  children: [
+                    SizedBox(
+                      height: 100.0 * sectionAssessments.length,
+                      child: ListView.builder(
+                        itemCount: sectionAssessments.length,
+                        itemBuilder: (context, index) {
+                          final assessment = sectionAssessments[index];
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: SwipeableTile.card(
                               color: Colors.transparent,
-                              blurRadius: 0,
-                              offset: Offset(2, 2),
-                            ),
-                            horizontalPadding: 0,
-                            verticalPadding: 0,
-                            direction: SwipeDirection.horizontal,
-                            onSwiped: (direction) =>
-                                _deleteAssessment(assessment),
-                            backgroundBuilder: (context, direction, progress) {
-                              return AnimatedBuilder(
-                                animation: progress,
-                                builder: (context, child) {
-                                  return AnimatedContainer(
-                                    duration: const Duration(milliseconds: 400),
-                                    color: progress.value > 0.4
-                                        ? const Color(0xFFed7474)
-                                        : isLightMode
-                                            ? AppTheme.white
-                                            : AppTheme.nearlyBlack,
-                                  );
-                                },
-                              );
-                            },
-                            key: UniqueKey(),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color:
-                                    themeProvider.primaryColor.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                    color: isLightMode
-                                        ? AppTheme.grey
-                                        : themeProvider.primaryColor
-                                            .withOpacity(0.8),
-                                    width: 3),
+                              shadow: const BoxShadow(
+                                color: Colors.transparent,
+                                blurRadius: 0,
+                                offset: Offset(2, 2),
                               ),
-                              child: ListTile(
-                                title: Text(
-                                  assessment.name,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
+                              horizontalPadding: 0,
+                              verticalPadding: 0,
+                              direction: SwipeDirection.horizontal,
+                              onSwiped: (direction) =>
+                                  _deleteAssessment(assessment),
+                              backgroundBuilder:
+                                  (context, direction, progress) {
+                                return AnimatedBuilder(
+                                  animation: progress,
+                                  builder: (context, child) {
+                                    return AnimatedContainer(
+                                      duration:
+                                          const Duration(milliseconds: 400),
+                                      color: progress.value > 0.4
+                                          ? const Color(0xFFed7474)
+                                          : isLightMode
+                                              ? AppTheme.white
+                                              : AppTheme.nearlyBlack,
+                                    );
+                                  },
+                                );
+                              },
+                              key: UniqueKey(),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: themeProvider.primaryColor
+                                      .withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
                                       color: isLightMode
-                                          ? Colors.black
-                                          : Colors.white),
+                                          ? AppTheme.grey
+                                          : themeProvider.primaryColor
+                                              .withOpacity(0.8),
+                                      width: 3),
                                 ),
-                                subtitle: RichText(
-                                  text: TextSpan(
-                                    children: <TextSpan>[
-                                      TextSpan(
-                                        text: "Marks ",
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                            color: isLightMode
-                                                ? AppTheme.nearlyBlack
-                                                : AppTheme.white),
-                                      ),
-                                      TextSpan(
-                                        text:
-                                            "${assessment.obtainedMarks.toStringAsFixed(0)}/${assessment.totalMarks.toStringAsFixed(0)}",
-                                        style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                            color: isLightMode
-                                                ? Colors.black
-                                                : Colors.white),
-                                      ),
-                                      TextSpan(
-                                          text: "\nWeightage ",
+                                child: ListTile(
+                                  title: Text(
+                                    assessment.name,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                        color: isLightMode
+                                            ? Colors.black
+                                            : Colors.white),
+                                  ),
+                                  subtitle: RichText(
+                                    text: TextSpan(
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                          text: "Marks ",
                                           style: TextStyle(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w500,
                                               color: isLightMode
                                                   ? AppTheme.nearlyBlack
-                                                  : AppTheme.white)),
-                                      TextSpan(
-                                        text:
-                                            "${assessment.weightage.toStringAsFixed(1)}%",
-                                        style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold,
-                                            color: isLightMode
-                                                ? Colors.black
-                                                : Colors.white),
-                                      ),
-                                    ],
+                                                  : AppTheme.white),
+                                        ),
+                                        TextSpan(
+                                          text:
+                                              "${assessment.obtainedMarks.toStringAsFixed(0)}/${assessment.totalMarks.toStringAsFixed(0)}",
+                                          style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: isLightMode
+                                                  ? Colors.black
+                                                  : Colors.white),
+                                        ),
+                                        TextSpan(
+                                            text: "\nWeightage ",
+                                            style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                                color: isLightMode
+                                                    ? AppTheme.nearlyBlack
+                                                    : AppTheme.white)),
+                                        TextSpan(
+                                          text:
+                                              "${assessment.weightage.toStringAsFixed(1)}%",
+                                          style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: isLightMode
+                                                  ? Colors.black
+                                                  : Colors.white),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                trailing: IconButton(
-                                  icon: Icon(
-                                    Icons.edit,
-                                    color: isLightMode
-                                        ? AppTheme.nearlyBlack
-                                        : AppTheme.white,
-                                  ), // Changed the delete icon to edit icon
-                                  onPressed: () {
-                                    _editAssessment(
-                                        assessment, index, isLightMode);
-                                  },
+                                  trailing: IconButton(
+                                    icon: Icon(
+                                      Icons.edit,
+                                      color: isLightMode
+                                          ? AppTheme.nearlyBlack
+                                          : AppTheme.white,
+                                    ), // Changed the delete icon to edit icon
+                                    onPressed: () {
+                                      _editAssessment(
+                                          assessment, index, isLightMode);
+                                    },
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                  )
-                ],
+                          );
+                        },
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           );

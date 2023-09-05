@@ -1,4 +1,6 @@
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:mynust/Screens/Home/home_drawer_list.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
 import '../../Components/toasts.dart';
@@ -92,99 +94,115 @@ class HelpScreenState extends State<HelpScreen> {
   Widget build(BuildContext context) {
     bool isLightMode = Provider.of<ThemeProvider>(context).isLightMode ??
         MediaQuery.of(context).platformBrightness == Brightness.light;
-    return Container(
-      color: isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-      child: SafeArea(
-        top: false,
-        child: Scaffold(
-          backgroundColor:
-              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-          body: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top,
-                      left: 16,
-                      right: 16),
-                  child: Image.asset('assets/images/help.png'),
-                ),
-                Container(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Text(
-                    'How can we help you?',
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: isLightMode ? Colors.black : Colors.white),
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacement(
+          context,
+          PageTransition(
+            duration: const Duration(milliseconds: 500),
+            type: PageTransitionType.rightToLeft,
+            alignment: Alignment.bottomCenter,
+            child: const NavigationHomeScreen(),
+            inheritTheme: true,
+            ctx: context,
+          ),
+        );
+        return false;
+      },
+      child: Container(
+        color: isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+        child: SafeArea(
+          top: false,
+          child: Scaffold(
+            backgroundColor:
+                isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+            body: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).padding.top,
+                        left: 16,
+                        right: 16),
+                    child: Image.asset('assets/images/help.png'),
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(13),
-                  child: Text(
-                    'It looks like you are experiencing problems in our app. We are here to help so please get in touch with us',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: isLightMode ? Colors.black : Colors.white),
+                  Container(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      'How can we help you?',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: isLightMode ? Colors.black : Colors.white),
+                    ),
                   ),
-                ),
-                _buildComposer(isLightMode),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16, bottom: 30),
-                  child: Center(
-                    child: Container(
-                      width: 120,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: isLightMode ? Colors.blue : Colors.white,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(4.0)),
-                        boxShadow: !isLightMode
-                            ? null
-                            : <BoxShadow>[
-                                BoxShadow(
-                                    color: Colors.grey.withOpacity(0.6),
-                                    offset: const Offset(4, 4),
-                                    blurRadius: 8.0),
-                              ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: isLoading
+                  Container(
+                    padding: const EdgeInsets.all(13),
+                    child: Text(
+                      'It looks like you are experiencing problems in our app. We are here to help so please get in touch with us',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: isLightMode ? Colors.black : Colors.white),
+                    ),
+                  ),
+                  _buildComposer(isLightMode),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16, bottom: 30),
+                    child: Center(
+                      child: Container(
+                        width: 120,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: isLightMode ? Colors.blue : Colors.white,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(4.0)),
+                          boxShadow: !isLightMode
                               ? null
-                              : () => _handleSendButtonPressed(isLightMode),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: isLoading
-                                  ? LoadingAnimationWidget.hexagonDots(
-                                      size: 20,
-                                      color: isLightMode
-                                          ? AppTheme.white
-                                          : AppTheme.grey,
-                                    )
-                                  : Text(
-                                      buttonText,
-                                      style: isLightMode
-                                          ? const TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              color: AppTheme.notWhite,
-                                            )
-                                          : const TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              color: AppTheme.darkText,
-                                            ),
-                                    ),
+                              : <BoxShadow>[
+                                  BoxShadow(
+                                      color: Colors.grey.withOpacity(0.6),
+                                      offset: const Offset(4, 4),
+                                      blurRadius: 8.0),
+                                ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: isLoading
+                                ? null
+                                : () => _handleSendButtonPressed(isLightMode),
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: isLoading
+                                    ? LoadingAnimationWidget.hexagonDots(
+                                        size: 20,
+                                        color: isLightMode
+                                            ? AppTheme.white
+                                            : AppTheme.grey,
+                                      )
+                                    : Text(
+                                        buttonText,
+                                        style: isLightMode
+                                            ? const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                color: AppTheme.notWhite,
+                                              )
+                                            : const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                color: AppTheme.darkText,
+                                              ),
+                                      ),
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
           ),
         ),

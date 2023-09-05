@@ -19,6 +19,8 @@ class LargeSlider extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: Container(
+        width: 220,
+        height: 200,
         decoration: BoxDecoration(
           color: themeProvider.primaryColor.withOpacity(0.2),
           borderRadius: BorderRadius.circular(12),
