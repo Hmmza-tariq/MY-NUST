@@ -140,14 +140,14 @@ class _MyAppState extends State<MyApp> {
         }
       });
     }).catchError((e) {
-      print(e.toString());
+      //print(e.toString());
     });
   }
 
   void update() async {
     await InAppUpdate.startFlexibleUpdate();
     InAppUpdate.completeFlexibleUpdate().then((_) {}).catchError((e) {
-      print(e.toString());
+      //print(e.toString());
     });
   }
 
