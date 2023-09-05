@@ -11,7 +11,7 @@ import 'package:mynust/Provider/notice_board_provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:upgrader/upgrader.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'Components/error_widget.dart';
 import 'Components/hex_color.dart';
 import 'Core/app_Theme.dart';
@@ -102,6 +102,7 @@ class _MyAppState extends State<MyApp> {
         _authenticate();
       } else {
         locked = false;
+        checkForUpdate();
       }
     });
     FlutterNativeSplash.remove();
@@ -122,12 +123,32 @@ class _MyAppState extends State<MyApp> {
       if (authenticated) {
         setState(() {
           locked = false;
+          checkForUpdate();
           FlutterNativeSplash.remove();
         });
       } else {
         SystemNavigator.pop();
       }
     } on PlatformException {}
+  }
+
+  Future<void> checkForUpdate() async {
+    InAppUpdate.checkForUpdate().then((info) {
+      setState(() {
+        if (info.updateAvailability == UpdateAvailability.updateAvailable) {
+          update();
+        }
+      });
+    }).catchError((e) {
+      print(e.toString());
+    });
+  }
+
+  void update() async {
+    await InAppUpdate.startFlexibleUpdate();
+    InAppUpdate.completeFlexibleUpdate().then((_) {}).catchError((e) {
+      print(e.toString());
+    });
   }
 
   @override
@@ -157,24 +178,17 @@ class _MyAppState extends State<MyApp> {
         title: 'My Nust',
         debugShowCheckedModeBanner: false,
         theme: ThemeProvider.theme,
-        home: UpgradeAlert(
-          upgrader: Upgrader(
-              shouldPopScope: () => true,
-              canDismissDialog: true,
-              durationUntilAlertAgain: const Duration(days: 3),
-              dialogStyle: UpgradeDialogStyle.cupertino),
-          child: locked
-              ? Scaffold(
-                  backgroundColor: HexColor('#0263B5'),
-                  body: SafeArea(
-                    child: Center(
-                      child: SizedBox(
-                          width: MediaQuery.of(context).size.width / 1.6,
-                          child: Image.asset('assets/images/appLogoLarge.png')),
-                    ),
+        home: locked
+            ? Scaffold(
+                backgroundColor: HexColor('#0263B5'),
+                body: SafeArea(
+                  child: Center(
+                    child: SizedBox(
+                        width: MediaQuery.of(context).size.width / 1.6,
+                        child: Image.asset('assets/images/appLogoLarge.png')),
                   ),
-                )
-              : const NavigationHomeScreen(),
-        ));
+                ),
+              )
+            : const NavigationHomeScreen());
   }
 }

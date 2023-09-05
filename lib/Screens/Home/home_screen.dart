@@ -78,7 +78,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               setState(() {
                 homeList.add(LargeSliderListData(
                   isWidget: true,
-                  imagePath: 'assets/images/Error.png',
+                  imagePath: 'assets/images/appLogo.png',
                   name: 'AD',
                   widget: ConstrainedBox(
                     constraints: const BoxConstraints(

@@ -67,7 +67,7 @@ class SmallSliderState extends State<SmallSlider>
                   ? Center(
                       child: Wrap(
                         spacing: 8,
-                        runSpacing: 8,
+                        runSpacing: 4,
                         children: List.generate(
                           sliderListData0.length,
                           (index) {

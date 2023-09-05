@@ -169,15 +169,34 @@ class DepartmentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ExpansionTile(
-        title: Text(
-          title,
-          style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: isLightMode ? AppTheme.nearlyBlack : AppTheme.white),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppTheme.chipBackground.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+              color: isLightMode
+                  ? AppTheme.grey.withOpacity(0.8)
+                  : AppTheme.chipBackground,
+              width: 3),
         ),
-        children: listDpt);
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+              iconColor: Colors.grey,
+              collapsedIconColor: Colors.grey,
+              title: Text(
+                title,
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isLightMode ? AppTheme.nearlyBlack : AppTheme.white),
+              ),
+              children: listDpt),
+        ),
+      ),
+    );
   }
 }
 
