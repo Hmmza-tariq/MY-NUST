@@ -67,6 +67,7 @@ class AboutScreenState extends State<AboutScreen> {
                             Text(
                               'Author Description',
                               style: TextStyle(
+                                  fontFamily: AppTheme.fontName,
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   color: isLightMode
@@ -88,6 +89,7 @@ class AboutScreenState extends State<AboutScreen> {
                               child: Text(
                                 "Hey, I'm Hamza Tariq (CE-43, CEME), the brain behind this app. I'm a Flutter fanatic and app aficionado. I've cooked up this app with passion and around 15,000 lines of code. I hope it rocks!",
                                 style: TextStyle(
+                                    fontFamily: AppTheme.fontName,
                                     fontSize: 16,
                                     color: isLightMode
                                         ? Colors.black
@@ -117,6 +119,7 @@ class AboutScreenState extends State<AboutScreen> {
                               Text(
                                 'Privacy Policy',
                                 style: TextStyle(
+                                    fontFamily: AppTheme.fontName,
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                     color: isLightMode
@@ -127,6 +130,7 @@ class AboutScreenState extends State<AboutScreen> {
                               Text(
                                 'We take your privacy seriously. This app does not collect any personal data or information from its users. Any data you enter in the app, such as LMS / Qalam ID, Passwords or your GPA, is stored locally on your device and not shared with any third parties.',
                                 style: TextStyle(
+                                    fontFamily: AppTheme.fontName,
                                     fontSize: 16,
                                     color: isLightMode
                                         ? Colors.black
@@ -135,6 +139,7 @@ class AboutScreenState extends State<AboutScreen> {
                               Text(
                                 'By using this app, you agree to the following:',
                                 style: TextStyle(
+                                    fontFamily: AppTheme.fontName,
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: isLightMode
@@ -145,6 +150,7 @@ class AboutScreenState extends State<AboutScreen> {
                               Text(
                                 '- All data you enter in the app is stored locally on your device and is not shared with any external servers.',
                                 style: TextStyle(
+                                    fontFamily: AppTheme.fontName,
                                     fontSize: 16,
                                     color: isLightMode
                                         ? Colors.black
@@ -153,6 +159,7 @@ class AboutScreenState extends State<AboutScreen> {
                               Text(
                                 '- We do not collect or store any personal information, including your name, email, or location.',
                                 style: TextStyle(
+                                    fontFamily: AppTheme.fontName,
                                     fontSize: 16,
                                     color: isLightMode
                                         ? Colors.black
@@ -165,6 +172,7 @@ class AboutScreenState extends State<AboutScreen> {
                                     Text(
                                       'For more details visit:',
                                       style: TextStyle(
+                                          fontFamily: AppTheme.fontName,
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                           color: isLightMode
@@ -201,6 +209,7 @@ class AboutScreenState extends State<AboutScreen> {
                                         Text(
                                           'Privacy Policy',
                                           style: TextStyle(
+                                            fontFamily: AppTheme.fontName,
                                             fontSize: 16,
                                             color: Colors.blue,
                                           ),
@@ -237,6 +246,7 @@ class AboutScreenState extends State<AboutScreen> {
                                         Text(
                                           'Terms and Conditions',
                                           style: TextStyle(
+                                            fontFamily: AppTheme.fontName,
                                             fontSize: 16,
                                             color: Colors.blue,
                                           ),
@@ -257,6 +267,7 @@ class AboutScreenState extends State<AboutScreen> {
                                         Text(
                                           'Request source code:',
                                           style: TextStyle(
+                                              fontFamily: AppTheme.fontName,
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
                                               color: isLightMode
@@ -266,6 +277,7 @@ class AboutScreenState extends State<AboutScreen> {
                                         Text(
                                           '(not going to approve it though)',
                                           style: TextStyle(
+                                              fontFamily: AppTheme.fontName,
                                               fontSize: 12,
                                               fontWeight: FontWeight.w300,
                                               color: isLightMode
@@ -301,6 +313,7 @@ class AboutScreenState extends State<AboutScreen> {
                                         Text(
                                           'Github',
                                           style: TextStyle(
+                                            fontFamily: AppTheme.fontName,
                                             fontSize: 16,
                                             color: Colors.blue,
                                           ),
@@ -330,6 +343,7 @@ class AboutScreenState extends State<AboutScreen> {
                             Text(
                               'Why ads?',
                               style: TextStyle(
+                                  fontFamily: AppTheme.fontName,
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   color: isLightMode
@@ -342,6 +356,7 @@ class AboutScreenState extends State<AboutScreen> {
                               child: Text(
                                 ":)))",
                                 style: TextStyle(
+                                    fontFamily: AppTheme.fontName,
                                     fontSize: 16,
                                     color: isLightMode
                                         ? Colors.black
