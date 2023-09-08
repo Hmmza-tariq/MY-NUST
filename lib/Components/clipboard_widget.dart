@@ -1,13 +1,11 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
-import 'package:encrypt/encrypt.dart' as ec;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:info_popup/info_popup.dart';
 import 'package:mynust/Components/hex_color.dart';
 import 'package:mynust/Components/toasts.dart';
+import 'package:mynust/Core/credentials.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../Provider/internet_provider.dart';
 
 class ClipboardWidget extends StatefulWidget {
@@ -17,36 +15,11 @@ class ClipboardWidget extends StatefulWidget {
 }
 
 class _ClipboardWidgetState extends State<ClipboardWidget> {
-  TextEditingController idTextController = TextEditingController();
-  TextEditingController passTextController = TextEditingController();
   final CustomPopupMenuController _controller = CustomPopupMenuController();
-  final key = ec.Key.fromLength(32);
-  final iv = ec.IV.fromLength(16);
   @override
   void initState() {
     super.initState();
-    loadTextValues();
-  }
-
-  Future<void> loadTextValues() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      final encrypter = ec.Encrypter(ec.AES(key));
-      final encryptedID = ec.Encrypted.fromBase64(prefs.getString('ID') ?? '');
-      final encryptedPass =
-          ec.Encrypted.fromBase64(prefs.getString('PASS') ?? '');
-      idTextController.text = encrypter.decrypt(encryptedID, iv: iv);
-      passTextController.text = encrypter.decrypt(encryptedPass, iv: iv);
-    });
-  }
-
-  Future<void> saveTextValues() async {
-    final encrypter = ec.Encrypter(ec.AES(key));
-    final encryptedID = encrypter.encrypt(idTextController.text, iv: iv);
-    final encryptedPass = encrypter.encrypt(passTextController.text, iv: iv);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('ID', encryptedID.base64);
-    await prefs.setString('PASS', encryptedPass.base64);
+    Hexagon().loadTextValues();
   }
 
   @override
@@ -99,7 +72,7 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                                     dismissTriggerBehavior:
                                         PopupDismissTriggerBehavior.anyWhere,
                                     contentTitle:
-                                        'Your ID and password is saved locally on your device in  encrypted form.',
+                                        'Can be changed through settings.',
                                     child: Icon(
                                       Icons.info_outline,
                                       color: Colors.grey,
@@ -111,19 +84,15 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                             Row(
                               children: [
                                 Expanded(
-                                    child: TextField(
-                                  onChanged: (value) => saveTextValues(),
-                                  keyboardType: hideId
-                                      ? TextInputType.visiblePassword
-                                      : TextInputType.name,
-                                  obscureText: hideId,
-                                  style: const TextStyle(color: Colors.white),
-                                  controller: idTextController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'ID',
-                                    labelStyle: TextStyle(color: Colors.white),
+                                  child: Text(
+                                    hideId
+                                        ? '*' * Hexagon.getAuthor().length
+                                        : Hexagon.getAuthor(),
+                                    style: const TextStyle(color: Colors.white),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.fade,
                                   ),
-                                )),
+                                ),
                                 IconButton(
                                   onPressed: () {
                                     setState(() {
@@ -138,9 +107,8 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                                 ),
                                 IconButton(
                                   onPressed: () {
-                                    saveTextValues();
                                     Clipboard.setData(ClipboardData(
-                                        text: idTextController.text));
+                                        text: Hexagon.getAuthor()));
                                     Toast().successToast(context, 'ID copied');
                                   },
                                   icon: const Icon(Icons.copy,
@@ -151,19 +119,15 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                             Row(
                               children: [
                                 Expanded(
-                                    child: TextField(
-                                  onChanged: (value) => saveTextValues(),
-                                  keyboardType: hidePass
-                                      ? TextInputType.visiblePassword
-                                      : TextInputType.name,
-                                  obscureText: hidePass,
-                                  style: const TextStyle(color: Colors.white),
-                                  controller: passTextController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Pass',
-                                    labelStyle: TextStyle(color: Colors.white),
+                                  child: Text(
+                                    hidePass
+                                        ? '*' * Hexagon.getPrivacy().length
+                                        : Hexagon.getPrivacy(),
+                                    style: const TextStyle(color: Colors.white),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.fade,
                                   ),
-                                )),
+                                ),
                                 IconButton(
                                   onPressed: () {
                                     setState(() {
@@ -178,9 +142,8 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                                 ),
                                 IconButton(
                                   onPressed: () {
-                                    saveTextValues();
                                     Clipboard.setData(ClipboardData(
-                                        text: passTextController.text));
+                                        text: Hexagon.getPrivacy()));
                                     Toast().successToast(
                                         context, 'Password copied');
                                   },

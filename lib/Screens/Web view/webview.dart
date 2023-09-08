@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mynust/Components/toasts.dart';
+import 'package:mynust/Core/credentials.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../Core/app_Theme.dart';
@@ -22,26 +24,31 @@ class WebsiteView extends StatefulWidget {
 class _WebsiteViewState extends State<WebsiteView> {
   final GlobalKey webViewKey = GlobalKey();
   double progress = 0.0;
-  bool _isLoading = false;
+  bool _isLoading = false, _autoFill = false;
 
   @override
   void initState() {
     super.initState();
-    InternetManager.startStreaming(context);
-    InternetManager.checkInternet(context);
-    initializeWebView();
+    _loadAutoPreference().then((value) {
+      setState(() {
+        _autoFill = value ?? false;
+      });
+      Hexagon().loadTextValues();
+      InternetManager.startStreaming(context);
+      InternetManager.checkInternet(context);
+      initializeWebView();
+    });
+  }
+
+  Future<bool?> _loadAutoPreference() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('autoFill');
   }
 
   void initializeWebView() async {
     InternetProvider ip = Provider.of<InternetProvider>(context, listen: false);
     ip.webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      // ..runJavaScript(
-      //     "navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';")
-      // ..runJavaScriptReturningResult(
-      //     "navigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3';")
-      // ..setUserAgent(
-      //     "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Mobile Safari/537.36")
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -57,6 +64,35 @@ class _WebsiteViewState extends State<WebsiteView> {
             });
           },
           onPageFinished: (String url) {
+            if (widget.initialUrl.contains("lms.nust.edu.pk")) {
+              ip.webViewController.runJavaScript('''
+          var viewport = document.querySelector("meta[name=viewport]");
+          viewport.setAttribute("content", "width=700"); 
+          var elements = document.getElementsByClassName('navbar');
+          for (var i = 0; i < elements.length; i++) {
+            elements[i].style.top = '1px';
+          }
+           ''');
+            }
+            if (_autoFill) {
+              String id = Hexagon.getAuthor();
+              String pass = Hexagon.getPrivacy();
+              if (widget.initialUrl.contains("lms.nust.edu.pk")) {
+                ip.webViewController.runJavaScript('''
+          var viewport = document.querySelector("meta[name=viewport]");
+          viewport.setAttribute("content", "width=600"); 
+            document.getElementById('username').value = '$id';
+            document.getElementById('password').value = '$pass';
+                ''');
+              }
+              if (widget.initialUrl.contains("qalam.nust.edu.pk")) {
+                ip.webViewController.runJavaScript(''' 
+          document.getElementById('login').value = '$id';
+          document.getElementById('password').value = '$pass';
+                ''');
+              }
+            }
+
             setState(() {
               _isLoading = false;
             });
@@ -104,13 +140,14 @@ class _WebsiteViewState extends State<WebsiteView> {
           },
         ),
       )
-      ..enableZoom(true)
+      ..enableZoom(false)
       ..loadRequest(Uri.parse(widget.initialUrl));
   }
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
       systemNavigationBarColor: AppTheme.white,
       systemNavigationBarIconBrightness: Brightness.dark,
