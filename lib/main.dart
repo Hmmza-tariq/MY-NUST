@@ -29,9 +29,6 @@ Future<void> main() async {
   await FlutterDownloader.initialize(ignoreSsl: false);
 
   MobileAds.instance.initialize();
-  RequestConfiguration requestConfiguration =
-      RequestConfiguration(testDeviceIds: ["57A34DAFAF346A59AC6C4D1CED65FC5A"]);
-  MobileAds.instance.updateRequestConfiguration(requestConfiguration);
 
   NotificationService().initNotification();
   tz.initializeTimeZones();

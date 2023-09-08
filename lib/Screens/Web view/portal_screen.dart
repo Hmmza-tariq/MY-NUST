@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../Components/clipboard_widget.dart';
 import 'webview.dart';
 
@@ -15,14 +16,19 @@ class PortalScreen extends StatefulWidget {
 class _PortalScreenState extends State<PortalScreen>
     with TickerProviderStateMixin {
   AnimationController? animationController;
-  bool showCopyButton = true;
-  bool forwardAnimation = true;
+  bool showCopyButton = true,
+      forwardAnimation = true,
+      copyButtonEnabled = false;
   int time = 50;
   @override
   void initState() {
+    _loadCopyPreference().then((value) {
+      setState(() {
+        copyButtonEnabled = value ?? false;
+      });
+    });
     animationController = AnimationController(
         duration: const Duration(milliseconds: 2000), vsync: this);
-
     Timer(Duration(seconds: time), () {
       if (mounted) {
         setState(() {
@@ -51,6 +57,11 @@ class _PortalScreenState extends State<PortalScreen>
     super.dispose();
   }
 
+  Future<bool?> _loadCopyPreference() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('copyButton');
+  }
+
   @override
   Widget build(BuildContext context) {
     Animation<double> fadeAnimation =
@@ -77,35 +88,37 @@ class _PortalScreenState extends State<PortalScreen>
           WebsiteView(
             initialUrl: widget.initialUrl,
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: MediaQuery.of(context).size.height / 5,
-            ),
-            child: AnimatedBuilder(
-                animation: animationController!,
-                builder: (BuildContext context, Widget? child) {
-                  return forwardAnimation
-                      ? FadeTransition(
-                          opacity: fadeAnimation,
-                          child: Transform(
-                            transform: Matrix4.translationValues(
-                              -50 * (1.0 - fadeAnimation.value),
-                              0,
-                              0,
-                            ),
-                            child: const ClipboardWidget(),
-                          ),
-                        )
-                      : Visibility(
-                          visible: showCopyButton,
-                          child: ScaleTransition(
-                            alignment: Alignment.centerLeft,
-                            scale: scaleAnimation,
-                            child: const ClipboardWidget(),
-                          ),
-                        );
-                }),
-          )
+          copyButtonEnabled
+              ? Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.height / 5,
+                  ),
+                  child: AnimatedBuilder(
+                      animation: animationController!,
+                      builder: (BuildContext context, Widget? child) {
+                        return forwardAnimation
+                            ? FadeTransition(
+                                opacity: fadeAnimation,
+                                child: Transform(
+                                  transform: Matrix4.translationValues(
+                                    -50 * (1.0 - fadeAnimation.value),
+                                    0,
+                                    0,
+                                  ),
+                                  child: const ClipboardWidget(),
+                                ),
+                              )
+                            : Visibility(
+                                visible: showCopyButton,
+                                child: ScaleTransition(
+                                  alignment: Alignment.centerLeft,
+                                  scale: scaleAnimation,
+                                  child: const ClipboardWidget(),
+                                ),
+                              );
+                      }),
+                )
+              : Container()
         ],
       )),
     );
