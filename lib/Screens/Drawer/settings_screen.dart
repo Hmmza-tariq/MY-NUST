@@ -425,23 +425,30 @@ class SettingsScreenState extends State<SettingsScreen> {
                     fontWeight: FontWeight.bold,
                     color: isLightMode ? Colors.black : Colors.white),
               ),
-              const InfoPopupWidget(
-                contentOffset: Offset(-15, 0),
+              InfoPopupWidget(
+                contentOffset: const Offset(0, 0),
                 arrowTheme: InfoPopupArrowTheme(
                   arrowDirection: ArrowDirection.down,
-                  color: Colors.grey,
+                  color: isLightMode
+                      ? const Color.fromARGB(255, 199, 199, 199)
+                      : const Color.fromARGB(255, 1, 54, 98),
                 ),
                 contentTheme: InfoPopupContentTheme(
-                  infoContainerBackgroundColor: Colors.grey,
-                  infoTextStyle: TextStyle(color: Colors.white),
-                  contentPadding: EdgeInsets.all(6),
-                  contentBorderRadius: BorderRadius.all(Radius.circular(10)),
+                  infoContainerBackgroundColor: isLightMode
+                      ? const Color.fromARGB(255, 199, 199, 199)
+                      : const Color.fromARGB(255, 1, 54, 98),
+                  infoTextStyle: TextStyle(
+                    color: isLightMode ? AppTheme.nearlyBlack : AppTheme.white,
+                  ),
+                  contentPadding: const EdgeInsets.all(6),
+                  contentBorderRadius:
+                      const BorderRadius.all(Radius.circular(10)),
                   infoTextAlign: TextAlign.center,
                 ),
                 dismissTriggerBehavior: PopupDismissTriggerBehavior.anyWhere,
                 contentTitle:
                     'Your ID and password are saved locally on your device in highly encrypted form. We take your data security seriously. However, please be aware that any issues related to this data are beyond our control. It is your responsibility to keep your device secure and ensure the safety of your login credentials.',
-                child: Icon(
+                child: const Icon(
                   Icons.info_outline,
                   color: Colors.red,
                 ),
@@ -680,7 +687,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.all(4.0),
                                 child: Text(
-                                  'Add',
+                                  'ID/Pass',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     color: isLightMode

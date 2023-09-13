@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mynust/Components/rewarded_ad.dart';
+import 'package:mynust/Components/result_ad.dart';
 import 'package:mynust/Core/app_theme.dart';
 
 class ActionButton extends StatefulWidget {
