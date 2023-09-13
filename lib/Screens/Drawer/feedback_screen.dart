@@ -53,12 +53,9 @@ class FeedbackScreenState extends State<FeedbackScreen> {
     } else {
       final Email email = Email(
         body:
-            'Name: ${_nameController.text}\nFeedback: ${_messageController.text}',
-        subject: 'Feedback',
+            'Dear Team Hexag⬡ne,\n\nI am writing to provide feedback on using My NUST.\n\n${_messageController.text}\n\nBest regards,\n${_nameController.text}',
+        subject: 'Feedback on My NUST',
         recipients: ['hexagone.playstore@gmail.com'],
-        cc: [],
-        bcc: [],
-        attachmentPaths: [],
         isHTML: false,
       );
 

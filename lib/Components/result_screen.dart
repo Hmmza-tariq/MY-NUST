@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:mynust/Components/rewarded_ad.dart';
+import 'package:mynust/Components/result_ad.dart';
 import 'package:mynust/Core/app_theme.dart';
 import 'package:share_files_and_screenshot_widgets/share_files_and_screenshot_widgets.dart';
 

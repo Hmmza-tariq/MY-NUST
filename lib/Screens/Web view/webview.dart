@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mynust/Components/toasts.dart';
 import 'package:mynust/Core/credentials.dart';
+import 'package:mynust/Provider/theme_provider.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -64,15 +65,11 @@ class _WebsiteViewState extends State<WebsiteView> {
             });
           },
           onPageFinished: (String url) {
-            if (widget.initialUrl.contains("lms.nust.edu.pk")) {
+            if (!widget.initialUrl.contains("qalam.nust")) {
               ip.webViewController.runJavaScript('''
           var viewport = document.querySelector("meta[name=viewport]");
-          viewport.setAttribute("content", "width=700"); 
-          var elements = document.getElementsByClassName('navbar');
-          for (var i = 0; i < elements.length; i++) {
-            elements[i].style.top = '1px';
-          }
-           ''');
+          viewport.setAttribute("content", "width=450"); 
+          ''');
             }
             if (_autoFill) {
               String id = Hexagon.getAuthor();
@@ -153,7 +150,8 @@ class _WebsiteViewState extends State<WebsiteView> {
       systemNavigationBarIconBrightness: Brightness.dark,
     ));
     InternetProvider ip = Provider.of<InternetProvider>(context, listen: false);
-
+    bool isLightMode = Provider.of<ThemeProvider>(context).isLightMode ??
+        MediaQuery.of(context).platformBrightness == Brightness.light;
     return Stack(
       children: [
         WillPopScope(
@@ -162,6 +160,14 @@ class _WebsiteViewState extends State<WebsiteView> {
                 ip.webViewController.goBack();
                 return false;
               } else {
+                SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+                  statusBarIconBrightness:
+                      isLightMode ? Brightness.dark : Brightness.light,
+                  systemNavigationBarColor:
+                      isLightMode ? AppTheme.white : AppTheme.nearlyBlack,
+                  systemNavigationBarIconBrightness:
+                      isLightMode ? Brightness.dark : Brightness.light,
+                ));
                 return true;
               }
             },

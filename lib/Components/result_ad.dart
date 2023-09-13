@@ -2,21 +2,20 @@ import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class ResultAd {
-  static const adUnitId = 'ca-app-pub-8875342677218505/6914141218';
-  static RewardedInterstitialAd? _rewardedInterstitialAd;
+  static AppOpenAd? _appOpenAd;
   static bool isAdLoaded = false;
 
   static void loadAd() {
-    RewardedInterstitialAd.load(
-      adUnitId: adUnitId,
+    AppOpenAd.load(
+      adUnitId: 'ca-app-pub-8875342677218505/4721874523',
       request: const AdRequest(),
-      rewardedInterstitialAdLoadCallback: RewardedInterstitialAdLoadCallback(
+      adLoadCallback: AppOpenAdLoadCallback(
         onAdLoaded: (ad) {
           if (kDebugMode) {
             print('$ad loaded.');
           }
           isAdLoaded = true;
-          _rewardedInterstitialAd = ad;
+          _appOpenAd = ad;
         },
         onAdFailedToLoad: (LoadAdError error) {
           if (kDebugMode) {
@@ -25,13 +24,11 @@ class ResultAd {
           isAdLoaded = false;
         },
       ),
+      orientation: AppOpenAd.orientationPortrait,
     );
   }
 
   static void playAd() {
-    (isAdLoaded)
-        ? _rewardedInterstitialAd!.show(
-            onUserEarnedReward: (AdWithoutView ad, RewardItem rewardItem) {})
-        : null;
+    (isAdLoaded) ? _appOpenAd!.show() : null;
   }
 }

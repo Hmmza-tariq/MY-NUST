@@ -1,3 +1,4 @@
+import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mynust/Screens/Home/home_drawer_list.dart';
 import 'package:page_transition/page_transition.dart';
@@ -6,8 +7,6 @@ import 'package:provider/provider.dart';
 import '../../Components/toasts.dart';
 import '../../Core/app_theme.dart';
 import 'package:flutter/material.dart';
-
-import '../../Core/email.dart';
 import '../../Provider/theme_provider.dart';
 
 class HelpScreen extends StatefulWidget {
@@ -39,55 +38,55 @@ class HelpScreenState extends State<HelpScreen> {
   }
 
   void _handleSendButtonPressed(bool isLightMode) async {
-    if (!sent) {
-      setState(() {
-        isLoading = true;
-        buttonText = '';
-      });
-      bool success = false;
-      final emailPattern =
-          RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
+    setState(() {
+      isLoading = true;
+      buttonText = '';
+    });
+    bool success = false;
+    final emailPattern =
+        RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
 
-      bool isValidEmail = _mailController.text.isNotEmpty &&
-          emailPattern.hasMatch(_mailController.text);
-      bool isValidMessage = _messageController.text.isNotEmpty;
-      bool error = !isValidEmail || !isValidMessage;
-      if (error) {
+    bool isValidEmail = _mailController.text.isNotEmpty &&
+        emailPattern.hasMatch(_mailController.text);
+    bool isValidMessage = _messageController.text.isNotEmpty;
+    bool error = !isValidEmail || !isValidMessage;
+    if (error) {
+      success = false;
+      Toast().errorToast(context, 'Invalid Email or Message');
+    } else {
+      final Email email = Email(
+        body:
+            'Dear Team Hexag⬡ne,\n\nI am writing to request assistance with using My NUST.\n\n${_messageController.text}\n\nBest regards,\n${_nameController.text}',
+        subject: 'Help needed using My NUST',
+        recipients: ['hexagone.playstore@gmail.com'],
+        isHTML: false,
+      );
+
+      try {
+        await FlutterEmailSender.send(email);
+        success = true;
+      } catch (error) {
         success = false;
-        Toast().errorToast(context, 'Invalid Email or Message');
-      } else {
-        success = await sendMail(
-          message: _messageController.text,
-          fromEmail: _mailController.text,
-          screen: 'Help',
-          fromName: _nameController.text,
-        );
       }
-
-      setState(() {
-        isLoading = false;
-        buttonText = success ? 'Success' : 'Failed';
-        if (success) {
-          _mailController.clear();
-          _messageController.clear();
-        }
-      });
-
-      Future.delayed(const Duration(seconds: 3), () {
-        setState(() {
-          if (success) {
-            error = false;
-            sent = true;
-          } else {
-            sent = false;
-            buttonText = 'Send';
-          }
-        });
-      });
-
-      // ignore: use_build_context_synchronously
-      FocusScope.of(context).requestFocus(FocusNode());
     }
+
+    setState(() {
+      isLoading = false;
+      buttonText = success ? 'Success' : 'Failed';
+      if (success) {
+        _mailController.clear();
+        _messageController.clear();
+        _nameController.clear();
+      }
+    });
+
+    Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+        error = false;
+
+        buttonText = 'Send';
+      });
+    });
   }
 
   @override
