@@ -131,7 +131,6 @@ class _ResultScreenState extends State<ResultScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // SizedBox(height: defaultPadding),
                 Stack(
                   alignment: AlignmentDirectional.topStart,
                   children: [
@@ -220,6 +219,7 @@ class _ResultScreenState extends State<ResultScreen> {
                     ? Container()
                     : Expanded(
                         child: ListView.builder(
+                          shrinkWrap: true,
                           itemCount: items,
                           itemBuilder: (context, index) {
                             return ListTile(
@@ -229,7 +229,15 @@ class _ResultScreenState extends State<ResultScreen> {
                                 subtitle: DetailCard(
                                   title: (widget.isSGPA)
                                       ? widget.subjects[index].name
-                                      : "Semester ${index + 1}",
+                                      : (widget.isGPA)
+                                          ? (widget.semesters[index].name ==
+                                                  'Summer')
+                                              ? 'Summer'
+                                              : "Semester ${widget.semesters[index].name}"
+                                          : (widget.sems[index].name ==
+                                                  'Summer')
+                                              ? 'Summer'
+                                              : "Semester ${widget.sems[index].name}",
                                   trailing: (widget.isSGPA)
                                       ? widget.subjects[index].expectedGrade
                                       : (widget.isCGPA)
@@ -237,7 +245,7 @@ class _ResultScreenState extends State<ResultScreen> {
                                               .toStringAsFixed(2)
                                           : widget.semesters[index].gpa
                                               .toStringAsFixed(2),
-                                  numOfFiles: (widget.isSGPA)
+                                  description: (widget.isSGPA)
                                       ? widget.subjects[index].creditHours
                                       : (widget.isCGPA)
                                           ? widget.sems[index].credits
@@ -294,7 +302,6 @@ class Chart extends StatelessWidget {
   Color getColorForIndex(int index) {
     List<Color> colorList = [
       Colors.green,
-      Colors.red,
       Colors.blue,
       Colors.orange,
       Colors.purple,
@@ -470,13 +477,13 @@ class DetailCard extends StatelessWidget {
     Key? key,
     required this.title,
     required this.trailing,
-    required this.numOfFiles,
+    required this.description,
     required this.isLightMode,
     required this.defaultPadding,
   }) : super(key: key);
 
   final String title, trailing;
-  final int numOfFiles;
+  final int description;
   final double defaultPadding;
   final bool isLightMode;
 
@@ -513,7 +520,7 @@ class DetailCard extends StatelessWidget {
                         color: isLightMode ? Colors.black : Colors.white),
                   ),
                   Text(
-                    "$numOfFiles Credits",
+                    "$description Credits",
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(
                         color: isLightMode ? Colors.black : Colors.white),
                   ),
@@ -521,14 +528,12 @@ class DetailCard extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            width: 35,
-            child: Text(
-              trailing,
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: isLightMode ? Colors.black : Colors.white,
-                  fontWeight: FontWeight.w700),
-            ),
+          Text(
+            trailing,
+            textAlign: TextAlign.start,
+            style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                color: isLightMode ? Colors.black : Colors.white,
+                fontWeight: FontWeight.w700),
           )
         ],
       ),

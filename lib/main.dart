@@ -49,26 +49,23 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown
-  ]).then((_) => runApp(MultiProvider(
-        providers: [
-          ChangeNotifierProvider<ThemeProvider>(
-            create: (_) => ThemeProvider(option),
-          ),
-          ChangeNotifierProvider<NoticeBoardProvider>(
-            create: (_) => NoticeBoardProvider(noticeBoard ?? 'CEME'),
-          ),
-          ChangeNotifierProvider<GpaProvider>(
-            create: (_) => GpaProvider(),
-          ),
-          ChangeNotifierProvider<AssessmentProvider>(
-            create: (_) => AssessmentProvider(),
-          ),
-          ChangeNotifierProvider<InternetProvider>(
-            create: (_) => InternetProvider(),
-          ),
-        ],
-        child: const MyApp(),
-      )));
+  ]).then((_) => runApp(MultiProvider(providers: [
+        ChangeNotifierProvider<ThemeProvider>(
+          create: (_) => ThemeProvider(option),
+        ),
+        ChangeNotifierProvider<NoticeBoardProvider>(
+          create: (_) => NoticeBoardProvider(noticeBoard ?? 'CEME'),
+        ),
+        ChangeNotifierProvider<GpaProvider>(
+          create: (_) => GpaProvider(),
+        ),
+        ChangeNotifierProvider<AssessmentProvider>(
+          create: (_) => AssessmentProvider(),
+        ),
+        ChangeNotifierProvider<InternetProvider>(
+          create: (_) => InternetProvider(),
+        ),
+      ], child: const MyApp())));
 
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return const ErrorScreen(

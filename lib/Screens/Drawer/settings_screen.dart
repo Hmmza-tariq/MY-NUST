@@ -129,46 +129,56 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _clearSharedPrefs(BuildContext context, bool isLightMode) async {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor:
-              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-          title: Text(
-            'Confirm Clear',
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isLightMode ? Colors.black : Colors.white),
-          ),
-          content: Text(
-              'It includes your GPA, Tasks, Id / Pass etc... \nAre you sure you want to clear all data? ',
-              style: TextStyle(
-                  fontSize: 14,
-                  color: isLightMode ? Colors.black : Colors.white)),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel',
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      transitionBuilder: (context, a1, a2, widget) {
+        return ScaleTransition(
+            scale: Tween<double>(begin: 0, end: 1.0).animate(a1),
+            child: AlertDialog(
+              backgroundColor:
+                  isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+              title: Text(
+                'Confirm Clear',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isLightMode ? Colors.black : Colors.white),
+              ),
+              content: Text(
+                  'It includes your GPA, Tasks, Id / Pass etc... \nAre you sure you want to clear all data? ',
                   style: TextStyle(
                       fontSize: 14,
                       color: isLightMode ? Colors.black : Colors.white)),
-            ),
-            TextButton(
-              onPressed: () async {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                await prefs.clear();
-                // ignore: use_build_context_synchronously
-                Navigator.of(context).pop();
-              },
-              child: const Text('Clear',
-                  style: TextStyle(fontSize: 14, color: Colors.red)),
-            ),
-          ],
-        );
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cancel',
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: isLightMode ? Colors.black : Colors.white)),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    await prefs.clear();
+                    Hexagon().saveTextValues('', '');
+                    // ignore: use_build_context_synchronously
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Clear',
+                      style: TextStyle(fontSize: 14, color: Colors.red)),
+                ),
+              ],
+            ));
       },
     );
   }
@@ -214,57 +224,65 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _chooseThemeDialog(bool isLightMode) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) {
-        return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-          return AlertDialog(
-            backgroundColor:
-                isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-            title: Center(
-              child: Text(
-                'Choose Theme mode',
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                    fontSize: 16,
-                    color: isLightMode ? Colors.black : Colors.white),
-              ),
-            ),
-            content: SizedBox(
-              height: 150.0,
-              child: RadioGroup<String>.builder(
-                direction: Axis.vertical,
-                groupValue: _selectedThemeOption,
-                horizontalAlignment: MainAxisAlignment.center,
-                onChanged: (value) => setState(() {
-                  _selectedThemeOption = value!;
-                  _setThemePreference(_selectedThemeOption, isLightMode);
-                }),
-                items: _radioThemeOptionsList,
-                textStyle: TextStyle(
-                    fontSize: 16,
-                    color: isLightMode ? Colors.black : Colors.white),
-                itemBuilder: (item) => RadioButtonBuilder(
-                  item.toString(),
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      transitionBuilder: (context, a1, a2, widget) {
+        return ScaleTransition(
+            scale: Tween<double>(begin: 0, end: 1.0).animate(a1),
+            child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+              return AlertDialog(
+                backgroundColor:
+                    isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+                title: Center(
+                  child: Text(
+                    'Choose Theme mode',
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: isLightMode ? Colors.black : Colors.white),
+                  ),
                 ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: isLightMode ? Colors.black : Colors.white),
+                content: SizedBox(
+                  height: 150.0,
+                  child: RadioGroup<String>.builder(
+                    direction: Axis.vertical,
+                    groupValue: _selectedThemeOption,
+                    horizontalAlignment: MainAxisAlignment.center,
+                    onChanged: (value) => setState(() {
+                      _selectedThemeOption = value!;
+                      _setThemePreference(_selectedThemeOption, isLightMode);
+                    }),
+                    items: _radioThemeOptionsList,
+                    textStyle: TextStyle(
+                        fontSize: 16,
+                        color: isLightMode ? Colors.black : Colors.white),
+                    itemBuilder: (item) => RadioButtonBuilder(
+                      item.toString(),
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          );
-        });
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: isLightMode ? Colors.black : Colors.white),
+                    ),
+                  ),
+                ],
+              );
+            }));
       },
     );
   }
@@ -288,94 +306,104 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _chooseNoticeBoard(bool isLightMode) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) {
-        return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-          return AlertDialog(
-            backgroundColor:
-                isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-            title: Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Center(
-                child: Text(
-                  'Choose School/College',
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: isLightMode ? Colors.black : Colors.white),
-                ),
-              ),
-            ),
-            content: SizedBox(
-              height: 450.0,
-              child: SingleChildScrollView(
-                child: RadioGroup<String>.builder(
-                  direction: Axis.vertical,
-                  groupValue: _selectedNoticeBoardOption,
-                  horizontalAlignment: MainAxisAlignment.center,
-                  onChanged: (value) => setState(() {
-                    _selectedNoticeBoardOption = value!;
-
-                    _setNoticePreference(_selectedNoticeBoardOption);
-                  }),
-                  items: _radioNoticeBoardOptionsList,
-                  textStyle: TextStyle(
-                      fontSize: 16,
-                      color: isLightMode ? Colors.black : Colors.white),
-                  itemBuilder: (item) => RadioButtonBuilder(
-                    item.toString(),
-                  ),
-                ),
-              ),
-            ),
-            actionsAlignment: MainAxisAlignment.spaceBetween,
-            actions: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: InfoPopupWidget(
-                  contentOffset: const Offset(0, 0),
-                  arrowTheme: InfoPopupArrowTheme(
-                    arrowDirection: ArrowDirection.down,
-                    color: isLightMode
-                        ? const Color.fromARGB(255, 199, 199, 199)
-                        : const Color.fromARGB(255, 1, 54, 98),
-                  ),
-                  contentTheme: InfoPopupContentTheme(
-                    infoContainerBackgroundColor: isLightMode
-                        ? const Color.fromARGB(255, 199, 199, 199)
-                        : const Color.fromARGB(255, 1, 54, 98),
-                    infoTextStyle: TextStyle(
-                      color:
-                          isLightMode ? AppTheme.nearlyBlack : AppTheme.white,
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      transitionBuilder: (context, a1, a2, widget) {
+        return ScaleTransition(
+            scale: Tween<double>(begin: 0, end: 1.0).animate(a1),
+            child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+              return AlertDialog(
+                backgroundColor:
+                    isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+                title: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Center(
+                    child: Text(
+                      'Choose School/College',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: isLightMode ? Colors.black : Colors.white),
                     ),
-                    contentPadding: const EdgeInsets.all(6),
-                    contentBorderRadius:
-                        const BorderRadius.all(Radius.circular(10)),
-                    infoTextAlign: TextAlign.center,
-                  ),
-                  dismissTriggerBehavior: PopupDismissTriggerBehavior.anyWhere,
-                  contentTitle:
-                      "Need to add your School/College/Campus? Contact support.",
-                  child: const Icon(
-                    Icons.info_outline,
-                    color: Colors.grey,
                   ),
                 ),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('Back',
-                    style: TextStyle(
-                        fontSize: 14,
-                        color: isLightMode ? Colors.black : Colors.white)),
-              ),
-            ],
-          );
-        });
+                content: SizedBox(
+                  height: 450.0,
+                  child: SingleChildScrollView(
+                    child: RadioGroup<String>.builder(
+                      direction: Axis.vertical,
+                      groupValue: _selectedNoticeBoardOption,
+                      horizontalAlignment: MainAxisAlignment.center,
+                      onChanged: (value) => setState(() {
+                        _selectedNoticeBoardOption = value!;
+
+                        _setNoticePreference(_selectedNoticeBoardOption);
+                      }),
+                      items: _radioNoticeBoardOptionsList,
+                      textStyle: TextStyle(
+                          fontSize: 16,
+                          color: isLightMode ? Colors.black : Colors.white),
+                      itemBuilder: (item) => RadioButtonBuilder(
+                        item.toString(),
+                      ),
+                    ),
+                  ),
+                ),
+                actionsAlignment: MainAxisAlignment.spaceBetween,
+                actions: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: InfoPopupWidget(
+                      contentOffset: const Offset(0, 0),
+                      arrowTheme: InfoPopupArrowTheme(
+                        arrowDirection: ArrowDirection.down,
+                        color: isLightMode
+                            ? const Color.fromARGB(255, 199, 199, 199)
+                            : const Color.fromARGB(255, 1, 54, 98),
+                      ),
+                      contentTheme: InfoPopupContentTheme(
+                        infoContainerBackgroundColor: isLightMode
+                            ? const Color.fromARGB(255, 199, 199, 199)
+                            : const Color.fromARGB(255, 1, 54, 98),
+                        infoTextStyle: TextStyle(
+                          color: isLightMode
+                              ? AppTheme.nearlyBlack
+                              : AppTheme.white,
+                        ),
+                        contentPadding: const EdgeInsets.all(6),
+                        contentBorderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        infoTextAlign: TextAlign.center,
+                      ),
+                      dismissTriggerBehavior:
+                          PopupDismissTriggerBehavior.anyWhere,
+                      contentTitle:
+                          "Need to add your School/College/Campus? Contact support.",
+                      child: const Icon(
+                        Icons.info_outline,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Back',
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: isLightMode ? Colors.black : Colors.white)),
+                  ),
+                ],
+              );
+            }));
       },
     );
   }
@@ -409,133 +437,155 @@ class SettingsScreenState extends State<SettingsScreen> {
     TextEditingController passController = TextEditingController();
     idController.text = Hexagon.getAuthor();
     passController.text = Hexagon.getPrivacy();
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor:
-              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Add Credentials',
-                style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: isLightMode ? Colors.black : Colors.white),
-              ),
-              InfoPopupWidget(
-                contentOffset: const Offset(0, 0),
-                arrowTheme: InfoPopupArrowTheme(
-                  arrowDirection: ArrowDirection.down,
-                  color: isLightMode
-                      ? const Color.fromARGB(255, 199, 199, 199)
-                      : const Color.fromARGB(255, 1, 54, 98),
-                ),
-                contentTheme: InfoPopupContentTheme(
-                  infoContainerBackgroundColor: isLightMode
-                      ? const Color.fromARGB(255, 199, 199, 199)
-                      : const Color.fromARGB(255, 1, 54, 98),
-                  infoTextStyle: TextStyle(
-                    color: isLightMode ? AppTheme.nearlyBlack : AppTheme.white,
-                  ),
-                  contentPadding: const EdgeInsets.all(6),
-                  contentBorderRadius:
-                      const BorderRadius.all(Radius.circular(10)),
-                  infoTextAlign: TextAlign.center,
-                ),
-                dismissTriggerBehavior: PopupDismissTriggerBehavior.anyWhere,
-                contentTitle:
-                    'Your ID and password are saved locally on your device in highly encrypted form. We take your data security seriously. However, please be aware that any issues related to this data are beyond our control. It is your responsibility to keep your device secure and ensure the safety of your login credentials.',
-                child: const Icon(
-                  Icons.info_outline,
-                  color: Colors.red,
-                ),
-              ),
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: StatefulBuilder(builder: (context, setState) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      transitionBuilder: (context, a1, a2, widget) {
+        return ScaleTransition(
+            scale: Tween<double>(begin: 0, end: 1.0).animate(a1),
+            child: AlertDialog(
+              backgroundColor:
+                  isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                          child: TextField(
-                        controller: idController,
-                        keyboardType: hideId
-                            ? TextInputType.visiblePassword
-                            : TextInputType.name,
-                        obscureText: hideId,
-                        style: TextStyle(
-                            color: isLightMode ? Colors.black : Colors.white),
-                        decoration: InputDecoration(
-                          labelText: 'ID',
-                          labelStyle: TextStyle(
-                              color: isLightMode ? Colors.black : Colors.white),
-                        ),
-                      )),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            hideId = !hideId;
-                          });
-                        },
-                        icon: Icon(
-                            hideId ? Icons.visibility_off : Icons.visibility,
-                            color: isLightMode ? Colors.black : Colors.white),
-                      ),
-                    ],
+                  Text(
+                    'Add Credentials',
+                    style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: isLightMode ? Colors.black : Colors.white),
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: TextField(
-                        controller: passController,
-                        keyboardType: hidePass
-                            ? TextInputType.visiblePassword
-                            : TextInputType.name,
-                        obscureText: hidePass,
-                        style: TextStyle(
-                            color: isLightMode ? Colors.black : Colors.white),
-                        decoration: InputDecoration(
-                          labelText: 'Pass',
-                          labelStyle: TextStyle(
-                              color: isLightMode ? Colors.black : Colors.white),
-                        ),
-                      )),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            hidePass = !hidePass;
-                          });
-                        },
-                        icon: Icon(
-                            hidePass ? Icons.visibility_off : Icons.visibility,
-                            color: isLightMode ? Colors.black : Colors.white),
+                  InfoPopupWidget(
+                    contentOffset: const Offset(0, 0),
+                    arrowTheme: InfoPopupArrowTheme(
+                      arrowDirection: ArrowDirection.down,
+                      color: isLightMode
+                          ? const Color.fromARGB(255, 199, 199, 199)
+                          : const Color.fromARGB(255, 1, 54, 98),
+                    ),
+                    contentTheme: InfoPopupContentTheme(
+                      infoContainerBackgroundColor: isLightMode
+                          ? const Color.fromARGB(255, 199, 199, 199)
+                          : const Color.fromARGB(255, 1, 54, 98),
+                      infoTextStyle: TextStyle(
+                        color:
+                            isLightMode ? AppTheme.nearlyBlack : AppTheme.white,
                       ),
-                    ],
+                      contentPadding: const EdgeInsets.all(6),
+                      contentBorderRadius:
+                          const BorderRadius.all(Radius.circular(10)),
+                      infoTextAlign: TextAlign.center,
+                    ),
+                    dismissTriggerBehavior:
+                        PopupDismissTriggerBehavior.anyWhere,
+                    contentTitle:
+                        'Your ID and password are saved locally on your device in highly encrypted form. We take your data security seriously. However, please be aware that any issues related to this data are beyond our control. It is your responsibility to keep your device secure and ensure the safety of your login credentials.',
+                    child: const Icon(
+                      Icons.info_outline,
+                      color: Colors.red,
+                    ),
                   ),
                 ],
-              );
-            }),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Add',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: isLightMode ? Colors.black : Colors.white)),
-              onPressed: () {
-                Hexagon()
-                    .saveTextValues(idController.text, passController.text);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
+              ),
+              content: SingleChildScrollView(
+                child: StatefulBuilder(builder: (context, setState) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                              child: TextField(
+                            controller: idController,
+                            keyboardType: hideId
+                                ? TextInputType.visiblePassword
+                                : TextInputType.name,
+                            obscureText: hideId,
+                            style: TextStyle(
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                            decoration: InputDecoration(
+                              labelText: 'ID',
+                              labelStyle: TextStyle(
+                                  color: isLightMode
+                                      ? Colors.black
+                                      : Colors.white),
+                            ),
+                          )),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                hideId = !hideId;
+                              });
+                            },
+                            icon: Icon(
+                                hideId
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: TextField(
+                            controller: passController,
+                            keyboardType: hidePass
+                                ? TextInputType.visiblePassword
+                                : TextInputType.name,
+                            obscureText: hidePass,
+                            style: TextStyle(
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                            decoration: InputDecoration(
+                              labelText: 'Pass',
+                              labelStyle: TextStyle(
+                                  color: isLightMode
+                                      ? Colors.black
+                                      : Colors.white),
+                            ),
+                          )),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                hidePass = !hidePass;
+                              });
+                            },
+                            icon: Icon(
+                                hidePass
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                }),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Add',
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: isLightMode ? Colors.black : Colors.white)),
+                  onPressed: () {
+                    Hexagon()
+                        .saveTextValues(idController.text, passController.text);
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ));
       },
     );
   }

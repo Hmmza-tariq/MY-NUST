@@ -47,101 +47,130 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
 
   void _editSemester(int index, bool isLightMode) {
     Sem semester = semesters[index];
-    int semesterNo = semester.name;
+    String semesterNo = semester.name;
     int credits = semester.credits;
     double sgpa = semester.sgpa;
-    showDialog(
+    List<String> semesterNames = [
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      'Summer'
+    ];
+    showGeneralDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor:
-              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-          title: Text(
-            'Edit Semester',
-            style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: isLightMode ? Colors.black : Colors.white),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(
-                      color: isLightMode ? Colors.black : Colors.white),
-                  onChanged: (value) {
-                    semesterNo = int.parse(value);
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Semester no',
-                    labelStyle: TextStyle(
-                        color: isLightMode ? Colors.black : Colors.white),
-                  ),
-                  controller:
-                      TextEditingController(text: semesterNo.toString()),
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      transitionBuilder: (context, a1, a2, widget) {
+        return ScaleTransition(
+            scale: Tween<double>(begin: 0, end: 1.0).animate(a1),
+            child: AlertDialog(
+              backgroundColor:
+                  isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+              title: Text(
+                'Edit Semester',
+                style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: isLightMode ? Colors.black : Colors.white),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<String>(
+                      dropdownColor: isLightMode
+                          ? AppTheme.nearlyWhite
+                          : AppTheme.nearlyBlack,
+                      style: TextStyle(
+                          color: isLightMode ? Colors.black : Colors.white),
+                      value: semesterNo,
+                      onChanged: (newValue) {
+                        setState(() {
+                          semesterNo = newValue!;
+                        });
+                      },
+                      items: semesterNames.map((name) {
+                        return DropdownMenuItem<String>(
+                          value: name,
+                          child: Text(
+                            name,
+                            style: TextStyle(
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                          ),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'Semester',
+                        labelStyle: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                      ),
+                    ),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(
+                          color: isLightMode ? Colors.black : Colors.white),
+                      onChanged: (value) {
+                        sgpa = double.parse(value);
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'SGPA',
+                        labelStyle: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                      ),
+                      controller: TextEditingController(text: sgpa.toString()),
+                    ),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(
+                          color: isLightMode ? Colors.black : Colors.white),
+                      onChanged: (value) {
+                        credits = int.parse(value);
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Credit hours',
+                        labelStyle: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                      ),
+                      controller:
+                          TextEditingController(text: credits.toString()),
+                    ),
+                  ],
                 ),
-                TextField(
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(
-                      color: isLightMode ? Colors.black : Colors.white),
-                  onChanged: (value) {
-                    sgpa = double.parse(value);
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Save',
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: isLightMode ? Colors.black : Colors.white)),
+                  onPressed: () {
+                    if (sgpa <= 4 && sgpa > 0 && credits <= 30 && credits > 0) {
+                      setState(() {
+                        semesters[index] = Sem(
+                          semesterNo,
+                          sgpa,
+                          credits,
+                        );
+                      });
+                      _saveSemesters();
+                      Navigator.pop(context);
+                    } else {
+                      Toast().errorToast(context, 'Incorrect Data');
+                    }
                   },
-                  decoration: InputDecoration(
-                    labelText: 'SGPA',
-                    labelStyle: TextStyle(
-                        color: isLightMode ? Colors.black : Colors.white),
-                  ),
-                  controller: TextEditingController(text: sgpa.toString()),
-                ),
-                TextField(
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(
-                      color: isLightMode ? Colors.black : Colors.white),
-                  onChanged: (value) {
-                    credits = int.parse(value);
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Credit hours',
-                    labelStyle: TextStyle(
-                        color: isLightMode ? Colors.black : Colors.white),
-                  ),
-                  controller: TextEditingController(text: credits.toString()),
                 ),
               ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Save',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: isLightMode ? Colors.black : Colors.white)),
-              onPressed: () {
-                if (semesterNo <= 8 &&
-                    semesterNo > 0 &&
-                    sgpa <= 4 &&
-                    sgpa > 0 &&
-                    credits <= 30 &&
-                    credits > 0) {
-                  setState(() {
-                    semesters[index] = Sem(
-                      semesterNo,
-                      sgpa,
-                      credits,
-                    );
-                  });
-                  _saveSemesters();
-                  Navigator.pop(context);
-                } else {
-                  Toast().errorToast(context, 'Incorrect Data');
-                }
-              },
-            ),
-          ],
-        );
+            ));
       },
     );
   }
@@ -173,101 +202,129 @@ class CalcCgpaScreenState extends State<CalcCgpaScreen>
   void addSemester(bool isLightMode) {
     double sgpa = 0.0;
     int credits = 0;
-    int semesterNo = 1;
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor:
-              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-          title: Text(
-            'Add Semester',
-            style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: isLightMode ? Colors.black : Colors.white),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(
-                      color: isLightMode ? Colors.black : Colors.white),
-                  onChanged: (value) {
-                    setState(() {
-                      semesterNo = int.parse(value);
-                    });
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Semester No',
-                    labelStyle: TextStyle(
-                        color: isLightMode ? Colors.black : Colors.white),
-                  ),
+    String newSemesterName = '1';
+    List<String> semesterNames = [
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      'Summer'
+    ];
+    showGeneralDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierLabel: '',
+        transitionDuration: const Duration(milliseconds: 200),
+        pageBuilder: (context, animation1, animation2) {
+          return Container();
+        },
+        transitionBuilder: (context, a1, a2, widget) {
+          return ScaleTransition(
+            scale: Tween<double>(begin: 0, end: 1.0).animate(a1),
+            child: AlertDialog(
+              backgroundColor:
+                  isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+              title: Text(
+                'Add Semester',
+                style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: isLightMode ? Colors.black : Colors.white),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DropdownButtonFormField<String>(
+                      dropdownColor: isLightMode
+                          ? AppTheme.nearlyWhite
+                          : AppTheme.nearlyBlack,
+                      style: TextStyle(
+                          color: isLightMode ? Colors.black : Colors.white),
+                      value: newSemesterName,
+                      onChanged: (newValue) {
+                        setState(() {
+                          newSemesterName = newValue!;
+                        });
+                      },
+                      items: semesterNames.map((name) {
+                        return DropdownMenuItem<String>(
+                          value: name,
+                          child: Text(
+                            name,
+                            style: TextStyle(
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                          ),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'Semester',
+                        labelStyle: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                      ),
+                    ),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(
+                          color: isLightMode ? Colors.black : Colors.white),
+                      onChanged: (value) {
+                        setState(() {
+                          sgpa = double.parse(value);
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'SGPA',
+                        labelStyle: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                      ),
+                    ),
+                    TextField(
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(
+                          color: isLightMode ? Colors.black : Colors.white),
+                      onChanged: (value) {
+                        setState(() {
+                          credits = int.parse(value);
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Credit Hours',
+                        labelStyle: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                      ),
+                    ),
+                  ],
                 ),
-                TextField(
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(
-                      color: isLightMode ? Colors.black : Colors.white),
-                  onChanged: (value) {
-                    setState(() {
-                      sgpa = double.parse(value);
-                    });
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Add',
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: isLightMode ? Colors.black : Colors.white)),
+                  onPressed: () {
+                    if (sgpa <= 4 && sgpa > 0 && credits <= 30 && credits > 0) {
+                      setState(() {
+                        semesters.add(
+                          Sem(newSemesterName, sgpa, credits),
+                        );
+                      });
+                      _saveSemesters();
+                      Navigator.pop(context);
+                    } else {
+                      Toast().errorToast(context, 'Incorrect Data');
+                    }
                   },
-                  decoration: InputDecoration(
-                    labelText: 'SGPA',
-                    labelStyle: TextStyle(
-                        color: isLightMode ? Colors.black : Colors.white),
-                  ),
-                ),
-                TextField(
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(
-                      color: isLightMode ? Colors.black : Colors.white),
-                  onChanged: (value) {
-                    setState(() {
-                      credits = int.parse(value);
-                    });
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Credit Hours',
-                    labelStyle: TextStyle(
-                        color: isLightMode ? Colors.black : Colors.white),
-                  ),
                 ),
               ],
             ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Add',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: isLightMode ? Colors.black : Colors.white)),
-              onPressed: () {
-                if (semesterNo <= 8 &&
-                    semesterNo > 0 &&
-                    sgpa <= 4 &&
-                    sgpa > 0 &&
-                    credits <= 30 &&
-                    credits > 0) {
-                  setState(() {
-                    semesters.add(
-                      Sem(semesterNo, sgpa, credits),
-                    );
-                  });
-                  _saveSemesters();
-                  Navigator.pop(context);
-                } else {
-                  Toast().errorToast(context, 'Incorrect Data');
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
+          );
+        });
   }
 
   /// *********************************************************

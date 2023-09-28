@@ -119,7 +119,9 @@ class Card1Widget extends StatelessWidget {
                                               child: SizedBox(
                                                 width: 80,
                                                 child: Text(
-                                                  '#$name',
+                                                  (name == 'Summer')
+                                                      ? "Summer"
+                                                      : '#$name',
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   style: TextStyle(
