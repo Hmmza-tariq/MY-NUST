@@ -71,46 +71,54 @@ class FolderScreenState extends State<FolderScreen> {
 
   void _deleteDialog(BuildContext context, bool isLightMode, bool all,
       {String filePath = ''}) async {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor:
-              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-          title: Text(
-            'Confirm Delete',
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isLightMode ? Colors.black : Colors.white),
-          ),
-          content: Text(
-              all
-                  ? 'Are you sure you want to delete all images?'
-                  : 'Are you sure you want to delete this image?',
-              style: TextStyle(
-                  fontSize: 14,
-                  color: isLightMode ? Colors.black : Colors.white)),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel',
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      transitionBuilder: (context, a1, a2, widget) {
+        return ScaleTransition(
+            scale: Tween<double>(begin: 0, end: 1.0).animate(a1),
+            child: AlertDialog(
+              backgroundColor:
+                  isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+              title: Text(
+                'Confirm Delete',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isLightMode ? Colors.black : Colors.white),
+              ),
+              content: Text(
+                  all
+                      ? 'Are you sure you want to delete all images?'
+                      : 'Are you sure you want to delete this image?',
                   style: TextStyle(
                       fontSize: 14,
                       color: isLightMode ? Colors.black : Colors.white)),
-            ),
-            TextButton(
-              onPressed: () {
-                all ? deleteAllFilesInDirectory() : deleteFile(filePath);
-                Navigator.of(context).pop();
-              },
-              child: const Text('Delete',
-                  style: TextStyle(fontSize: 14, color: Colors.red)),
-            ),
-          ],
-        );
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Cancel',
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: isLightMode ? Colors.black : Colors.white)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    all ? deleteAllFilesInDirectory() : deleteFile(filePath);
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Delete',
+                      style: TextStyle(fontSize: 14, color: Colors.red)),
+                ),
+              ],
+            ));
       },
     );
   }

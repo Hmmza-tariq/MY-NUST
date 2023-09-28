@@ -16,7 +16,7 @@ class Subject {
 }
 
 class Sem {
-  int name = 1;
+  String name = "1";
   double sgpa = 0;
   int credits = 0;
   Sem(this.name, this.sgpa, this.credits);

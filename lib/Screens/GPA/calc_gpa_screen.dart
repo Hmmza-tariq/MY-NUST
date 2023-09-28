@@ -5,7 +5,6 @@ import 'package:page_transition/page_transition.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/card_1_widget.dart';
 import '../../Components/result_screen.dart';
-import '../../Components/toasts.dart';
 import '../../Core/app_theme.dart';
 import '../../Provider/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -51,56 +50,82 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
 
   void addSemester(bool isLightMode) {
     var gpaProvider = Provider.of<GpaProvider>(context, listen: false);
-    showDialog(
+    String newSemesterName = '1';
+    List<String> semesterNames = [
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      'Summer'
+    ];
+    showGeneralDialog(
       context: context,
-      builder: (context) {
-        String newSemesterName = '';
-        return AlertDialog(
-          backgroundColor:
-              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-          title: Text(
-            'Add Semester',
-            style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: isLightMode ? Colors.black : Colors.white),
-          ),
-          content: TextField(
-            style: TextStyle(color: isLightMode ? Colors.black : Colors.white),
-            onChanged: (value) {
-              newSemesterName = value;
-            },
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-                labelText: 'Semester',
-                labelStyle: TextStyle(
-                    fontSize: 12,
-                    color: isLightMode ? Colors.black : Colors.white)),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Add',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: isLightMode ? Colors.black : Colors.white)),
-              onPressed: () {
-                _saveSemesters();
-                if (newSemesterName.isNotEmpty) {
-                  if ((int.parse(newSemesterName) < 9) &&
-                      int.parse(newSemesterName) > 0) {
-                    setState(() {
-                      Semester sem = Semester(newSemesterName, [], gpa: 0);
-                      semesters = gpaProvider.addSemesterData(sem);
-                    });
-                    Navigator.pop(context);
-                  }
-                } else {
-                  Toast().errorToast(context, 'Incorrect name');
-                }
-              },
-            ),
-          ],
-        );
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      transitionBuilder: (context, a1, a2, widget) {
+        return ScaleTransition(
+            scale: Tween<double>(begin: 0, end: 1.0).animate(a1),
+            child: AlertDialog(
+              backgroundColor:
+                  isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+              title: Text(
+                'Add Semester',
+                style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: isLightMode ? Colors.black : Colors.white),
+              ),
+              content: DropdownButtonFormField<String>(
+                dropdownColor:
+                    isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+                style:
+                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
+                value: newSemesterName,
+                onChanged: (newValue) {
+                  setState(() {
+                    newSemesterName = newValue!;
+                  });
+                },
+                items: semesterNames.map((name) {
+                  return DropdownMenuItem<String>(
+                    value: name,
+                    child: Text(
+                      name,
+                      style: TextStyle(
+                          color: isLightMode ? Colors.black : Colors.white),
+                    ),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  labelText: 'Semester',
+                  labelStyle: TextStyle(
+                      color: isLightMode ? Colors.black : Colors.white),
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                    child: Text('Add',
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: isLightMode ? Colors.black : Colors.white)),
+                    onPressed: () {
+                      _saveSemesters();
+                      setState(() {
+                        Semester sem = Semester(newSemesterName, [], gpa: 0);
+                        semesters = gpaProvider.addSemesterData(sem);
+                      });
+                      Navigator.pop(context);
+                    }),
+              ],
+            ));
       },
     );
   }

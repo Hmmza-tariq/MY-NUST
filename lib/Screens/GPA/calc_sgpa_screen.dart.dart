@@ -27,8 +27,6 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
   List<String> expectedGradesList = ['A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'];
   List<Subject> subjects = [];
   late Subject _deletedSubject;
-  bool isEditingTitle = false;
-  final TextEditingController _titleController = TextEditingController();
   bool _showUndoButton = false;
 
   /// *********************************************************
@@ -54,119 +52,131 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
     int selectedCreditHours = subject.creditHours;
     String selectedExpectedGrade = subject.expectedGrade;
 
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor:
-              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-          title: Text(
-            'Edit Subject',
-            style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: isLightMode ? Colors.black : Colors.white),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  style: TextStyle(
-                      color: isLightMode ? Colors.black : Colors.white),
-                  onChanged: (value) {
-                    subjectName = value;
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Subject Name',
-                    labelStyle: TextStyle(
-                        color: isLightMode ? Colors.black : Colors.white),
-                  ),
-                  controller: TextEditingController(text: subjectName),
-                ),
-                DropdownButtonFormField<int>(
-                  dropdownColor:
-                      isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-                  style: TextStyle(
-                      color: isLightMode ? Colors.black : Colors.white),
-                  value: selectedCreditHours,
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedCreditHours = newValue!;
-                    });
-                  },
-                  items: creditHoursList.map((creditHours) {
-                    return DropdownMenuItem<int>(
-                      value: creditHours,
-                      child: Text(
-                        creditHours.toString(),
-                        style: TextStyle(
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      transitionBuilder: (context, a1, a2, widget) {
+        return ScaleTransition(
+            scale: Tween<double>(begin: 0, end: 1.0).animate(a1),
+            child: AlertDialog(
+              backgroundColor:
+                  isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+              title: Text(
+                'Edit Subject',
+                style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: isLightMode ? Colors.black : Colors.white),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      style: TextStyle(
+                          color: isLightMode ? Colors.black : Colors.white),
+                      onChanged: (value) {
+                        subjectName = value;
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Subject Name',
+                        labelStyle: TextStyle(
                             color: isLightMode ? Colors.black : Colors.white),
                       ),
-                    );
-                  }).toList(),
-                  decoration: InputDecoration(
-                    labelText: 'Credit Hours',
-                    labelStyle: TextStyle(
-                        color: isLightMode ? Colors.black : Colors.white),
-                  ),
-                ),
-                DropdownButtonFormField<String>(
-                  dropdownColor:
-                      isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-                  style: TextStyle(
-                      color: isLightMode ? Colors.black : Colors.white),
-                  value: selectedExpectedGrade,
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedExpectedGrade = newValue!;
-                    });
-                  },
-                  items: expectedGradesList.map((grade) {
-                    return DropdownMenuItem<String>(
-                      value: grade,
-                      child: Text(
-                        grade,
-                        style: TextStyle(
+                      controller: TextEditingController(text: subjectName),
+                    ),
+                    DropdownButtonFormField<int>(
+                      dropdownColor: isLightMode
+                          ? AppTheme.nearlyWhite
+                          : AppTheme.nearlyBlack,
+                      style: TextStyle(
+                          color: isLightMode ? Colors.black : Colors.white),
+                      value: selectedCreditHours,
+                      onChanged: (newValue) {
+                        setState(() {
+                          selectedCreditHours = newValue!;
+                        });
+                      },
+                      items: creditHoursList.map((creditHours) {
+                        return DropdownMenuItem<int>(
+                          value: creditHours,
+                          child: Text(
+                            creditHours.toString(),
+                            style: TextStyle(
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                          ),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'Credit Hours',
+                        labelStyle: TextStyle(
                             color: isLightMode ? Colors.black : Colors.white),
                       ),
-                    );
-                  }).toList(),
-                  decoration: InputDecoration(
-                    labelText: 'Expected Grade',
-                    labelStyle: TextStyle(
-                        color: isLightMode ? Colors.black : Colors.white),
-                  ),
+                    ),
+                    DropdownButtonFormField<String>(
+                      dropdownColor: isLightMode
+                          ? AppTheme.nearlyWhite
+                          : AppTheme.nearlyBlack,
+                      style: TextStyle(
+                          color: isLightMode ? Colors.black : Colors.white),
+                      value: selectedExpectedGrade,
+                      onChanged: (newValue) {
+                        setState(() {
+                          selectedExpectedGrade = newValue!;
+                        });
+                      },
+                      items: expectedGradesList.map((grade) {
+                        return DropdownMenuItem<String>(
+                          value: grade,
+                          child: Text(
+                            grade,
+                            style: TextStyle(
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                          ),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'Expected Grade',
+                        labelStyle: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Save',
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: isLightMode ? Colors.black : Colors.white)),
+                  onPressed: () {
+                    if (subjectName.isNotEmpty) {
+                      setState(() {
+                        subjects[index] = Subject(
+                          subjectName,
+                          selectedCreditHours,
+                          selectedExpectedGrade,
+                        );
+                        updateData();
+                        selectedExpectedGrade = 'A';
+                        selectedCreditHours = 0;
+                      });
+                      Navigator.pop(context);
+                    } else {
+                      Toast().errorToast(context, 'Incorrect name');
+                    }
+                  },
                 ),
               ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Save',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: isLightMode ? Colors.black : Colors.white)),
-              onPressed: () {
-                if (subjectName.isNotEmpty) {
-                  setState(() {
-                    subjects[index] = Subject(
-                      subjectName,
-                      selectedCreditHours,
-                      selectedExpectedGrade,
-                    );
-                    updateData();
-                    selectedExpectedGrade = 'A';
-                    selectedCreditHours = 0;
-                  });
-                  Navigator.pop(context);
-                } else {
-                  Toast().errorToast(context, 'Incorrect name');
-                }
-              },
-            ),
-          ],
-        );
+            ));
       },
     );
   }
@@ -195,189 +205,133 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
     });
   }
 
-  void _editTitle(bool isLightMode) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return SingleChildScrollView(
-          child: AlertDialog(
-            backgroundColor:
-                isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-            title: Text(
-              'Edit Semester Title',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: isLightMode ? Colors.black : Colors.white,
-              ),
-            ),
-            content: TextField(
-              keyboardType: TextInputType.number,
-              controller: _titleController,
-              style:
-                  TextStyle(color: isLightMode ? Colors.black : Colors.white),
-              decoration: InputDecoration(
-                labelText: 'Semester Title',
-                labelStyle:
-                    TextStyle(color: isLightMode ? Colors.black : Colors.white),
-              ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(
-                      color: isLightMode ? Colors.black : Colors.white),
-                ),
-                onPressed: () {
-                  setState(() {
-                    isEditingTitle = false;
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-              TextButton(
-                child: Text(
-                  'Save',
-                  style: TextStyle(
-                      color: isLightMode ? Colors.black : Colors.white),
-                ),
-                onPressed: () {
-                  if ((int.parse(_titleController.text) > 0) &&
-                      int.parse(_titleController.text) < 9) {
-                    setState(() {
-                      widget.semester.name = _titleController.text;
-                      isEditingTitle = false;
-                      updateData();
-                    });
-                    Navigator.pop(context);
-                  } else {
-                    Toast().errorToast(context, 'Incorrect name');
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   void addSubject(bool isLightMode) {
     String selectedExpectedGrade = 'A';
     int selectedCreditHours = 1;
     String subjectName = '';
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor:
-              isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-          title: Text(
-            'Add Subject',
-            style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: isLightMode ? Colors.black : Colors.white),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  style: TextStyle(
-                      color: isLightMode ? Colors.black : Colors.white),
-                  onChanged: (value) {
-                    setState(() {
-                      subjectName = value;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Subject Name',
-                    labelStyle: TextStyle(
-                        color: isLightMode ? Colors.black : Colors.white),
-                  ),
-                ),
-                DropdownButtonFormField<int>(
-                  dropdownColor:
-                      isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-                  style: TextStyle(
-                      color: isLightMode ? Colors.black : Colors.white),
-                  value: selectedCreditHours,
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedCreditHours = newValue!;
-                    });
-                  },
-                  items: creditHoursList.map((creditHours) {
-                    return DropdownMenuItem<int>(
-                      value: creditHours,
-                      child: Text(
-                        creditHours.toString(),
-                        style: TextStyle(
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (context, animation1, animation2) {
+        return Container();
+      },
+      transitionBuilder: (context, a1, a2, widget) {
+        return ScaleTransition(
+            scale: Tween<double>(begin: 0, end: 1.0).animate(a1),
+            child: AlertDialog(
+              backgroundColor:
+                  isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
+              title: Text(
+                'Add Subject',
+                style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: isLightMode ? Colors.black : Colors.white),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      style: TextStyle(
+                          color: isLightMode ? Colors.black : Colors.white),
+                      onChanged: (value) {
+                        setState(() {
+                          subjectName = value;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Subject Name',
+                        labelStyle: TextStyle(
                             color: isLightMode ? Colors.black : Colors.white),
                       ),
-                    );
-                  }).toList(),
-                  decoration: InputDecoration(
-                    labelText: 'Credit Hours',
-                    labelStyle: TextStyle(
-                        color: isLightMode ? Colors.black : Colors.white),
-                  ),
-                ),
-                DropdownButtonFormField<String>(
-                  dropdownColor:
-                      isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-                  style: TextStyle(
-                      color: isLightMode ? Colors.black : Colors.white),
-                  value: selectedExpectedGrade,
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedExpectedGrade = newValue!;
-                    });
-                  },
-                  items: expectedGradesList.map((grade) {
-                    return DropdownMenuItem<String>(
-                      value: grade,
-                      child: Text(
-                        grade,
-                        style: TextStyle(
+                    ),
+                    DropdownButtonFormField<int>(
+                      dropdownColor: isLightMode
+                          ? AppTheme.nearlyWhite
+                          : AppTheme.nearlyBlack,
+                      style: TextStyle(
+                          color: isLightMode ? Colors.black : Colors.white),
+                      value: selectedCreditHours,
+                      onChanged: (newValue) {
+                        setState(() {
+                          selectedCreditHours = newValue!;
+                        });
+                      },
+                      items: creditHoursList.map((creditHours) {
+                        return DropdownMenuItem<int>(
+                          value: creditHours,
+                          child: Text(
+                            creditHours.toString(),
+                            style: TextStyle(
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                          ),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'Credit Hours',
+                        labelStyle: TextStyle(
                             color: isLightMode ? Colors.black : Colors.white),
                       ),
-                    );
-                  }).toList(),
-                  decoration: InputDecoration(
-                    labelText: 'Expected Grade',
-                    labelStyle: TextStyle(
-                        color: isLightMode ? Colors.black : Colors.white),
-                  ),
+                    ),
+                    DropdownButtonFormField<String>(
+                      dropdownColor: isLightMode
+                          ? AppTheme.nearlyWhite
+                          : AppTheme.nearlyBlack,
+                      style: TextStyle(
+                          color: isLightMode ? Colors.black : Colors.white),
+                      value: selectedExpectedGrade,
+                      onChanged: (newValue) {
+                        setState(() {
+                          selectedExpectedGrade = newValue!;
+                        });
+                      },
+                      items: expectedGradesList.map((grade) {
+                        return DropdownMenuItem<String>(
+                          value: grade,
+                          child: Text(
+                            grade,
+                            style: TextStyle(
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                          ),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        labelText: 'Expected Grade',
+                        labelStyle: TextStyle(
+                            color: isLightMode ? Colors.black : Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Add',
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: isLightMode ? Colors.black : Colors.white)),
+                  onPressed: () {
+                    if (subjectName.isNotEmpty) {
+                      setState(() {
+                        subjects.add(
+                          Subject(subjectName, selectedCreditHours,
+                              selectedExpectedGrade),
+                        );
+                        updateData();
+                      });
+                      Navigator.pop(context);
+                    } else {
+                      Toast().errorToast(context, 'Incorrect name');
+                    }
+                  },
                 ),
               ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Add',
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: isLightMode ? Colors.black : Colors.white)),
-              onPressed: () {
-                if (subjectName.isNotEmpty) {
-                  setState(() {
-                    subjects.add(
-                      Subject(subjectName, selectedCreditHours,
-                          selectedExpectedGrade),
-                    );
-                    updateData();
-                  });
-                  Navigator.pop(context);
-                } else {
-                  Toast().errorToast(context, 'Incorrect name');
-                }
-              },
-            ),
-          ],
-        );
+            ));
       },
     );
   }
@@ -551,22 +505,14 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
         leading: null,
         iconTheme:
             IconThemeData(color: isLightMode ? Colors.black : Colors.white),
-        title: GestureDetector(
-          onTap: () {
-            setState(() {
-              isEditingTitle = true;
-            });
-            _editTitle(isLightMode);
-          },
-          child: isEditingTitle
-              ? const SizedBox.shrink()
-              : Text(
-                  'Semester ${widget.semester.name}',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: isLightMode ? Colors.black : Colors.white),
-                ),
+        title: Text(
+          (widget.semester.name == 'Summer')
+              ? "Summer Semester"
+              : 'Semester ${widget.semester.name}',
+          style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: isLightMode ? Colors.black : Colors.white),
         ),
         actions: _showUndoButton
             ? [
