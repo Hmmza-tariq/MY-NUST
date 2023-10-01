@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:mynust/Components/info_widget.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
 import '../../Components/card_1_widget.dart';
@@ -302,7 +303,11 @@ class CalcGpaScreenState extends State<CalcGpaScreen>
                       color: Colors.grey,
                     ))
               ]
-            : null,
+            : [
+                InfoWidget(
+                  isLightMode: isLightMode,
+                )
+              ],
       ),
       body: semesters.isEmpty
           ? const Padding(

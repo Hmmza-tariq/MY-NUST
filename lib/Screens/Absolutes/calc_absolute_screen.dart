@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:info_popup/info_popup.dart';
+import 'package:mynust/Components/info_widget.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
@@ -791,6 +792,9 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                 color: isLightMode ? Colors.black : Colors.white),
           ),
           actions: [
+            InfoWidget(
+              isLightMode: isLightMode,
+            ),
             _showUndoButton
                 ? IconButton(
                     onPressed: _undoDelete,
