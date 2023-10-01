@@ -21,6 +21,10 @@ class _LinksScreenState extends State<LinksScreen> {
         title: "complete"),
     const LinkWidget(
         link:
+            "https://drive.google.com/drive/u/0/mobile/folders/1ea5vWtZttK3A4ryyPOWh3a6zoifjDlZu?usp=sharing",
+        title: "complete (latest)"),
+    const LinkWidget(
+        link:
             "https://drive.google.com/drive/folders/1Ngoc5wYx6yXIT8cdQzbrImWufPTRvyHL",
         title: "semester-2"),
     const LinkWidget(

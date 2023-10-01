@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mynust/Components/info_widget.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:swipeable_tile/swipeable_tile.dart';
@@ -523,7 +524,11 @@ class CalcSgpaScreenState extends State<CalcSgpaScreen> {
                       color: Colors.grey,
                     ))
               ]
-            : null,
+            : [
+                InfoWidget(
+                  isLightMode: isLightMode,
+                )
+              ],
       ),
       body: subjects.isEmpty
           ? const Padding(
