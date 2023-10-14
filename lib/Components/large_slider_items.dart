@@ -35,6 +35,6 @@ class LargeSliderListData {
       imagePath: 'assets/images/noticeBoard.png',
       name: 'Notice Board',
       navigateScreen: const NoticeBoardScreen(),
-    )
+    ),
   ];
 }
