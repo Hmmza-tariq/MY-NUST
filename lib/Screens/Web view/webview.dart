@@ -25,7 +25,7 @@ class WebsiteView extends StatefulWidget {
 class _WebsiteViewState extends State<WebsiteView> {
   final GlobalKey webViewKey = GlobalKey();
   double progress = 0.0;
-  bool _isLoading = false, _autoFill = false;
+  bool _isLoading = false, _autoFill = false, first = true;
 
   @override
   void initState() {
@@ -65,6 +65,22 @@ class _WebsiteViewState extends State<WebsiteView> {
             });
           },
           onPageFinished: (String url) {
+            // print('url $url');
+            if (widget.initialUrl.contains("PaymentsSearchBill")) {
+              print('kuickpay pass');
+              ip.webViewController.runJavaScript('''
+          document.getElementById("MainContent_cboInstitution").value = "04490";
+          document.getElementById("MainContent_cboSearchBy").value = "RegistrationNumber";
+          ''');
+              Future.delayed(const Duration(milliseconds: 800)).then((value) {
+                if (first) {
+                  first = false;
+                  ip.webViewController.runJavaScript('''
+          document.getElementById("MainContent_btnSubmit").click();
+          ''');
+                }
+              });
+            }
             if (!widget.initialUrl.contains("qalam.nust")) {
               ip.webViewController.runJavaScript('''
           var viewport = document.querySelector("meta[name=viewport]");
@@ -110,7 +126,25 @@ class _WebsiteViewState extends State<WebsiteView> {
               '.doc',
               '.ppt'
             ];
+            if (widget.initialUrl.contains("VoucherView")) {
+              print('kuickpay pass');
+              ip.webViewController.runJavaScript('''
+// Get all elements on the page
+var allElements = document.querySelectorAll('*');
 
+// Iterate through each element and increase font size
+for (var i = 0; i < allElements.length; i++) {
+    var element = allElements[i];
+    var currentSize = window.getComputedStyle(element).fontSize; // Get current font size
+    var newSize = parseFloat(currentSize) * 1.2; // Increase font size by 20%
+
+    // Set the new font size
+    element.style.fontSize = newSize + 'px';
+}
+
+          ''');
+            }
+            print('url $url');
             bool isDownloadable = downloadableExtensions
                 .any((ext) => url.toLowerCase().endsWith(ext));
             if (Uri.parse(url).host != (Uri.parse(widget.initialUrl).host)) {

@@ -6,6 +6,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 // import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:mynust/Core/notifications.dart';
 import 'package:mynust/Provider/internet_provider.dart';
 import 'package:mynust/Provider/notice_board_provider.dart';
 import 'package:mynust/Screens/Web%20view/notice_board_screen.dart';
@@ -37,6 +38,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
   NotificationService().initNotification();
   tz.initializeTimeZones();
+  await FirebaseApi().initNotifications();
 
   final sp = await SharedPreferences.getInstance();
 

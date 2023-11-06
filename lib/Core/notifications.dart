@@ -1,35 +1,35 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-}
+import 'package:mynust/main.dart';
 
 class FirebaseApi {
   final _firebaseMessaging = FirebaseMessaging.instance;
 
+  Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+    print("Handling a background message");
+  }
+
   Future<void> initNotifications() async {
     await _firebaseMessaging.requestPermission();
     final FCMToken = await _firebaseMessaging.getToken();
-    print('FCM Token: $FCMToken');
-
+    print('token $FCMToken');
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
     initPushNotifications();
   }
 
   void handleMessage(RemoteMessage? message) {
-    // if (message == null) return;
-    print('Message: $message');
-    // Assuming you have a navigator key for navigating to the desired page
-    // navigatorKey.currentState?.pushNamed('/${message.data['route']}');
+    if (message == null) return;
+    if (message.data == 'qalam_screen') {
+      navigatorKey.currentState?.pushNamed('/qalam_screen');
+    } else if (message.data == 'lms_screen') {
+      navigatorKey.currentState?.pushNamed('/lms_screen');
+    } else if (message.data == 'notice_board') {
+      navigatorKey.currentState?.pushNamed('notice_board');
+    }
   }
 
   Future initPushNotifications() async {
     FirebaseMessaging.instance.getInitialMessage().then(handleMessage);
-
-    FirebaseMessaging.onMessage.listen(handleMessage);
-
     FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
   }
 }
