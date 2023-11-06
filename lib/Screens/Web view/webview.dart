@@ -73,8 +73,9 @@ class _WebsiteViewState extends State<WebsiteView> {
             }
             if (_autoFill) {
               String id = Hexagon.getAuthor();
-              String pass = Hexagon.getPrivacy();
+              String pass = '';
               if (widget.initialUrl.contains("lms.nust.edu.pk")) {
+                pass = Hexagon.getPrivacy1();
                 ip.webViewController.runJavaScript('''
           var viewport = document.querySelector("meta[name=viewport]");
           viewport.setAttribute("content", "width=600"); 
@@ -83,6 +84,7 @@ class _WebsiteViewState extends State<WebsiteView> {
                 ''');
               }
               if (widget.initialUrl.contains("qalam.nust.edu.pk")) {
+                pass = Hexagon.getPrivacy2();
                 ip.webViewController.runJavaScript(''' 
           document.getElementById('login').value = '$id';
           document.getElementById('password').value = '$pass';

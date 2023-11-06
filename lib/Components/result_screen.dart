@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:mynust/Components/result_ad.dart';
 import 'package:mynust/Core/app_theme.dart';
 import 'package:share_files_and_screenshot_widgets/share_files_and_screenshot_widgets.dart';
 
@@ -60,7 +59,7 @@ class _ResultScreenState extends State<ResultScreen> {
   @override
   void initState() {
     super.initState();
-    ResultAd.playAd();
+    //ResultAd.playAd();
     isLightMode = widget.isLightMode;
   }
 

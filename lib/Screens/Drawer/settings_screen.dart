@@ -170,7 +170,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     SharedPreferences prefs =
                         await SharedPreferences.getInstance();
                     await prefs.clear();
-                    Hexagon().saveTextValues('', '');
+                    Hexagon().saveTextValues('', '', '');
                     // ignore: use_build_context_synchronously
                     Navigator.of(context).pop();
                   },
@@ -432,11 +432,13 @@ class SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _addData(bool isLightMode) {
-    bool hideId = true, hidePass = true;
+    bool hideId = true, hideLMSPass = true, hideQalamPass = true;
     TextEditingController idController = TextEditingController();
-    TextEditingController passController = TextEditingController();
+    TextEditingController lMSPassController = TextEditingController();
+    TextEditingController qalamPassController = TextEditingController();
     idController.text = Hexagon.getAuthor();
-    passController.text = Hexagon.getPrivacy();
+    lMSPassController.text = Hexagon.getPrivacy1();
+    qalamPassController.text = Hexagon.getPrivacy2();
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -485,7 +487,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                     dismissTriggerBehavior:
                         PopupDismissTriggerBehavior.anyWhere,
                     contentTitle:
-                        'Your ID and password are saved locally on your device in highly encrypted form. We take your data security seriously. However, please be aware that any issues related to this data are beyond our control. It is your responsibility to keep your device secure and ensure the safety of your login credentials.',
+                        'Your ID and passwords are saved locally on your device in highly encrypted form. We take your data security seriously. However, please be aware that any issues related to this data are beyond our control. It is your responsibility to keep your device secure and ensure the safety of your login credentials.',
                     child: const Icon(
                       Icons.info_outline,
                       color: Colors.red,
@@ -537,16 +539,16 @@ class SettingsScreenState extends State<SettingsScreen> {
                         children: [
                           Expanded(
                               child: TextField(
-                            controller: passController,
-                            keyboardType: hidePass
+                            controller: lMSPassController,
+                            keyboardType: hideLMSPass
                                 ? TextInputType.visiblePassword
                                 : TextInputType.name,
-                            obscureText: hidePass,
+                            obscureText: hideLMSPass,
                             style: TextStyle(
                                 color:
                                     isLightMode ? Colors.black : Colors.white),
                             decoration: InputDecoration(
-                              labelText: 'Pass',
+                              labelText: 'LMS Password',
                               labelStyle: TextStyle(
                                   color: isLightMode
                                       ? Colors.black
@@ -556,11 +558,46 @@ class SettingsScreenState extends State<SettingsScreen> {
                           IconButton(
                             onPressed: () {
                               setState(() {
-                                hidePass = !hidePass;
+                                hideLMSPass = !hideLMSPass;
                               });
                             },
                             icon: Icon(
-                                hidePass
+                                hideLMSPass
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: TextField(
+                            controller: qalamPassController,
+                            keyboardType: hideQalamPass
+                                ? TextInputType.visiblePassword
+                                : TextInputType.name,
+                            obscureText: hideQalamPass,
+                            style: TextStyle(
+                                color:
+                                    isLightMode ? Colors.black : Colors.white),
+                            decoration: InputDecoration(
+                              labelText: 'Qalam Password',
+                              labelStyle: TextStyle(
+                                  color: isLightMode
+                                      ? Colors.black
+                                      : Colors.white),
+                            ),
+                          )),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                hideQalamPass = !hideQalamPass;
+                              });
+                            },
+                            icon: Icon(
+                                hideQalamPass
                                     ? Icons.visibility_off
                                     : Icons.visibility,
                                 color:
@@ -579,8 +616,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                           fontSize: 12,
                           color: isLightMode ? Colors.black : Colors.white)),
                   onPressed: () {
-                    Hexagon()
-                        .saveTextValues(idController.text, passController.text);
+                    Hexagon().saveTextValues(idController.text,
+                        lMSPassController.text, qalamPassController.text);
                     Navigator.pop(context);
                   },
                 ),
