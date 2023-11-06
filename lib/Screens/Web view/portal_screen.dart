@@ -18,10 +18,14 @@ class _PortalScreenState extends State<PortalScreen>
   AnimationController? animationController;
   bool showCopyButton = true,
       forwardAnimation = true,
-      copyButtonEnabled = false;
+      copyButtonEnabled = false,
+      isLMS = false;
   int time = 50;
   @override
   void initState() {
+    if (widget.initialUrl.contains("lms.nust.edu.pk")) {
+      isLMS = true;
+    }
     _loadCopyPreference().then((value) {
       setState(() {
         copyButtonEnabled = value ?? false;
@@ -105,7 +109,9 @@ class _PortalScreenState extends State<PortalScreen>
                                     0,
                                     0,
                                   ),
-                                  child: const ClipboardWidget(),
+                                  child: ClipboardWidget(
+                                    isLMS: isLMS,
+                                  ),
                                 ),
                               )
                             : Visibility(
@@ -113,7 +119,9 @@ class _PortalScreenState extends State<PortalScreen>
                                 child: ScaleTransition(
                                   alignment: Alignment.centerLeft,
                                   scale: scaleAnimation,
-                                  child: const ClipboardWidget(),
+                                  child: ClipboardWidget(
+                                    isLMS: isLMS,
+                                  ),
                                 ),
                               );
                       }),

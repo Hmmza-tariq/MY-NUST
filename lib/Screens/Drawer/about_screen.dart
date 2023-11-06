@@ -328,47 +328,47 @@ class AboutScreenState extends State<AboutScreen> {
                         ),
                       ),
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: themeProvider.primaryColor.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                            color: themeProvider.primaryColor.withOpacity(0.8),
-                            width: 3),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Text(
-                              'Why ads?',
-                              style: TextStyle(
-                                  fontFamily: AppTheme.fontName,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: isLightMode
-                                      ? Colors.black
-                                      : Colors.white),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: Text(
-                                ":)))",
-                                style: TextStyle(
-                                    fontFamily: AppTheme.fontName,
-                                    fontSize: 16,
-                                    color: isLightMode
-                                        ? Colors.black
-                                        : Colors.white),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
+                    // Container(
+                    //   decoration: BoxDecoration(
+                    //     color: themeProvider.primaryColor.withOpacity(0.2),
+                    //     borderRadius: BorderRadius.circular(12),
+                    //     border: Border.all(
+                    //         color: themeProvider.primaryColor.withOpacity(0.8),
+                    //         width: 3),
+                    //   ),
+                    //   child: Padding(
+                    //     padding: const EdgeInsets.all(8.0),
+                    //     child: Column(
+                    //       children: [
+                    //         Text(
+                    //           'Why ads?',
+                    //           style: TextStyle(
+                    //               fontFamily: AppTheme.fontName,
+                    //               fontSize: 20,
+                    //               fontWeight: FontWeight.bold,
+                    //               color: isLightMode
+                    //                   ? Colors.black
+                    //                   : Colors.white),
+                    //         ),
+                    //         Padding(
+                    //           padding:
+                    //               const EdgeInsets.symmetric(horizontal: 8.0),
+                    //           child: Text(
+                    //             ":)))",
+                    //             style: TextStyle(
+                    //                 fontFamily: AppTheme.fontName,
+                    //                 fontSize: 16,
+                    //                 color: isLightMode
+                    //                     ? Colors.black
+                    //                     : Colors.white),
+                    //             textAlign: TextAlign.center,
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 10),
                     Container(
                       decoration: BoxDecoration(
                         color: themeProvider.primaryColor.withOpacity(0.2),

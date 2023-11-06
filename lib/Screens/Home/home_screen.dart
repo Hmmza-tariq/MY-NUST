@@ -4,8 +4,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:info_popup/info_popup.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
+// import 'package:info_popup/info_popup.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,21 +33,21 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   bool isWrap = true;
   int itemCount = 1;
   int currentPageIndex = 0;
-  late NativeAd? _nativeAd_1;
-  late NativeAd? _nativeAd_2;
-  bool _isAdLoaded = false;
+  // late NativeAd? _nativeAd_1;
+  // late NativeAd? _nativeAd_2;
+  // final bool _isAdLoaded = false;
   List<SmallSliderListData> sliderListData =
       SmallSliderListData.smallSliderList0;
-  bool _isLightMode = false;
-  var adStyle = NativeTemplateTextStyle(
-      textColor: AppTheme.notWhite,
-      backgroundColor: Colors.transparent,
-      style: NativeTemplateFontStyle.normal,
-      size: 12.0);
+  // bool _isLightMode = false;
+  // var adStyle = NativeTemplateTextStyle(
+  //     textColor: AppTheme.notWhite,
+  //     backgroundColor: Colors.transparent,
+  //     style: NativeTemplateFontStyle.normal,
+  //     size: 12.0);
   @override
   void initState() {
-    loadAd_1();
-    loadAd_2();
+    // loadAd_1();
+    // loadAd_2();
     _loadWrap();
     animationController = AnimationController(
         duration: const Duration(milliseconds: 1000), vsync: this);
@@ -61,111 +61,110 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     return true;
   }
 
-  void loadAd_1() {
-    adStyle = NativeTemplateTextStyle(
-        textColor: _isLightMode ? AppTheme.nearlyBlack : Colors.white,
-        backgroundColor: Colors.transparent,
-        style: NativeTemplateFontStyle.normal,
-        size: 12.0);
-    if (homeList.last.name != 'AD') {
-      _nativeAd_1 = NativeAd(
-          adUnitId: 'ca-app-pub-8875342677218505/8191563863',
-          listener: NativeAdListener(
-            onAdLoaded: (ad) {
-              if (kDebugMode) {
-                print('$NativeAd loaded #1.');
-              }
-              setState(() {
-                homeList.add(LargeSliderListData(
-                  isWidget: true,
-                  imagePath: 'assets/images/appLogo.png',
-                  name: 'AD',
-                  widget: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                      minWidth: 180,
-                      minHeight: 180,
-                      maxWidth: 220,
-                      maxHeight: 220,
-                    ),
-                    child: AdWidget(ad: _nativeAd_1!),
-                  ),
-                ));
-              });
-            },
-            onAdFailedToLoad: (ad, error) {
-              if (kDebugMode) {
-                print('$NativeAd failedToLoad #1: $error');
-              }
-              ad.dispose();
-            },
-            onAdClicked: (ad) {},
-            onAdImpression: (ad) {},
-            onAdClosed: (ad) {},
-            onAdOpened: (ad) {},
-            onAdWillDismissScreen: (ad) {},
-            onPaidEvent: (ad, valueMicros, precision, currencyCode) {},
-          ),
-          request: const AdRequest(),
-          nativeTemplateStyle: NativeTemplateStyle(
-            templateType: TemplateType.medium,
-            mainBackgroundColor:
-                _isLightMode ? Colors.white : AppTheme.nearlyBlack,
-            cornerRadius: 10.0,
-            callToActionTextStyle: adStyle,
-            primaryTextStyle: adStyle,
-            secondaryTextStyle: adStyle,
-            tertiaryTextStyle: adStyle,
-          ))
-        ..load();
-    }
-  }
-
-  void loadAd_2() {
-    adStyle = NativeTemplateTextStyle(
-        textColor: _isLightMode ? AppTheme.nearlyBlack : Colors.white,
-        backgroundColor: Colors.transparent,
-        style: NativeTemplateFontStyle.normal,
-        size: 12.0);
-    _nativeAd_2 = NativeAd(
-        adUnitId: 'ca-app-pub-8875342677218505/5565400523',
-        listener: NativeAdListener(
-          onAdLoaded: (ad) {
-            if (kDebugMode) {
-              print('$NativeAd loaded #2.');
-            }
-            setState(() {
-              _isAdLoaded = true;
-            });
-          },
-          onAdFailedToLoad: (ad, error) {
-            if (kDebugMode) {
-              print('$NativeAd failedToLoad #2: $error');
-            }
-            setState(() {
-              _isAdLoaded = false;
-            });
-            ad.dispose();
-          },
-          onAdClicked: (ad) {},
-          onAdImpression: (ad) {},
-          onAdClosed: (ad) {},
-          onAdOpened: (ad) {},
-          onAdWillDismissScreen: (ad) {},
-          onPaidEvent: (ad, valueMicros, precision, currencyCode) {},
-        ),
-        request: const AdRequest(),
-        nativeTemplateStyle: NativeTemplateStyle(
-          templateType: TemplateType.medium,
-          mainBackgroundColor:
-              _isLightMode ? Colors.white : AppTheme.nearlyBlack,
-          cornerRadius: 20.0,
-          callToActionTextStyle: adStyle,
-          primaryTextStyle: adStyle,
-          secondaryTextStyle: adStyle,
-          tertiaryTextStyle: adStyle,
-        ))
-      ..load();
-  }
+  // void loadAd_1() {
+  //   adStyle = NativeTemplateTextStyle(
+  //       textColor: _isLightMode ? AppTheme.nearlyBlack : Colors.white,
+  //       backgroundColor: Colors.transparent,
+  //       style: NativeTemplateFontStyle.normal,
+  //       size: 12.0);
+  //   if (homeList.last.name != 'AD') {
+  //     _nativeAd_1 = NativeAd(
+  //         adUnitId: 'ca-app-pub-8875342677218505/8191563863',
+  //         listener: NativeAdListener(
+  //           onAdLoaded: (ad) {
+  //             if (kDebugMode) {
+  //               print('$NativeAd loaded #1.');
+  //             }
+  //             setState(() {
+  //               homeList.add(LargeSliderListData(
+  //                 isWidget: true,
+  //                 imagePath: 'assets/images/appLogo.png',
+  //                 name: 'AD',
+  //                 widget: ConstrainedBox(
+  //                   constraints: const BoxConstraints(
+  //                     minWidth: 180,
+  //                     minHeight: 180,
+  //                     maxWidth: 220,
+  //                     maxHeight: 220,
+  //                   ),
+  //                   child: AdWidget(ad: _nativeAd_1!),
+  //                 ),
+  //               ));
+  //             });
+  //           },
+  //           onAdFailedToLoad: (ad, error) {
+  //             if (kDebugMode) {
+  //               print('$NativeAd failedToLoad #1: $error');
+  //             }
+  //             ad.dispose();
+  //           },
+  //           onAdClicked: (ad) {},
+  //           onAdImpression: (ad) {},
+  //           onAdClosed: (ad) {},
+  //           onAdOpened: (ad) {},
+  //           onAdWillDismissScreen: (ad) {},
+  //           onPaidEvent: (ad, valueMicros, precision, currencyCode) {},
+  //         ),
+  //         request: const AdRequest(),
+  //         nativeTemplateStyle: NativeTemplateStyle(
+  //           templateType: TemplateType.medium,
+  //           mainBackgroundColor:
+  //               _isLightMode ? Colors.white : AppTheme.nearlyBlack,
+  //           cornerRadius: 10.0,
+  //           callToActionTextStyle: adStyle,
+  //           primaryTextStyle: adStyle,
+  //           secondaryTextStyle: adStyle,
+  //           tertiaryTextStyle: adStyle,
+  //         ))
+  //       ..load();
+  //   }
+  // }
+  // void loadAd_2() {
+  //   adStyle = NativeTemplateTextStyle(
+  //       textColor: _isLightMode ? AppTheme.nearlyBlack : Colors.white,
+  //       backgroundColor: Colors.transparent,
+  //       style: NativeTemplateFontStyle.normal,
+  //       size: 12.0);
+  //   _nativeAd_2 = NativeAd(
+  //       adUnitId: 'ca-app-pub-8875342677218505/5565400523',
+  //       listener: NativeAdListener(
+  //         onAdLoaded: (ad) {
+  //           if (kDebugMode) {
+  //             print('$NativeAd loaded #2.');
+  //           }
+  //           setState(() {
+  //             _isAdLoaded = true;
+  //           });
+  //         },
+  //         onAdFailedToLoad: (ad, error) {
+  //           if (kDebugMode) {
+  //             print('$NativeAd failedToLoad #2: $error');
+  //           }
+  //           setState(() {
+  //             _isAdLoaded = false;
+  //           });
+  //           ad.dispose();
+  //         },
+  //         onAdClicked: (ad) {},
+  //         onAdImpression: (ad) {},
+  //         onAdClosed: (ad) {},
+  //         onAdOpened: (ad) {},
+  //         onAdWillDismissScreen: (ad) {},
+  //         onPaidEvent: (ad, valueMicros, precision, currencyCode) {},
+  //       ),
+  //       request: const AdRequest(),
+  //       nativeTemplateStyle: NativeTemplateStyle(
+  //         templateType: TemplateType.medium,
+  //         mainBackgroundColor:
+  //             _isLightMode ? Colors.white : AppTheme.nearlyBlack,
+  //         cornerRadius: 20.0,
+  //         callToActionTextStyle: adStyle,
+  //         primaryTextStyle: adStyle,
+  //         secondaryTextStyle: adStyle,
+  //         tertiaryTextStyle: adStyle,
+  //       ))
+  //     ..load();
+  // }
 
   @override
   void dispose() {
@@ -191,7 +190,7 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
     bool isLightMode = themeProvider.isLightMode ??
         MediaQuery.of(context).platformBrightness == Brightness.light;
-    _isLightMode = isLightMode;
+    // _isLightMode = isLightMode;
     itemCount = homeList.length;
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -358,139 +357,139 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Visibility(
-                      visible: _isAdLoaded,
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minWidth: MediaQuery.of(context).size.width / 1.5,
-                            minHeight: 350,
-                            maxWidth: MediaQuery.of(context).size.width / 1.2,
-                            maxHeight: 390,
-                          ),
-                          child: Stack(
-                            alignment: AlignmentDirectional.bottomCenter,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 18.0),
-                                child: Container(
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.nearlyBlack,
-                                      borderRadius: const BorderRadius.only(
-                                        bottomRight: Radius.circular(22.0),
-                                        bottomLeft: Radius.circular(22.0),
-                                        topLeft: Radius.circular(4.0),
-                                        topRight: Radius.circular(0),
-                                      ),
-                                      border: Border.all(
-                                          color: isLightMode
-                                              ? AppTheme.notWhite
-                                              : themeProvider.primaryColor,
-                                          width: 3),
-                                      boxShadow: !isLightMode
-                                          ? null
-                                          : <BoxShadow>[
-                                              BoxShadow(
-                                                  color: Colors.grey
-                                                      .withOpacity(0.6),
-                                                  offset: const Offset(4, 4),
-                                                  blurRadius: 8.0),
-                                            ],
-                                    ),
-                                    child: AdWidget(ad: _nativeAd_2!)),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 20.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: isLightMode
-                                        ? AppTheme.white
-                                        : AppTheme.nearlyBlack,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: isLightMode
-                                            ? AppTheme.notWhite
-                                            : themeProvider.primaryColor,
-                                        width: 3),
-                                    boxShadow: !isLightMode
-                                        ? null
-                                        : <BoxShadow>[
-                                            BoxShadow(
-                                                color: Colors.grey
-                                                    .withOpacity(0.6),
-                                                offset: const Offset(0, 8),
-                                                blurRadius: 8.0),
-                                          ],
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: SizedBox(
-                                      width: 80,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'AD ',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                              color: isLightMode
-                                                  ? AppTheme.nearlyBlack
-                                                  : AppTheme.white,
-                                            ),
-                                          ),
-                                          InfoPopupWidget(
-                                            contentOffset: const Offset(0, 0),
-                                            arrowTheme: InfoPopupArrowTheme(
-                                              arrowDirection:
-                                                  ArrowDirection.down,
-                                              color: isLightMode
-                                                  ? const Color.fromARGB(
-                                                      255, 199, 199, 199)
-                                                  : const Color.fromARGB(
-                                                      255, 1, 54, 98),
-                                            ),
-                                            contentTheme: InfoPopupContentTheme(
-                                              infoContainerBackgroundColor:
-                                                  isLightMode
-                                                      ? const Color.fromARGB(
-                                                          255, 199, 199, 199)
-                                                      : const Color.fromARGB(
-                                                          255, 1, 54, 98),
-                                              infoTextStyle: TextStyle(
-                                                color: isLightMode
-                                                    ? AppTheme.nearlyBlack
-                                                    : AppTheme.white,
-                                              ),
-                                              contentPadding:
-                                                  const EdgeInsets.all(6),
-                                              contentBorderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(10)),
-                                              infoTextAlign: TextAlign.center,
-                                            ),
-                                            dismissTriggerBehavior:
-                                                PopupDismissTriggerBehavior
-                                                    .anyWhere,
-                                            contentTitle: ' :) ',
-                                            child: const Icon(
-                                              Icons.info_outline,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    // Visibility(
+                    //   visible: _isAdLoaded,
+                    //   child: Center(
+                    //     child: ConstrainedBox(
+                    //       constraints: BoxConstraints(
+                    //         minWidth: MediaQuery.of(context).size.width / 1.5,
+                    //         minHeight: 350,
+                    //         maxWidth: MediaQuery.of(context).size.width / 1.2,
+                    //         maxHeight: 390,
+                    //       ),
+                    //       child: Stack(
+                    //         alignment: AlignmentDirectional.bottomCenter,
+                    //         children: [
+                    //           Padding(
+                    //             padding: const EdgeInsets.only(bottom: 18.0),
+                    //             child: Container(
+                    //                 decoration: BoxDecoration(
+                    //                   color: AppTheme.nearlyBlack,
+                    //                   borderRadius: const BorderRadius.only(
+                    //                     bottomRight: Radius.circular(22.0),
+                    //                     bottomLeft: Radius.circular(22.0),
+                    //                     topLeft: Radius.circular(4.0),
+                    //                     topRight: Radius.circular(0),
+                    //                   ),
+                    //                   border: Border.all(
+                    //                       color: isLightMode
+                    //                           ? AppTheme.notWhite
+                    //                           : themeProvider.primaryColor,
+                    //                       width: 3),
+                    //                   boxShadow: !isLightMode
+                    //                       ? null
+                    //                       : <BoxShadow>[
+                    //                           BoxShadow(
+                    //                               color: Colors.grey
+                    //                                   .withOpacity(0.6),
+                    //                               offset: const Offset(4, 4),
+                    //                               blurRadius: 8.0),
+                    //                         ],
+                    //                 ),
+                    //                 child: AdWidget(ad: _nativeAd_2!)),
+                    //           ),
+                    //           Padding(
+                    //             padding: const EdgeInsets.only(top: 20.0),
+                    //             child: Container(
+                    //               decoration: BoxDecoration(
+                    //                 color: isLightMode
+                    //                     ? AppTheme.white
+                    //                     : AppTheme.nearlyBlack,
+                    //                 borderRadius: BorderRadius.circular(12),
+                    //                 border: Border.all(
+                    //                     color: isLightMode
+                    //                         ? AppTheme.notWhite
+                    //                         : themeProvider.primaryColor,
+                    //                     width: 3),
+                    //                 boxShadow: !isLightMode
+                    //                     ? null
+                    //                     : <BoxShadow>[
+                    //                         BoxShadow(
+                    //                             color: Colors.grey
+                    //                                 .withOpacity(0.6),
+                    //                             offset: const Offset(0, 8),
+                    //                             blurRadius: 8.0),
+                    //                       ],
+                    //               ),
+                    //               child: Padding(
+                    //                 padding: const EdgeInsets.all(8.0),
+                    //                 child: SizedBox(
+                    //                   width: 80,
+                    //                   child: Row(
+                    //                     mainAxisAlignment:
+                    //                         MainAxisAlignment.center,
+                    //                     children: [
+                    //                       Text(
+                    //                         'AD ',
+                    //                         style: TextStyle(
+                    //                           fontSize: 20,
+                    //                           fontWeight: FontWeight.bold,
+                    //                           color: isLightMode
+                    //                               ? AppTheme.nearlyBlack
+                    //                               : AppTheme.white,
+                    //                         ),
+                    //                       ),
+                    //                       InfoPopupWidget(
+                    //                         contentOffset: const Offset(0, 0),
+                    //                         arrowTheme: InfoPopupArrowTheme(
+                    //                           arrowDirection:
+                    //                               ArrowDirection.down,
+                    //                           color: isLightMode
+                    //                               ? const Color.fromARGB(
+                    //                                   255, 199, 199, 199)
+                    //                               : const Color.fromARGB(
+                    //                                   255, 1, 54, 98),
+                    //                         ),
+                    //                         contentTheme: InfoPopupContentTheme(
+                    //                           infoContainerBackgroundColor:
+                    //                               isLightMode
+                    //                                   ? const Color.fromARGB(
+                    //                                       255, 199, 199, 199)
+                    //                                   : const Color.fromARGB(
+                    //                                       255, 1, 54, 98),
+                    //                           infoTextStyle: TextStyle(
+                    //                             color: isLightMode
+                    //                                 ? AppTheme.nearlyBlack
+                    //                                 : AppTheme.white,
+                    //                           ),
+                    //                           contentPadding:
+                    //                               const EdgeInsets.all(6),
+                    //                           contentBorderRadius:
+                    //                               const BorderRadius.all(
+                    //                                   Radius.circular(10)),
+                    //                           infoTextAlign: TextAlign.center,
+                    //                         ),
+                    //                         dismissTriggerBehavior:
+                    //                             PopupDismissTriggerBehavior
+                    //                                 .anyWhere,
+                    //                         contentTitle: ' :) ',
+                    //                         child: const Icon(
+                    //                           Icons.info_outline,
+                    //                           color: Colors.grey,
+                    //                         ),
+                    //                       ),
+                    //                     ],
+                    //                   ),
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //           )
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                    // const SizedBox(height: 16),
                   ],
                 );
               }

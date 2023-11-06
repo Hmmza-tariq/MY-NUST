@@ -9,7 +9,8 @@ import 'package:provider/provider.dart';
 import '../Provider/internet_provider.dart';
 
 class ClipboardWidget extends StatefulWidget {
-  const ClipboardWidget({super.key});
+  final bool isLMS;
+  const ClipboardWidget({super.key, required this.isLMS});
   @override
   State<ClipboardWidget> createState() => _ClipboardWidgetState();
 }
@@ -120,9 +121,13 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    hidePass
-                                        ? '*' * Hexagon.getPrivacy().length
-                                        : Hexagon.getPrivacy(),
+                                    widget.isLMS
+                                        ? hidePass
+                                            ? '*' * Hexagon.getPrivacy1().length
+                                            : Hexagon.getPrivacy1()
+                                        : hidePass
+                                            ? '*' * Hexagon.getPrivacy2().length
+                                            : Hexagon.getPrivacy2(),
                                     style: const TextStyle(color: Colors.white),
                                     maxLines: 1,
                                     overflow: TextOverflow.fade,
@@ -143,7 +148,9 @@ class _ClipboardWidgetState extends State<ClipboardWidget> {
                                 IconButton(
                                   onPressed: () {
                                     Clipboard.setData(ClipboardData(
-                                        text: Hexagon.getPrivacy()));
+                                        text: widget.isLMS
+                                            ? Hexagon.getPrivacy1()
+                                            : Hexagon.getPrivacy2()));
                                     Toast().successToast(
                                         context, 'Password copied');
                                   },

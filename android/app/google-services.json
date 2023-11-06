@@ -1,67 +1,29 @@
 {
   "project_info": {
-    "project_number": "577789407385",
-    "project_id": "my-nust-1c25e",
-    "storage_bucket": "my-nust-1c25e.appspot.com"
+    "project_number": "301675718302",
+    "project_id": "nust---a-student-app",
+    "storage_bucket": "nust---a-student-app.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:577789407385:android:fb20728cfda89cfe7fc808",
+        "mobilesdk_app_id": "1:301675718302:android:3015abdd72cd86ce027d8f",
         "android_client_info": {
           "package_name": "com.hexagone.mynust"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "577789407385-q4lag61nmaaadvsb5h80v0tg2ejovqpk.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC21dFo06A9QZVrJQufMoXIdzaNBQquc9c"
+          "current_key": "AIzaSyBcSVhBBHLd0BKTWByJROF46F5mOsHqjH4"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "577789407385-q4lag61nmaaadvsb5h80v0tg2ejovqpk.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:577789407385:android:2d8a08169c18916d7fc808",
-        "android_client_info": {
-          "package_name": "com.hmmza.mynust"
+          "other_platform_oauth_client": []
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "577789407385-q4lag61nmaaadvsb5h80v0tg2ejovqpk.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyC21dFo06A9QZVrJQufMoXIdzaNBQquc9c"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "577789407385-q4lag61nmaaadvsb5h80v0tg2ejovqpk.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
+      "admob_app_id": "ca-app-pub-8875342677218505~5014698195"
     }
   ],
   "configuration_version": "1"

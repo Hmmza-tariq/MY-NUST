@@ -4,10 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+// import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:mynust/Provider/internet_provider.dart';
 import 'package:mynust/Provider/notice_board_provider.dart';
+import 'package:mynust/Screens/Web%20view/notice_board_screen.dart';
+import 'package:mynust/Screens/Web%20view/portal_screen.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,6 +22,9 @@ import 'Provider/gpa_provider.dart';
 import 'Core/notification_service.dart';
 import 'Provider/theme_provider.dart';
 import 'Screens/Home/home_drawer_list.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+final navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -28,8 +33,8 @@ Future<void> main() async {
 
   await FlutterDownloader.initialize(ignoreSsl: false);
 
-  MobileAds.instance.initialize();
-
+  // MobileAds.instance.initialize();
+  await Firebase.initializeApp();
   NotificationService().initNotification();
   tz.initializeTimeZones();
 
@@ -172,6 +177,16 @@ class _MyAppState extends State<MyApp> {
         title: 'My Nust',
         debugShowCheckedModeBanner: false,
         theme: ThemeProvider.theme,
+        navigatorKey: navigatorKey,
+        routes: {
+          '/notice_board': (context) => const NoticeBoardScreen(),
+          '/qalam_screen': (context) => const PortalScreen(
+                initialUrl: 'https://qalam.nust.edu.pk/',
+              ),
+          '/lms_screen': (context) => const PortalScreen(
+                initialUrl: 'https://lms.nust.edu.pk/portal/my/',
+              ),
+        },
         home: locked
             ? Scaffold(
                 backgroundColor: HexColor('#0263B5'),
