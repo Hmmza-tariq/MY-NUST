@@ -67,12 +67,11 @@ class _WebsiteViewState extends State<WebsiteView> {
           onPageFinished: (String url) {
             // print('url $url');
             if (widget.initialUrl.contains("PaymentsSearchBill")) {
-              print('kuickpay pass');
               ip.webViewController.runJavaScript('''
           document.getElementById("MainContent_cboInstitution").value = "04490";
           document.getElementById("MainContent_cboSearchBy").value = "RegistrationNumber";
           ''');
-              Future.delayed(const Duration(milliseconds: 800)).then((value) {
+              Future.delayed(const Duration(milliseconds: 1000)).then((value) {
                 if (first) {
                   first = false;
                   ip.webViewController.runJavaScript('''
@@ -127,24 +126,12 @@ class _WebsiteViewState extends State<WebsiteView> {
               '.ppt'
             ];
             if (widget.initialUrl.contains("VoucherView")) {
-              print('kuickpay pass');
               ip.webViewController.runJavaScript('''
-// Get all elements on the page
-var allElements = document.querySelectorAll('*');
-
-// Iterate through each element and increase font size
-for (var i = 0; i < allElements.length; i++) {
-    var element = allElements[i];
-    var currentSize = window.getComputedStyle(element).fontSize; // Get current font size
-    var newSize = parseFloat(currentSize) * 1.2; // Increase font size by 20%
-
-    // Set the new font size
-    element.style.fontSize = newSize + 'px';
-}
+          var viewport = document.getElementById("Pe95bdc0067064a1381dc73ba7a3445e1_1_oReportCell");
+          viewport.setAttribute("content", "width=10"); 
 
           ''');
             }
-            print('url $url');
             bool isDownloadable = downloadableExtensions
                 .any((ext) => url.toLowerCase().endsWith(ext));
             if (Uri.parse(url).host != (Uri.parse(widget.initialUrl).host)) {
