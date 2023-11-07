@@ -1,11 +1,8 @@
 import 'dart:async';
 
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mynust/Provider/notice_board_provider.dart';
-import 'package:mynust/Screens/Web%20view/portal_screen.dart';
 // import 'package:google_mobile_ads/google_mobile_ads.dart';
 // import 'package:info_popup/info_popup.dart';
 import 'package:page_transition/page_transition.dart';
@@ -196,18 +193,6 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     // _isLightMode = isLightMode;
 
     itemCount = homeList.length;
-    if (itemCount < 4) {
-      (Provider.of<NoticeBoardProvider>(context).noticeBoard.contains('CEME'))
-          ? homeList.add(LargeSliderListData(
-              imagePath: 'assets/images/bill.png',
-              name: 'Monthly Bills',
-              navigateScreen: const PortalScreen(
-                initialUrl: 'https://app.kuickpay.com/PaymentsSearchBill',
-              ),
-            ))
-          : null;
-      itemCount++;
-    }
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarIconBrightness: isLightMode ? Brightness.dark : Brightness.light,
       systemNavigationBarColor:
