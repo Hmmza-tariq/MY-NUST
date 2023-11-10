@@ -4,9 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-// import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:mynust/Components/large_slider_items.dart';
 import 'package:mynust/Core/notifications.dart';
 import 'package:mynust/Provider/internet_provider.dart';
 import 'package:mynust/Provider/notice_board_provider.dart';
@@ -35,7 +34,7 @@ Future<void> main() async {
 
   await FlutterDownloader.initialize(ignoreSsl: false);
 
-  // MobileAds.instance.initialize();
+  MobileAds.instance.initialize();
   await Firebase.initializeApp();
   NotificationService().initNotification();
   tz.initializeTimeZones();
@@ -44,15 +43,7 @@ Future<void> main() async {
   final sp = await SharedPreferences.getInstance();
 
   final String? noticeBoard = sp.getString('noticeBoard');
-  if (noticeBoard == 'CEME') {
-    LargeSliderListData.homeList.add(LargeSliderListData(
-      imagePath: 'assets/images/bill.png',
-      name: 'Monthly Bills',
-      navigateScreen: const PortalScreen(
-        initialUrl: 'https://app.kuickpay.com/PaymentsSearchBill',
-      ),
-    ));
-  }
+
   final String? themeMode = sp.getString('theme');
   int option = themeMode != null
       ? themeMode == 'Light mode'
