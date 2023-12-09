@@ -48,8 +48,8 @@ class MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       size: 12.0);
   @override
   void initState() {
-    loadAd_1();
-    loadAd_2();
+    // loadAd_1();
+    // loadAd_2();
     _loadWrap();
     animationController = AnimationController(
         duration: const Duration(milliseconds: 1000), vsync: this);
