@@ -13,13 +13,12 @@ class Card1Widget extends StatelessWidget {
   final String name;
   final int credits;
   const Card1Widget(
-      {Key? key,
+      {super.key,
       this.animationController,
       this.animation,
       required this.gpa,
       required this.name,
-      required this.credits})
-      : super(key: key);
+      required this.credits});
 
   @override
   Widget build(BuildContext context) {

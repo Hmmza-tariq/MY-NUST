@@ -6,9 +6,11 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:mynust/Core/notifications.dart';
+import 'package:mynust/Core/credentials.dart';
+import 'package:mynust/Core/firebase_api.dart';
 import 'package:mynust/Provider/internet_provider.dart';
 import 'package:mynust/Provider/notice_board_provider.dart';
+import 'package:mynust/Provider/settings_provider.dart';
 import 'package:mynust/Screens/Web%20view/notice_board_screen.dart';
 import 'package:mynust/Screens/Web%20view/portal_screen.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -44,6 +46,8 @@ Future<void> main() async {
 
   final String? noticeBoard = sp.getString('noticeBoard');
 
+  Hexagon().loadTextValues();
+
   final String? themeMode = sp.getString('theme');
   int option = themeMode != null
       ? themeMode == 'Light mode'
@@ -72,6 +76,9 @@ Future<void> main() async {
         ChangeNotifierProvider<InternetProvider>(
           create: (_) => InternetProvider(),
         ),
+        ChangeNotifierProvider<SettingsProvider>(
+          create: (_) => SettingsProvider(),
+        ),
       ], child: const MyApp())));
 
   ErrorWidget.builder = (FlutterErrorDetails details) {
@@ -91,6 +98,7 @@ class _MyAppState extends State<MyApp> {
   late final LocalAuthentication auth;
   bool locked = false;
   late SharedPreferences prefs;
+
   @override
   void initState() {
     super.initState();
@@ -99,7 +107,6 @@ class _MyAppState extends State<MyApp> {
         locked = value ?? false;
       });
       if (locked) {
-        auth = LocalAuthentication();
         _authenticate();
       } else {
         locked = false;
@@ -117,6 +124,7 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _authenticate() async {
     try {
+      auth = LocalAuthentication();
       bool authenticated = await auth.authenticate(
           localizedReason: 'Biometric authentication is enabled',
           options: const AuthenticationOptions(
@@ -130,7 +138,9 @@ class _MyAppState extends State<MyApp> {
       } else {
         SystemNavigator.pop();
       }
-    } on PlatformException {}
+    } catch (e) {
+      debugPrint('error $e');
+    }
   }
 
   Future<void> checkForUpdate() async {
@@ -172,7 +182,8 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
         builder: (BuildContext context, Widget? child) {
           return MediaQuery(
-            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: const TextScaler.linear(1.0)),
             child: child!,
           );
         },

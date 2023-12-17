@@ -8,11 +8,10 @@ import '../../Provider/theme_provider.dart';
 
 class HomeDrawer extends StatefulWidget {
   const HomeDrawer(
-      {Key? key,
+      {super.key,
       this.screenIndex,
       this.iconAnimationController,
-      this.callBackIndex})
-      : super(key: key);
+      this.callBackIndex});
 
   final AnimationController? iconAnimationController;
   final DrawerIndex? screenIndex;
@@ -170,7 +169,7 @@ class HomeDrawerState extends State<HomeDrawer> {
   void onTapped() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const SettingsScreen()),
+      MaterialPageRoute(builder: (context) => SettingsScreen()),
     );
   }
 

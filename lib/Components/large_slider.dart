@@ -7,7 +7,7 @@ import '../Provider/theme_provider.dart';
 import 'large_slider_items.dart';
 
 class LargeSlider extends StatelessWidget {
-  const LargeSlider({Key? key, this.listData}) : super(key: key);
+  const LargeSlider({super.key, this.listData});
 
   final LargeSliderListData? listData;
   @override

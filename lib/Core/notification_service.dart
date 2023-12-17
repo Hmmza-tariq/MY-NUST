@@ -31,7 +31,7 @@ class NotificationService {
     await _notification
             .resolvePlatformSpecificImplementation<
                 AndroidFlutterLocalNotificationsPlugin>()
-            ?.requestPermission() ??
+            ?.requestNotificationsPermission() ??
         false;
   }
 
