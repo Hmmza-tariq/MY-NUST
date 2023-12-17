@@ -75,7 +75,7 @@ class NavigationHomeScreenState extends State<NavigationHomeScreen> {
           });
         case DrawerIndex.settings:
           setState(() {
-            screenView = const SettingsScreen();
+            screenView = SettingsScreen();
           });
           break;
         default:

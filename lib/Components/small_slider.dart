@@ -9,11 +9,10 @@ import '../Provider/theme_provider.dart';
 
 class SmallSlider extends StatefulWidget {
   const SmallSlider(
-      {Key? key,
+      {super.key,
       this.mainScreenAnimationController,
       this.mainScreenAnimation,
-      required this.isWrap})
-      : super(key: key);
+      required this.isWrap});
 
   final AnimationController? mainScreenAnimationController;
   final Animation<double>? mainScreenAnimation;
@@ -164,12 +163,11 @@ class SmallSliderState extends State<SmallSlider>
 
 class SliderView extends StatelessWidget {
   const SliderView(
-      {Key? key,
+      {super.key,
       this.sliderListData,
       this.animationController,
       this.animation,
-      required this.isWrap})
-      : super(key: key);
+      required this.isWrap});
 
   final SmallSliderListData? sliderListData;
   final AnimationController? animationController;

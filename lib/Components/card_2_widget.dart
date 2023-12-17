@@ -7,7 +7,7 @@ import 'brick.dart';
 
 class Card2Widget extends StatefulWidget {
   const Card2Widget(
-      {Key? key,
+      {super.key,
       required this.name,
       required this.credits,
       required this.grade,
@@ -15,8 +15,7 @@ class Card2Widget extends StatefulWidget {
       required this.subjectIndex,
       required this.gradeUpgrade,
       required this.gradeDowngrade,
-      required this.editFunction})
-      : super(key: key);
+      required this.editFunction});
 
   final String name;
   final int credits;

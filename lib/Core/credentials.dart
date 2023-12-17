@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:encrypt/encrypt.dart' as ec;
 
@@ -9,17 +10,21 @@ class Hexagon {
   final iv = ec.IV.fromLength(16);
 
   Future<void> loadTextValues() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final encrypter = ec.Encrypter(ec.AES(key));
-    final encryptedID =
-        ec.Encrypted.fromBase64(prefs.getString('author') ?? '');
-    final encryptedPass1 =
-        ec.Encrypted.fromBase64(prefs.getString('privacy1') ?? '');
-    final encryptedPass2 =
-        ec.Encrypted.fromBase64(prefs.getString('privacy2') ?? '');
-    _author = encrypter.decrypt(encryptedID, iv: iv);
-    _privacy1 = encrypter.decrypt(encryptedPass1, iv: iv);
-    _privacy2 = encrypter.decrypt(encryptedPass2, iv: iv);
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      final encrypter = ec.Encrypter(ec.AES(key));
+      final encryptedID =
+          ec.Encrypted.fromBase64(prefs.getString('author') ?? '');
+      final encryptedPass1 =
+          ec.Encrypted.fromBase64(prefs.getString('privacy1') ?? '');
+      final encryptedPass2 =
+          ec.Encrypted.fromBase64(prefs.getString('privacy2') ?? '');
+      _author = encrypter.decrypt(encryptedID, iv: iv);
+      _privacy1 = encrypter.decrypt(encryptedPass1, iv: iv);
+      _privacy2 = encrypter.decrypt(encryptedPass2, iv: iv);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   Future<void> saveTextValues(String a, String b, String c) async {

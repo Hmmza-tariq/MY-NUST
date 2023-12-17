@@ -1,7 +1,6 @@
 import 'package:info_popup/info_popup.dart';
-import 'package:local_auth/local_auth.dart';
 import 'package:mynust/Core/credentials.dart';
-import 'package:mynust/Provider/notice_board_provider.dart';
+import 'package:mynust/Provider/settings_provider.dart';
 import 'package:mynust/Screens/Home/home_drawer_list.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -12,22 +11,17 @@ import 'package:flutter/material.dart';
 
 import '../../Provider/theme_provider.dart';
 
-class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
-  @override
-  SettingsScreenState createState() => SettingsScreenState();
-}
-
-class SettingsScreenState extends State<SettingsScreen> {
-  late final LocalAuthentication auth;
-  bool _supportState = false,
-      _enableBiometricAuth = false,
-      _copyButton = false,
-      _autoFill = false;
+// ignore: must_be_immutable
+class SettingsScreen extends StatelessWidget {
+  SettingsScreen({super.key});
   String _selectedThemeOption = 'System default';
-  final _radioThemeOptionsList = ['Light mode', 'Dark mode', 'System default'];
+  final List<String> _radioThemeOptionsList = [
+    'Light mode',
+    'Dark mode',
+    'System default'
+  ];
   String _selectedNoticeBoardOption = 'CEME';
-  final _radioNoticeBoardOptionsList = [
+  final List<String> _radioNoticeBoardOptionsList = [
     'CEME',
     'MCS',
     'SMME',
@@ -41,50 +35,6 @@ class SettingsScreenState extends State<SettingsScreen> {
     'MCE',
     'IESE'
   ];
-
-  //--------------------------------------------------------------------------
-
-  @override
-  void initState() {
-    auth = LocalAuthentication();
-    auth.isDeviceSupported().then((bool isSupported) => setState(() async {
-          _supportState = isSupported || await auth.canCheckBiometrics;
-        }));
-    _loadBiometricPreference().then((value) {
-      setState(() {
-        _enableBiometricAuth = value ?? false;
-      });
-    });
-    _loadCopyPreference().then((value) {
-      setState(() {
-        _copyButton = value ?? false;
-      });
-    });
-    _loadAutoPreference().then((value) {
-      setState(() {
-        _autoFill = value ?? false;
-      });
-    });
-    Hexagon().loadTextValues();
-    _loadThemePreference();
-    _loadNoticePreference();
-    super.initState();
-  }
-
-  Future<void> _resetSettings(bool isLightMode) async {
-    setState(() {
-      _selectedThemeOption = 'System default';
-      _selectedNoticeBoardOption = 'CEME';
-      _enableBiometricAuth = false;
-      _copyButton = false;
-      _autoFill = false;
-    });
-    _setBiometricPreference(_enableBiometricAuth);
-    _setCopyPreference(_copyButton);
-    _setAutoPreference(_copyButton);
-    _setAutoPreference(_autoFill);
-    _setThemePreference(_selectedThemeOption, isLightMode);
-  }
 
   void _resetDialog(BuildContext context, bool isLightMode) async {
     showDialog(
@@ -116,7 +66,8 @@ class SettingsScreenState extends State<SettingsScreen> {
             ),
             TextButton(
               onPressed: () {
-                _resetSettings(isLightMode);
+                Provider.of<SettingsProvider>(context, listen: false)
+                    .resetSettings(isLightMode, context);
                 Navigator.of(context).pop();
               },
               child: const Text('Reset',
@@ -183,47 +134,10 @@ class SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-//--------------------------------------------------------------------------
-  Future<void> _setBiometricPreference(bool value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('biometric_enabled', value);
-  }
-
-  Future<bool?> _loadBiometricPreference() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('biometric_enabled');
-  }
-
-//--------------------------------------------------------------------------
-
-  Future<void> _setThemePreference(String value, bool isLightMode) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('theme', value);
-    int option = 0;
-    setState(() {
-      if (value == 'Light mode') {
-        isLightMode = true;
-        option = 1;
-      } else if (value == 'Dark mode') {
-        isLightMode = false;
-        option = 2;
-      } else {
-        var brightness = MediaQuery.of(context).platformBrightness;
-        isLightMode = brightness == Brightness.light;
-      }
-      Provider.of<ThemeProvider>(context, listen: false).setTheme(option);
-    });
-  }
-
-  Future<void> _loadThemePreference() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? value = prefs.getString('theme');
-    setState(() {
-      _selectedThemeOption = value!;
-    });
-  }
-
-  void _chooseThemeDialog(bool isLightMode) {
+  void _chooseThemeDialog(bool isLightMode, context) {
+    SettingsProvider settingsProvider =
+        Provider.of<SettingsProvider>(context, listen: false);
+    _selectedThemeOption = settingsProvider.selectedThemeOption;
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -257,7 +171,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                     horizontalAlignment: MainAxisAlignment.center,
                     onChanged: (value) => setState(() {
                       _selectedThemeOption = value!;
-                      _setThemePreference(_selectedThemeOption, isLightMode);
+                      settingsProvider.updateThemeOption(
+                          _selectedThemeOption, isLightMode, context);
                     }),
                     items: _radioThemeOptionsList,
                     textStyle: TextStyle(
@@ -286,26 +201,11 @@ class SettingsScreenState extends State<SettingsScreen> {
       },
     );
   }
-//--------------------------------------------------------------------------
 
-  Future<void> _setNoticePreference(String value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('noticeBoard', value);
-    setState(() {
-      Provider.of<NoticeBoardProvider>(context, listen: false)
-          .setNoticeBoard(_selectedNoticeBoardOption);
-    });
-  }
-
-  Future<void> _loadNoticePreference() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? value = prefs.getString('noticeBoard');
-    setState(() {
-      _selectedNoticeBoardOption = value!;
-    });
-  }
-
-  void _chooseNoticeBoard(bool isLightMode) {
+  void _chooseNoticeBoard(bool isLightMode, context) {
+    SettingsProvider settingsProvider =
+        Provider.of<SettingsProvider>(context, listen: false);
+    _selectedNoticeBoardOption = settingsProvider.selectedNoticeBoardOption;
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -343,8 +243,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                       horizontalAlignment: MainAxisAlignment.center,
                       onChanged: (value) => setState(() {
                         _selectedNoticeBoardOption = value!;
-
-                        _setNoticePreference(_selectedNoticeBoardOption);
+                        settingsProvider.updateNoticeBoardOption(
+                            _selectedNoticeBoardOption, context);
                       }),
                       items: _radioNoticeBoardOptionsList,
                       textStyle: TextStyle(
@@ -408,30 +308,7 @@ class SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-//--------------------------------------------------------------------------
-
-  Future<void> _setCopyPreference(bool value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('copyButton', value);
-  }
-
-  Future<bool?> _loadCopyPreference() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('copyButton');
-  }
-//--------------------------------------------------------------------------
-
-  Future<void> _setAutoPreference(bool value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('autoFill', value);
-  }
-
-  Future<bool?> _loadAutoPreference() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('autoFill');
-  }
-
-  void _addData(bool isLightMode) {
+  void _addData(bool isLightMode, context) {
     bool hideId = true, hideLMSPass = true, hideQalamPass = true;
     TextEditingController idController = TextEditingController();
     TextEditingController lMSPassController = TextEditingController();
@@ -627,11 +504,13 @@ class SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-//--------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     bool isLightMode = Provider.of<ThemeProvider>(context).isLightMode ??
         MediaQuery.of(context).platformBrightness == Brightness.light;
+
+    SettingsProvider settingsProvider = Provider.of<SettingsProvider>(context);
+
     return WillPopScope(
       onWillPop: () async {
         Navigator.pushReplacement(
@@ -650,326 +529,262 @@ class SettingsScreenState extends State<SettingsScreen> {
       child: Scaffold(
         backgroundColor:
             isLightMode ? AppTheme.nearlyWhite : AppTheme.nearlyBlack,
-        body: SafeArea(
-          top: false,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top,
-                      left: 16,
-                      right: 16),
-                  child: Image.asset('assets/images/settings.png'),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Container(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: SwitchListTile(
-                      title: Text(
-                        _supportState
-                            ? 'Enable biometric authentication'
-                            : 'Biometric not supported on your device',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: _supportState
-                                ? isLightMode
-                                    ? Colors.black
-                                    : Colors.white
-                                : Colors.grey),
-                      ),
-                      value: _enableBiometricAuth,
-                      onChanged: _supportState
-                          ? (bool value) {
-                              setState(() {
-                                _enableBiometricAuth = value;
-                              });
-                              _setBiometricPreference(value);
-                            }
-                          : null,
-                    ),
+        body: Builder(builder: (context) {
+          return SafeArea(
+            top: false,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).padding.top,
+                        left: 16,
+                        right: 16),
+                    child: Image.asset('assets/images/settings.png'),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Container(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: SwitchListTile(
-                      title: Text(
-                        'Show ID/ Pass to copy in LMS and Qalam',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: isLightMode ? Colors.black : Colors.white),
-                      ),
-                      value: _copyButton,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _copyButton = value;
-                        });
-                        _setCopyPreference(value);
-                      },
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Container(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: SwitchListTile(
-                      title: Text(
-                        'Autofill ID/ Pass',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: isLightMode ? Colors.black : Colors.white),
-                      ),
-                      value: _autoFill,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _autoFill = value;
-                        });
-                        _setAutoPreference(value);
-                      },
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Text(
-                        'Add ID/ Pass  ',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: isLightMode ? Colors.black : Colors.white),
-                      ),
-                      Container(
-                        width: 100,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: isLightMode ? Colors.blue : Colors.white,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(4.0)),
-                          boxShadow: !isLightMode
-                              ? null
-                              : <BoxShadow>[
-                                  BoxShadow(
-                                      color: Colors.grey.withOpacity(0.6),
-                                      offset: const Offset(1, 1),
-                                      blurRadius: 2.0),
-                                ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () => _addData(isLightMode),
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Text(
-                                  'ID/Pass',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: isLightMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Text(
-                        'Choose theme',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: isLightMode ? Colors.black : Colors.white),
-                      ),
-                      Container(
-                        width: 100,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: isLightMode ? Colors.blue : Colors.white,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(4.0)),
-                          boxShadow: !isLightMode
-                              ? null
-                              : <BoxShadow>[
-                                  BoxShadow(
-                                      color: Colors.grey.withOpacity(0.6),
-                                      offset: const Offset(1, 1),
-                                      blurRadius: 2.0),
-                                ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () => _chooseThemeDialog(isLightMode),
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Text(
-                                  'Theme',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: isLightMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Text(
-                        'Choose Notice\nBoard',
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: isLightMode ? Colors.black : Colors.white),
-                      ),
-                      Container(
-                        width: 100,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: isLightMode ? Colors.blue : Colors.white,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(4.0)),
-                          boxShadow: !isLightMode
-                              ? null
-                              : <BoxShadow>[
-                                  BoxShadow(
-                                      color: Colors.grey.withOpacity(0.6),
-                                      offset: const Offset(1, 1),
-                                      blurRadius: 2.0),
-                                ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () => _chooseNoticeBoard(isLightMode),
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: Text(
-                                  'Notice Board',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: isLightMode
-                                        ? Colors.white
-                                        : Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
                     child: Container(
-                      width: 140,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: isLightMode ? Colors.blue : Colors.white,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(4.0)),
-                        boxShadow: !isLightMode
-                            ? null
-                            : <BoxShadow>[
-                                BoxShadow(
-                                    color: Colors.grey.withOpacity(0.6),
-                                    offset: const Offset(4, 4),
-                                    blurRadius: 8.0),
-                              ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => _resetDialog(context, isLightMode),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Text(
-                                'Reset Settings',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color:
-                                      isLightMode ? Colors.white : Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: SwitchListTile(
+                        title: Text(
+                          settingsProvider.supportState
+                              ? 'Enable biometric authentication'
+                              : 'Biometric not supported on your device',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: settingsProvider.supportState
+                                  ? isLightMode
+                                      ? Colors.black
+                                      : Colors.white
+                                  : Colors.grey),
                         ),
+                        value: settingsProvider.enableBiometricAuth,
+                        onChanged: settingsProvider.supportState
+                            ? (bool value) {
+                                settingsProvider.updateBiometricAuth(value);
+                              }
+                            : null,
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
                     child: Container(
-                      width: 140,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: isLightMode ? Colors.blue : Colors.white,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(4.0)),
-                        boxShadow: !isLightMode
-                            ? null
-                            : <BoxShadow>[
-                                BoxShadow(
-                                    color: Colors.grey.withOpacity(0.6),
-                                    offset: const Offset(4, 4),
-                                    blurRadius: 8.0),
-                              ],
+                      padding: const EdgeInsets.only(left: 20, right: 20),
+                      child: SwitchListTile(
+                        title: Text(
+                          'Autofill ID/ Pass',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: isLightMode ? Colors.black : Colors.white),
+                        ),
+                        value: settingsProvider.autoFill,
+                        onChanged: (bool value) {
+                          settingsProvider.updateAutoFill(value);
+                        },
                       ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => _clearSharedPrefs(context, isLightMode),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Text(
-                                'Clear Data',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color:
-                                      isLightMode ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          'Add ID/ Pass  ',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: isLightMode ? Colors.black : Colors.white),
+                        ),
+                        Container(
+                          width: 100,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: isLightMode ? Colors.blue : Colors.white,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(4.0)),
+                            boxShadow: !isLightMode
+                                ? null
+                                : <BoxShadow>[
+                                    BoxShadow(
+                                        color: Colors.grey.withOpacity(0.6),
+                                        offset: const Offset(1, 1),
+                                        blurRadius: 2.0),
+                                  ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () => _addData(isLightMode, context),
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Text(
+                                    'ID/Pass',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      color: isLightMode
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          'Choose theme',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: isLightMode ? Colors.black : Colors.white),
+                        ),
+                        Container(
+                          width: 100,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: isLightMode ? Colors.blue : Colors.white,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(4.0)),
+                            boxShadow: !isLightMode
+                                ? null
+                                : <BoxShadow>[
+                                    BoxShadow(
+                                        color: Colors.grey.withOpacity(0.6),
+                                        offset: const Offset(1, 1),
+                                        blurRadius: 2.0),
+                                  ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () =>
+                                  _chooseThemeDialog(isLightMode, context),
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Text(
+                                    'Theme',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      color: isLightMode
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          'Choose Notice\nBoard',
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: isLightMode ? Colors.black : Colors.white),
+                        ),
+                        Container(
+                          width: 100,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: isLightMode ? Colors.blue : Colors.white,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(4.0)),
+                            boxShadow: !isLightMode
+                                ? null
+                                : <BoxShadow>[
+                                    BoxShadow(
+                                        color: Colors.grey.withOpacity(0.6),
+                                        offset: const Offset(1, 1),
+                                        blurRadius: 2.0),
+                                  ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () =>
+                                  _chooseNoticeBoard(isLightMode, context),
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: Text(
+                                    'Notice Board',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: isLightMode
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                      child: Container(
+                        width: 140,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: isLightMode ? Colors.blue : Colors.white,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(4.0)),
+                          boxShadow: !isLightMode
+                              ? null
+                              : <BoxShadow>[
+                                  BoxShadow(
+                                      color: Colors.grey.withOpacity(0.6),
+                                      offset: const Offset(4, 4),
+                                      blurRadius: 8.0),
+                                ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => _resetDialog(context, isLightMode),
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Text(
+                                  'Reset Settings',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: isLightMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
                                 ),
                               ),
                             ),
@@ -978,14 +793,57 @@ class SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
-                )
-              ],
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                      child: Container(
+                        width: 140,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: isLightMode ? Colors.blue : Colors.white,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(4.0)),
+                          boxShadow: !isLightMode
+                              ? null
+                              : <BoxShadow>[
+                                  BoxShadow(
+                                      color: Colors.grey.withOpacity(0.6),
+                                      offset: const Offset(4, 4),
+                                      blurRadius: 8.0),
+                                ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () =>
+                                _clearSharedPrefs(context, isLightMode),
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Text(
+                                  'Clear Data',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: isLightMode
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  )
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        }),
       ),
     );
   }

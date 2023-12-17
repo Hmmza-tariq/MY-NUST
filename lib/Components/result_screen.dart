@@ -28,7 +28,7 @@ class ResultScreen extends StatefulWidget {
   final List<Subject> subjects;
 
   const ResultScreen(
-      {Key? key,
+      {super.key,
       required this.marksObtained,
       required this.description1,
       required this.description2,
@@ -45,8 +45,7 @@ class ResultScreen extends StatefulWidget {
       required this.semesters,
       required this.sems,
       required this.subjects,
-      required this.isLightMode})
-      : super(key: key);
+      required this.isLightMode});
 
   @override
   State<ResultScreen> createState() => _ResultScreenState();
@@ -269,7 +268,7 @@ class _ResultScreenState extends State<ResultScreen> {
 
 class Chart extends StatelessWidget {
   const Chart(
-      {Key? key,
+      {super.key,
       required this.marksObtained,
       required this.marksTotal,
       required this.isLightMode,
@@ -282,8 +281,7 @@ class Chart extends StatelessWidget {
       required this.semesters,
       required this.sems,
       required this.subjects,
-      required this.color})
-      : super(key: key);
+      required this.color});
   final double marksObtained;
   final double marksTotal;
   final double defaultPadding;
@@ -473,13 +471,13 @@ class Chart extends StatelessWidget {
 
 class DetailCard extends StatelessWidget {
   const DetailCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.trailing,
     required this.description,
     required this.isLightMode,
     required this.defaultPadding,
-  }) : super(key: key);
+  });
 
   final String title, trailing;
   final int description;

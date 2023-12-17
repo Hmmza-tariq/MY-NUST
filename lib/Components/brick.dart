@@ -8,7 +8,7 @@ import 'package:vector_math/vector_math.dart' as vector;
 class BrickView extends StatefulWidget {
   final String grade;
 
-  const BrickView({Key? key, required this.grade}) : super(key: key);
+  const BrickView({super.key, required this.grade});
   @override
   BrickViewState createState() => BrickViewState();
 }

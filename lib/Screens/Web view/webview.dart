@@ -25,7 +25,10 @@ class WebsiteView extends StatefulWidget {
 class _WebsiteViewState extends State<WebsiteView> {
   final GlobalKey webViewKey = GlobalKey();
   double progress = 0.0;
-  bool _isLoading = false, _autoFill = false, first = true;
+  bool _isLoading = false,
+      _autoFill = false,
+      first = true,
+      isMonthlyBill = false;
 
   @override
   void initState() {
@@ -44,6 +47,24 @@ class _WebsiteViewState extends State<WebsiteView> {
   Future<bool?> _loadAutoPreference() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getBool('autoFill');
+  }
+
+  void autoFillMonthly() {
+    Provider.of<InternetProvider>(context, listen: false)
+        .webViewController
+        .runJavaScript('''
+           document.getElementById("MainContent_cboSearchBy").value = "RegistrationNumber";
+          ''')
+        .then((value) => Provider.of<InternetProvider>(context, listen: false)
+            .webViewController
+            .runJavaScript('''
+          document.getElementById("MainContent_cboInstitution").value = "04490";
+          '''))
+        .then((value) => Provider.of<InternetProvider>(context, listen: false)
+            .webViewController
+            .runJavaScript('''
+           document.getElementById("MainContent_btnSubmit").click();
+          '''));
   }
 
   void initializeWebView() async {
@@ -67,17 +88,8 @@ class _WebsiteViewState extends State<WebsiteView> {
           onPageFinished: (String url) {
             // print('url $url');
             if (widget.initialUrl.contains("PaymentsSearchBill")) {
-              ip.webViewController.runJavaScript('''
-          document.getElementById("MainContent_cboInstitution").value = "04490";
-          document.getElementById("MainContent_cboSearchBy").value = "RegistrationNumber";
-          ''');
-              Future.delayed(const Duration(milliseconds: 1000)).then((value) {
-                if (first) {
-                  first = false;
-                  ip.webViewController.runJavaScript('''
-          document.getElementById("MainContent_btnSubmit").click();
-          ''');
-                }
+              setState(() {
+                isMonthlyBill = true;
               });
             }
             if (!widget.initialUrl.contains("qalam.nust")) {
@@ -200,7 +212,7 @@ class _WebsiteViewState extends State<WebsiteView> {
                   children: [
                     Expanded(
                         child: Stack(
-                      alignment: Alignment.center,
+                      alignment: Alignment.topRight,
                       children: [
                         SizedBox(
                             child: GestureDetector(
@@ -215,6 +227,18 @@ class _WebsiteViewState extends State<WebsiteView> {
                             color: HexColor('#0F6FC5'),
                           ),
                         ),
+                        isMonthlyBill
+                            ? ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  backgroundColor: AppTheme.nearlyBlack,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onPressed: autoFillMonthly,
+                                child: const Text('Auto Fill'))
+                            : Container(),
                       ],
                     )),
                   ],

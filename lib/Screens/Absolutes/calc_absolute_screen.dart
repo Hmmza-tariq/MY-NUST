@@ -17,7 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class CalcAbsoluteScreen extends StatefulWidget {
   static const String id = "CalcAbsolute_Screen";
 
-  const CalcAbsoluteScreen({Key? key}) : super(key: key);
+  const CalcAbsoluteScreen({super.key});
 
   @override
   CalcAbsoluteScreenState createState() => CalcAbsoluteScreenState();
@@ -943,7 +943,6 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                       textDirection: TextDirection.ltr,
                       softWrap: true,
                       maxLines: 1,
-                      textScaleFactor: 1,
                       text: TextSpan(
                         children: <TextSpan>[
                           TextSpan(
@@ -976,6 +975,7 @@ class CalcAbsoluteScreenState extends State<CalcAbsoluteScreen> {
                           ),
                         ],
                       ),
+                      textScaler: const TextScaler.linear(1),
                     ),
                   ),
                   iconColor: Colors.grey,

@@ -11,13 +11,13 @@ class RoundedButton extends StatefulWidget {
   final double iconSize;
 
   const RoundedButton({
-    Key? key,
+    super.key,
     required this.title,
     required this.onPressed,
     required this.icon,
     this.fontSize = 18,
     this.iconSize = 24,
-  }) : super(key: key);
+  });
 
   @override
   RoundedButtonState createState() => RoundedButtonState();
