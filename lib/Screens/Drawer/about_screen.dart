@@ -74,20 +74,19 @@ class AboutScreenState extends State<AboutScreen> {
                                       ? Colors.black
                                       : Colors.white),
                             ),
+                            // Padding(
+                            //   padding:
+                            //       const EdgeInsets.symmetric(horizontal: 100.0),
+                            //   child: Divider(
+                            //       thickness: 2,
+                            //       height: 30,
+                            //       color: themeProvider.primaryColor
+                            //           .withOpacity(0.3)),
+                            // ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 100.0),
-                              child: Divider(
-                                  thickness: 2,
-                                  height: 30,
-                                  color: themeProvider.primaryColor
-                                      .withOpacity(0.3)),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              padding: const EdgeInsets.all(16.0),
                               child: Text(
-                                "Hey, I'm Hamza Tariq (CE-43, CEME), the brain behind this app. I'm a Flutter fanatic and app aficionado. I've cooked up this app with passion and around 15,000 lines of code. I hope it rocks!",
+                                "Hey, I'm Hamza. Have a nice day! :)",
                                 style: TextStyle(
                                     fontFamily: AppTheme.fontName,
                                     fontSize: 16,

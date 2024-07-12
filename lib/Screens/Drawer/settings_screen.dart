@@ -33,7 +33,12 @@ class SettingsScreen extends StatelessWidget {
     'NBC',
     'SCME',
     'MCE',
-    'IESE'
+    'IESE',
+    'NICE',
+    'IGIS',
+    'ASAB',
+    'SADA',
+    'S3H'
   ];
 
   void _resetDialog(BuildContext context, bool isLightMode) async {
