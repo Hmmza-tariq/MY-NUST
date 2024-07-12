@@ -34,7 +34,7 @@ if (keystorePropertiesFile.exists()) {
    
 android {
     namespace "com.hexagone.mynust"
-    compileSdkVersion 33
+    compileSdkVersion 34
     ndkVersion "25.2.9519653"
 
     compileOptions {
@@ -52,8 +52,8 @@ android {
 
     defaultConfig {
         applicationId "com.hexagone.mynust"
-        minSdkVersion 24
-        targetSdkVersion 33
+        minSdkVersion 34
+        targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true

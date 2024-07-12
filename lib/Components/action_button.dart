@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mynust/Components/result_ad.dart';
 import 'package:mynust/Core/app_theme.dart';
 
 class ActionButton extends StatefulWidget {
@@ -21,7 +20,7 @@ class _ActionButtonState extends State<ActionButton> {
   @override
   void initState() {
     if (widget.icon == Icons.calculate) {
-      ResultAd.loadAd();
+      // ResultAd.loadAd();
     }
     super.initState();
   }
@@ -44,5 +43,3 @@ class _ActionButtonState extends State<ActionButton> {
     );
   }
 }
-
-

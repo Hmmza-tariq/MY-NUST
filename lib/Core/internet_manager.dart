@@ -12,7 +12,8 @@ class InternetManager {
   static late StreamSubscription subscription;
   static void checkInternet(context, {int count = 2}) async {
     InternetProvider ip = Provider.of<InternetProvider>(context, listen: false);
-    result = await Connectivity().checkConnectivity();
+    var temp = await Connectivity().checkConnectivity();
+    result = temp.first;
     if (result != ConnectivityResult.none) {
       ip.setConnection(true);
       count = 0;

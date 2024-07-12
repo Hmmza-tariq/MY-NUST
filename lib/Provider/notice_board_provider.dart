@@ -30,6 +30,16 @@ class NoticeBoardProvider with ChangeNotifier {
       link = 'https://mce.nust.edu.pk/downloads/';
     } else if (name == 'IESE') {
       link = 'https://iese.nust.edu.pk/downloads/';
+    } else if (name == "NICE") {
+      link = 'https://nice.nust.edu.pk/downloads/';
+    } else if (name == "IGIS") {
+      link = 'https://igis.nust.edu.pk/downloads/';
+    } else if (name == "ASAB") {
+      link = 'https://asab.nust.edu.pk/downloads/';
+    } else if (name == "SADA") {
+      link = 'https://sada.nust.edu.pk/downloads/';
+    } else if (name == "S3H") {
+      link = 'https://s3h.nust.edu.pk/downloads/';
     } else {
       link = 'https://ceme.nust.edu.pk/downloads/student-notice-board-ug/';
     }
