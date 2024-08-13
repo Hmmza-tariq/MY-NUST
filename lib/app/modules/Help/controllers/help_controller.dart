@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:get/get.dart';
+import 'package:nust/app/controllers/theme_controller.dart';
 
 class HelpController extends GetxController {
+  final ThemeController themeController = Get.find();
   final nameController = TextEditingController();
   final mailController = TextEditingController();
   final messageController = TextEditingController();

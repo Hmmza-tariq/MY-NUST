@@ -1,14 +1,10 @@
 import 'package:get/get.dart';
+import 'package:nust/app/controllers/theme_controller.dart';
 
 class SettingsController extends GetxController {
-  var isDarkMode = false.obs;
   var isBiometricEnabled = false.obs;
   var isAutofillEnabled = false.obs;
-
-  void toggleDarkMode(bool value) {
-    isDarkMode.value = value;
-  }
-
+  ThemeController themeController = Get.find();
   void toggleBiometric(bool value) {
     isBiometricEnabled.value = value;
   }
@@ -18,7 +14,7 @@ class SettingsController extends GetxController {
   }
 
   void resetSettings() {
-    isDarkMode.value = false;
+    themeController.resetTheme();
     isBiometricEnabled.value = false;
     isAutofillEnabled.value = false;
   }

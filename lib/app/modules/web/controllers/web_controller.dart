@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:nust/app/controllers/authentication_controller.dart';
 import 'package:nust/app/modules/widgets/loading.dart';
 import 'package:nust/app/resources/color_manager.dart';
-import 'package:nust/app/services/authentication_service.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebController extends GetxController {
@@ -11,8 +11,7 @@ class WebController extends GetxController {
   var isMonthlyBill = false.obs;
   late WebViewController webViewController;
   var status = 0.obs;
-  AuthenticationService authenticationService = AuthenticationService();
-
+  AuthenticationController authenticationController = Get.find();
   @override
   void onInit() {
     super.onInit();
@@ -71,7 +70,7 @@ class WebController extends GetxController {
       ''');
     }
 
-    if (authenticationService.autoFill) {
+    if (authenticationController.autoFill) {
       autoFillLoginDetails(url);
     }
   }
@@ -82,8 +81,8 @@ class WebController extends GetxController {
         var username = document.getElementById('username');
         var password = document.getElementById('password');
         if (username && password) {
-          username.value = '${authenticationService.id}';
-          password.value = '${authenticationService.pass}';
+          username.value = '${authenticationController.id}';
+          password.value = '${authenticationController.pass}';
         }
       ''');
     } else if (url.contains("qalam.nust.edu.pk")) {
@@ -91,8 +90,8 @@ class WebController extends GetxController {
         var login = document.getElementById('login');
         var password = document.getElementById('password');
         if (login && password) {
-          login.value = '${authenticationService.id}';
-          password.value = '${authenticationService.pass}';
+          login.value = '${authenticationController.id}';
+          password.value = '${authenticationController.pass}';
         }
       ''');
     }
