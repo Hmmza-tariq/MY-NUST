@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/rendering.dart';
+import 'package:get/get.dart';
 // ignore: library_prefixes
 import 'package:html/parser.dart' as htmlParser;
 import 'package:html/dom.dart';
 
-class StoriesService {
+class StoriesController extends GetxController {
   final Dio _dio = Dio();
   final String _baseUrl = 'https://nust.edu.pk';
 

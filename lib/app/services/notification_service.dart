@@ -5,13 +5,17 @@ import 'package:flutter/foundation.dart';
 class NotificationsService {
   final _firebaseMessaging = FirebaseMessaging.instance;
   Future<void> initNotifications() async {
-    await Firebase.initializeApp();
+    try {
+      await Firebase.initializeApp();
 
-    await _firebaseMessaging.requestPermission();
-    final fCMToken = await _firebaseMessaging.getToken();
-    FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
-    if (kDebugMode) {
-      debugPrint('token: $fCMToken');
+      await _firebaseMessaging.requestPermission();
+      final fCMToken = await _firebaseMessaging.getToken();
+      FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+      if (kDebugMode) {
+        debugPrint('token: $fCMToken');
+      }
+    } catch (e) {
+      debugPrint('error: $e');
     }
   }
 }

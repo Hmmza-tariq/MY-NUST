@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:nust/app/resources/color_manager.dart';
 import 'package:nust/app/routes/app_pages.dart';
 
+import '../home/controllers/home_controller.dart';
+import 'custom_button.dart';
 import 'loading.dart';
 
 class HomeSmallButton extends StatelessWidget {
@@ -18,38 +21,39 @@ class HomeSmallButton extends StatelessWidget {
   final String page;
   @override
   Widget build(BuildContext context) {
+    final ThemeController themeController = Get.find();
     return InkWell(
       onTap: () {
         Get.toNamed(page);
       },
-      child: Container(
-        width: Get.width * 0.23,
-        height: 70,
-        // padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(
-          color: ColorManager.background2,
-          border: Border.all(color: ColorManager.primary, width: 2),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              icon,
-              height: 30,
-              width: 50,
+      child: Obx(
+        () => Container(
+            width: Get.width * 0.23,
+            height: 70,
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              color: themeController.theme.cardTheme.color,
+              border: Border.all(color: ColorManager.primary, width: 2),
+              borderRadius: BorderRadius.circular(10),
             ),
-            // const SizedBox(width: 10),
-            Text(
-              title,
-              style: const TextStyle(
-                  color: ColorManager.primary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  icon,
+                  height: 30,
+                  width: 50,
+                ),
+                // const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: const TextStyle(
+                      color: ColorManager.primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            )),
       ),
     );
   }
@@ -67,39 +71,40 @@ class HomeLargeButton extends StatelessWidget {
   final String page;
   @override
   Widget build(BuildContext context) {
+    final ThemeController themeController = Get.find();
     return InkWell(
       onTap: () {
         Get.toNamed(page);
       },
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(
-          color: ColorManager.background2,
-          border: Border.all(color: ColorManager.primary, width: 2),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              icon,
-              height: 50,
-              width: 50,
-              colorFilter:
-                  const ColorFilter.mode(ColorManager.primary, BlendMode.srcIn),
+      child: Obx(() => Container(
+            padding: const EdgeInsets.all(10),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              color: themeController.theme.cardTheme.color,
+              border: Border.all(color: ColorManager.primary, width: 2),
+              borderRadius: BorderRadius.circular(10),
             ),
-            const SizedBox(width: 10),
-            Text(
-              title,
-              style: const TextStyle(
-                  color: ColorManager.primary,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  icon,
+                  height: 50,
+                  width: 50,
+                  colorFilter: const ColorFilter.mode(
+                      ColorManager.primary, BlendMode.srcIn),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: const TextStyle(
+                      color: ColorManager.primary,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          )),
     );
   }
 }
@@ -115,80 +120,27 @@ class HomeWebButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeController themeController = Get.find();
     return InkWell(
       onTap: () {
         Get.toNamed(Routes.WEB, parameters: {'url': url});
       },
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        width: Get.width * 0.4,
-        decoration: BoxDecoration(
-          color: ColorManager.background2,
-          border: Border.all(color: ColorManager.primary, width: 2),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: SvgPicture.asset(
-          image,
-          height: 50,
-          width: 50,
-          colorFilter:
-              const ColorFilter.mode(ColorManager.primary, BlendMode.srcIn),
-        ),
-      ),
-    );
-  }
-}
-
-class TopStoriesScreen extends StatelessWidget {
-  final List<Map<String, String?>> topStories;
-
-  const TopStoriesScreen(this.topStories, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: topStories.length,
-      itemBuilder: (context, index) {
-        final story = topStories[index];
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (story['imageUrl'] != null && story['imageUrl']!.isNotEmpty)
-                  Image.network(
-                    story['imageUrl']!,
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(Icons.image,
-                          size: 100); // Placeholder icon
-                    },
-                  ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        story['title']!,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(story['category']!),
-                    ],
-                  ),
-                ),
-              ],
+      child: Obx(() => Container(
+            padding: const EdgeInsets.all(10),
+            width: Get.width * 0.4,
+            decoration: BoxDecoration(
+              color: themeController.theme.cardTheme.color,
+              border: Border.all(color: ColorManager.primary, width: 2),
+              borderRadius: BorderRadius.circular(10),
             ),
-          ),
-        );
-      },
+            child: SvgPicture.asset(
+              image,
+              height: 50,
+              width: 50,
+              colorFilter:
+                  const ColorFilter.mode(ColorManager.primary, BlendMode.srcIn),
+            ),
+          )),
     );
   }
 }
@@ -263,7 +215,7 @@ Widget buildStoryDetails(
     Map<String, String?> story, int index, int activePage) {
   return Container(
     padding: const EdgeInsets.all(8),
-    width: Get.width * 0.6,
+    width: Get.width * 0.58,
     height: activePage == index ? 120 : 100,
     decoration: BoxDecoration(
       gradient: LinearGradient(
@@ -275,9 +227,12 @@ Widget buildStoryDetails(
           ColorManager.background1.withOpacity(.5),
         ],
       ),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: const BorderRadius.only(
+        bottomLeft: Radius.circular(12),
+        bottomRight: Radius.circular(12),
+      ),
     ),
-    alignment: Alignment.bottomLeft,
+    alignment: Alignment.bottomCenter,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -322,4 +277,63 @@ Widget buildStoryDetails(
       ],
     ),
   );
+}
+
+class HomeCampusWidget extends StatelessWidget {
+  const HomeCampusWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final HomeController controller = Get.find();
+    return Obx(() => CustomButton(
+          title: '${controller.selectedCampus.value} Campus',
+          color: controller.themeController.theme.scaffoldBackgroundColor,
+          textColor: controller.themeController.isDarkMode.value
+              ? ColorManager.white
+              : ColorManager.black,
+          widthFactor: .5,
+          onPressed: () => Get.defaultDialog(
+            title: 'Select Campus',
+            titleStyle: TextStyle(
+              color: controller
+                  .themeController.theme.appBarTheme.titleTextStyle!.color,
+            ),
+            backgroundColor:
+                controller.themeController.theme.scaffoldBackgroundColor,
+            content: SizedBox(
+              height: (controller.campuses.length / 3).round() * (80),
+              width: Get.width * 0.9,
+              child: GridView(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 1.5,
+                ),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  ...controller.campuses.map((campus) => CustomButton(
+                      isBold: false,
+                      title: campus,
+                      onPressed: () {
+                        controller.selectedCampus.value = campus;
+                        Get.back();
+                      },
+                      color: campus == controller.selectedCampus.value
+                          ? ColorManager.primary
+                          : controller.themeController.theme.cardTheme.color!,
+                      textColor: campus == controller.selectedCampus.value
+                          ? ColorManager.white
+                          : controller.themeController.theme.appBarTheme
+                              .titleTextStyle!.color!,
+                      widthFactor: .2)),
+                ],
+              ),
+            ),
+          ),
+        ));
+  }
 }

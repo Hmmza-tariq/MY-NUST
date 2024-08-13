@@ -14,6 +14,7 @@ class AssetsManager {
   static const String lms = "$ICON_PATH/lms.svg";
   static const String qalam = "$ICON_PATH/qalam.svg";
   static const String gpa = "$ICON_PATH/gpa.svg";
+  static const String result = "$ICON_PATH/result.svg";
   static const String settings = "$ICON_PATH/settings.svg";
   static const String help = "$ICON_PATH/help.svg";
   static const String about = "$ICON_PATH/about.svg";

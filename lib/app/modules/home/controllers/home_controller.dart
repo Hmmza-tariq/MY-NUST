@@ -1,14 +1,16 @@
 import 'package:carousel_slider_plus/carousel_slider_plus.dart';
 import 'package:get/get.dart';
-import 'package:nust/app/services/stories_service.dart';
+import 'package:nust/app/controllers/stories_controller.dart';
+import 'package:nust/app/controllers/theme_controller.dart';
 
 class HomeController extends GetxController {
+  final ThemeController themeController = Get.find();
   final CarouselSliderController pageController = CarouselSliderController();
   var activePage = 0.obs;
   var totalPage = 0.obs;
   Rx<List<Map<String, String?>>> topStories =
       Rx<List<Map<String, String?>>>([]);
-  final storiesService = StoriesService();
+  final StoriesController storiesController = Get.find();
   List<String> campuses = [
     'CEME',
     'MCS',
@@ -40,7 +42,7 @@ class HomeController extends GetxController {
 
   void fetchStories() async {
     isLoading.value = true;
-    topStories.value = await storiesService.fetchTopStories();
+    topStories.value = await storiesController.fetchTopStories();
     isLoading.value = false;
   }
 }
