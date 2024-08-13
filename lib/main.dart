@@ -1,216 +1,42 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:local_auth/local_auth.dart';
-import 'package:mynust/Core/credentials.dart';
-import 'package:mynust/Core/firebase_api.dart';
-import 'package:mynust/Provider/internet_provider.dart';
-import 'package:mynust/Provider/notice_board_provider.dart';
-import 'package:mynust/Provider/settings_provider.dart';
-import 'package:mynust/Screens/Web%20view/notice_board_screen.dart';
-import 'package:mynust/Screens/Web%20view/portal_screen.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:in_app_update/in_app_update.dart';
-import 'Components/error_widget.dart';
-import 'Components/hex_color.dart';
-import 'Core/app_Theme.dart';
-import 'Provider/assessment_provider.dart';
-import 'Provider/gpa_provider.dart';
-import 'Core/notification_service.dart';
-import 'Provider/theme_provider.dart';
-import 'Screens/Home/home_drawer_list.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:nust/app/services/notification_service.dart';
+import 'app/modules/widgets/error_widget.dart';
+import 'app/resources/theme_manager.dart';
+import 'app/routes/app_pages.dart';
+import 'firebase_options.dart';
 
-final navigatorKey = GlobalKey<NavigatorState>();
-
-Future<void> main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
-  await FlutterDownloader.initialize(ignoreSsl: false);
-
-  MobileAds.instance.initialize();
-  await Firebase.initializeApp();
-  NotificationService().initNotification();
-  tz.initializeTimeZones();
-  await FirebaseApi().initNotifications();
-
-  final sp = await SharedPreferences.getInstance();
-
-  final String? noticeBoard = sp.getString('noticeBoard');
-
-  Hexagon().loadTextValues();
-
-  final String? themeMode = sp.getString('theme');
-  int option = themeMode != null
-      ? themeMode == 'Light mode'
-          ? 1
-          : themeMode == 'Dark mode'
-              ? 2
-              : 0
-      : 0;
-
-  await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown
-  ]).then((_) => runApp(MultiProvider(providers: [
-        ChangeNotifierProvider<ThemeProvider>(
-          create: (_) => ThemeProvider(option),
-        ),
-        ChangeNotifierProvider<NoticeBoardProvider>(
-          create: (_) => NoticeBoardProvider(noticeBoard ?? 'CEME'),
-        ),
-        ChangeNotifierProvider<GpaProvider>(
-          create: (_) => GpaProvider(),
-        ),
-        ChangeNotifierProvider<AssessmentProvider>(
-          create: (_) => AssessmentProvider(),
-        ),
-        ChangeNotifierProvider<InternetProvider>(
-          create: (_) => InternetProvider(),
-        ),
-        ChangeNotifierProvider<SettingsProvider>(
-          create: (_) => SettingsProvider(),
-        ),
-      ], child: const MyApp())));
-
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await NotificationsService().initNotifications();
+  runApp(GetMaterialApp(
+    title: "My Nust",
+    debugShowCheckedModeBanner: false,
+    theme: getApplicationTheme(),
+    initialRoute: AppPages.INITIAL,
+    getPages: AppPages.routes,
+    scrollBehavior: const MaterialScrollBehavior().copyWith(
+      dragDevices: {
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.touch,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.unknown
+      },
+    ),
+    builder: (BuildContext context, Widget? child) {
+      return MediaQuery(
+        data: MediaQuery.of(context)
+            .copyWith(textScaler: const TextScaler.linear(1.0)),
+        child: child!,
+      );
+    },
+  ));
   ErrorWidget.builder = (FlutterErrorDetails details) {
-    return const ErrorScreen(
-      errorName: 'Internal Error',
+    return ErrorScreen(
+      details: details,
     );
   };
-}
-
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  late final LocalAuthentication auth;
-  bool locked = false;
-  late SharedPreferences prefs;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadBiometricPreference().then((value) {
-      setState(() {
-        locked = value ?? false;
-      });
-      if (locked) {
-        _authenticate();
-      } else {
-        locked = false;
-        checkForUpdate();
-      }
-    });
-    FlutterNativeSplash.remove();
-  }
-
-  Future<bool?> _loadBiometricPreference() async {
-    prefs = await SharedPreferences.getInstance();
-
-    return prefs.getBool('biometric_enabled');
-  }
-
-  Future<void> _authenticate() async {
-    try {
-      auth = LocalAuthentication();
-      bool authenticated = await auth.authenticate(
-          localizedReason: 'Biometric authentication is enabled',
-          options: const AuthenticationOptions(
-              useErrorDialogs: false, stickyAuth: false, biometricOnly: false));
-      if (authenticated) {
-        setState(() {
-          locked = false;
-          checkForUpdate();
-          FlutterNativeSplash.remove();
-        });
-      } else {
-        SystemNavigator.pop();
-      }
-    } catch (e) {
-      debugPrint('error $e');
-    }
-  }
-
-  Future<void> checkForUpdate() async {
-    InAppUpdate.checkForUpdate().then((info) {
-      setState(() {
-        if (info.updateAvailability == UpdateAvailability.updateAvailable) {
-          update();
-        }
-      });
-    }).catchError((e) {
-      //print(e.toString());
-    });
-  }
-
-  void update() async {
-    await InAppUpdate.startFlexibleUpdate();
-    InAppUpdate.completeFlexibleUpdate().then((_) {}).catchError((e) {
-      //print(e.toString());
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    bool isLightMode = Provider.of<ThemeProvider>(context).isLightMode ??
-        MediaQuery.of(context).platformBrightness == Brightness.light;
-
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: isLightMode ? Brightness.dark : Brightness.light,
-      statusBarBrightness:
-          !kIsWeb && Platform.isAndroid ? Brightness.dark : Brightness.light,
-      systemNavigationBarColor:
-          isLightMode ? AppTheme.white : AppTheme.nearlyBlack,
-      systemNavigationBarDividerColor: Colors.transparent,
-      systemNavigationBarIconBrightness:
-          isLightMode ? Brightness.dark : Brightness.light,
-    ));
-
-    return MaterialApp(
-        builder: (BuildContext context, Widget? child) {
-          return MediaQuery(
-            data: MediaQuery.of(context)
-                .copyWith(textScaler: const TextScaler.linear(1.0)),
-            child: child!,
-          );
-        },
-        title: 'My Nust',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeProvider.theme,
-        navigatorKey: navigatorKey,
-        routes: {
-          '/notice_board': (context) => const NoticeBoardScreen(),
-          '/qalam_screen': (context) => const PortalScreen(
-                initialUrl: 'https://qalam.nust.edu.pk/',
-              ),
-          '/lms_screen': (context) => const PortalScreen(
-                initialUrl: 'https://lms.nust.edu.pk/portal/my/',
-              ),
-        },
-        home: locked
-            ? Scaffold(
-                backgroundColor: HexColor('#0263B5'),
-                body: SafeArea(
-                  child: Center(
-                    child: SizedBox(
-                        width: MediaQuery.of(context).size.width / 1.6,
-                        child: Image.asset('assets/images/appLogoLarge.png')),
-                  ),
-                ),
-              )
-            : const NavigationHomeScreen());
-  }
 }
