@@ -194,8 +194,16 @@ Widget buildStoryContainer(
                     width: Get.width * 0.6,
                     height: 120,
                     fit: BoxFit.fitHeight,
-                    errorBuilder: (context, error, stackTrace) => ErrorScreen(
-                          details: error.toString(),
+                    errorBuilder: (context, error, stackTrace) => ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            topRight: Radius.circular(12),
+                          ),
+                          child: ErrorScreen(
+                            details: "",
+                            height: 120,
+                            width: Get.width * 0.6,
+                          ),
                         )),
               ),
             ],

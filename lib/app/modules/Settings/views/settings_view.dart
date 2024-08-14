@@ -34,7 +34,7 @@ class SettingsView extends GetView<SettingsController> {
                   const Spacer(),
                   IconButton(
                     icon: SvgPicture.asset(
-                      AssetsManager.help_bg1,
+                      AssetsManager.help,
                       width: 32,
                     ),
                     onPressed: () {
@@ -100,11 +100,19 @@ class SettingsView extends GetView<SettingsController> {
                   onPressed: () => Get.defaultDialog(
                     contentPadding: const EdgeInsets.all(16),
                     title: 'Reset Settings',
-                    content: const Text.rich(
+                    titleStyle: TextStyle(
+                        color: controller.themeController.theme.appBarTheme
+                            .titleTextStyle!.color),
+                    backgroundColor: controller
+                        .themeController.theme.scaffoldBackgroundColor,
+                    content: Text.rich(
                       TextSpan(
                         text: 'Are you sure you want to reset all settings?',
-                        style: TextStyle(fontSize: 18),
-                        children: [
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: controller.themeController.theme.appBarTheme
+                                .titleTextStyle!.color),
+                        children: const [
                           TextSpan(
                               text: '\nThis action cannot be undone.',
                               style: TextStyle(
@@ -125,8 +133,10 @@ class SettingsView extends GetView<SettingsController> {
                         }),
                     cancel: CustomButton(
                         title: 'Cancel',
-                        color: ColorManager.lightGrey1,
-                        textColor: ColorManager.black,
+                        color:
+                            controller.themeController.theme.cardTheme.color!,
+                        textColor: controller.themeController.theme.appBarTheme
+                            .titleTextStyle!.color!,
                         widthFactor: 1,
                         onPressed: () {
                           Get.back();

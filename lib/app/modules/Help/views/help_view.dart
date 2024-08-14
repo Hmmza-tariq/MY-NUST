@@ -34,7 +34,7 @@ class HelpView extends GetView<HelpController> {
                     const Spacer(),
                     IconButton(
                       icon: SvgPicture.asset(
-                        AssetsManager.about_bg1,
+                        AssetsManager.about,
                         width: 32,
                       ),
                       onPressed: () {

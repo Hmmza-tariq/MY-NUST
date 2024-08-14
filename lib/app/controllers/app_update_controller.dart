@@ -7,8 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 class AppUpdateController extends GetxController {
   var isUpdateAvailable = false.obs;
-  final appleId = '6478523748';
-  final playStoreId = 'com.hexagone.green_eats';
+  final appleId = '';
+  final playStoreId = 'com.hexagone.mynust';
 
   @override
   void onInit() {

@@ -9,7 +9,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 class WebController extends GetxController {
   String url = Get.parameters['url'] ?? '';
   var isLoading = true.obs;
-  var isMonthlyBill = false.obs;
+  var isError = false.obs;
   late WebViewController webViewController;
   var status = 0.obs;
   AuthenticationController authenticationController = Get.find();
@@ -20,33 +20,7 @@ class WebController extends GetxController {
     initializeWebView();
   }
 
-  Future<void> reload() async {
-    if (internetController.isOnline.value) {
-      isLoading.value = true;
-      webViewController.reload();
-      isLoading.value = false;
-    } else {
-      await internetController.noInternetDialog(webViewController.reload);
-    }
-  }
-
-  void checkInternet() async {
-    internetController.isOnline.listen(
-      (isOnline) async {
-        if (isOnline) {
-          await reload();
-        } else {
-          await internetController.noInternetDialog(webViewController.reload);
-        }
-      },
-    );
-  }
-
   void initializeWebView() {
-    if (!internetController.isOnline.value) {
-      internetController.noInternetDialog(reload);
-      return;
-    }
     webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(ColorManager.background1)
@@ -60,14 +34,13 @@ class WebController extends GetxController {
           },
           onPageFinished: (String url) {
             isLoading.value = false;
-            if (url.contains("PaymentsSearchBill")) {
-              isMonthlyBill.value = true;
-            }
+            isError.value = false;
             runJavaScriptOnPageLoad(url);
           },
           onWebResourceError: (WebResourceError error) {
+            isError.value = true;
             isLoading.value = false;
-            snackbar('Error: ${error.description}');
+            debugPrint('Error: ${error.errorCode} - ${error.description}');
           },
           onNavigationRequest: (NavigationRequest request) async {
             String url = request.url;
@@ -80,8 +53,49 @@ class WebController extends GetxController {
           },
         ),
       )
-      ..enableZoom(false)
-      ..loadRequest(Uri.parse(url));
+      ..enableZoom(false);
+
+    if (!internetController.isOnline.value) {
+      isError.value = true;
+      isLoading.value = false;
+      internetController.noInternetDialog(reload);
+    } else {
+      webViewController.loadRequest(Uri.parse(url));
+    }
+
+    checkInternet();
+  }
+
+  void checkInternet() {
+    internetController.isOnline.listen(
+      (isOnline) async {
+        if (isOnline) {
+          isError.value = false;
+          if (isError.value) {
+            await reload();
+          }
+        } else {
+          isError.value = true;
+          internetController.noInternetDialog(reload);
+        }
+      },
+    );
+  }
+
+  Future<void> reload() async {
+    if (internetController.isOnline.value) {
+      isLoading.value = true;
+      if (await webViewController.currentUrl() == null) {
+        webViewController.loadRequest(Uri.parse(url));
+      } else {
+        await webViewController.reload();
+      }
+      isLoading.value = false;
+      isError.value = false;
+    } else {
+      isError.value = true;
+      internetController.noInternetDialog(reload);
+    }
   }
 
   void runJavaScriptOnPageLoad(String url) {

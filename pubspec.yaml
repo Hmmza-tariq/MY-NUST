@@ -1,7 +1,7 @@
 name: nust
 description: Nust unofficial Student app
 
-version: 1.0.0+22
+version: 2.0.0+22
 publish_to: none
 
 environment: 
@@ -26,7 +26,7 @@ dependencies:
   firebase_messaging: ^14.7.10
   url_launcher: ^6.3.0  
   connectivity_plus: ^6.0.5
-  app_version_update: ^5.0.1
+  app_version_update: 4.0.0
    
 
 dev_dependencies: 

@@ -11,6 +11,7 @@ abstract class Routes {
   static const HELP = _Paths.HELP;
   static const GPA_CALCULATION = _Paths.GPA_CALCULATION;
   static const ABOUT = _Paths.ABOUT;
+  static const AGGREGATE_CALCULATION = _Paths.AGGREGATE_CALCULATION;
 }
 
 abstract class _Paths {
@@ -21,4 +22,5 @@ abstract class _Paths {
   static const HELP = '/help';
   static const GPA_CALCULATION = '/gpa-calculation';
   static const ABOUT = '/about';
+  static const AGGREGATE_CALCULATION = '/aggregate-calculation';
 }
