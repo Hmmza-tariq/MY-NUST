@@ -2,10 +2,7 @@ import 'package:carousel_slider_plus/carousel_slider_plus.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/stories_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
-import 'package:nust/app/modules/widgets/custom_button.dart';
-
 import '../../../controllers/internet_controller.dart';
-import '../../../resources/color_manager.dart';
 
 class HomeController extends GetxController {
   final CarouselSliderController pageController = CarouselSliderController();
@@ -52,7 +49,7 @@ class HomeController extends GetxController {
       topStories.value = await storiesController.fetchTopStories();
       isLoading.value = false;
     } else {
-      await noInternetDialog();
+      await internetController.noInternetDialog(fetchStories);
     }
   }
 
@@ -62,25 +59,9 @@ class HomeController extends GetxController {
         if (isOnline) {
           await fetchStories();
         } else {
-          await noInternetDialog();
+          await internetController.noInternetDialog(fetchStories);
         }
       },
     );
-  }
-
-  Future<void> noInternetDialog() async {
-    await Get.defaultDialog(
-        title: 'No Internet',
-        middleText: 'Please check your internet connection and try again.',
-        confirm: CustomButton(
-          title: "Retry",
-          color: ColorManager.primary,
-          textColor: ColorManager.white,
-          widthFactor: 1,
-          onPressed: () {
-            fetchStories();
-            Get.back();
-          },
-        ));
   }
 }

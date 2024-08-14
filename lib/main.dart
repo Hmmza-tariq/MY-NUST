@@ -48,7 +48,7 @@ void main() async {
   ));
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return ErrorScreen(
-      details: details,
+      details: details.exceptionAsString(),
     );
   };
 }

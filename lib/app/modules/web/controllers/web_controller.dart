@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/authentication_controller.dart';
+import 'package:nust/app/controllers/internet_controller.dart';
 import 'package:nust/app/modules/widgets/loading.dart';
 import 'package:nust/app/resources/color_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -12,6 +13,7 @@ class WebController extends GetxController {
   late WebViewController webViewController;
   var status = 0.obs;
   AuthenticationController authenticationController = Get.find();
+  InternetController internetController = Get.find();
   @override
   void onInit() {
     super.onInit();
@@ -19,10 +21,32 @@ class WebController extends GetxController {
   }
 
   Future<void> reload() async {
-    webViewController.reload();
+    if (internetController.isOnline.value) {
+      isLoading.value = true;
+      webViewController.reload();
+      isLoading.value = false;
+    } else {
+      await internetController.noInternetDialog(webViewController.reload);
+    }
+  }
+
+  void checkInternet() async {
+    internetController.isOnline.listen(
+      (isOnline) async {
+        if (isOnline) {
+          await reload();
+        } else {
+          await internetController.noInternetDialog(webViewController.reload);
+        }
+      },
+    );
   }
 
   void initializeWebView() {
+    if (!internetController.isOnline.value) {
+      internetController.noInternetDialog(reload);
+      return;
+    }
     webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(ColorManager.background1)

@@ -1,7 +1,6 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nust/app/modules/widgets/error_widget.dart';
 import 'package:nust/app/modules/widgets/loading.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../resources/color_manager.dart';
@@ -21,11 +20,13 @@ class WebView extends GetView<WebController> {
             SizedBox(
               width: Get.width,
               height: Get.height,
-              child: WebViewWidget(
-                controller: controller.webViewController,
-                gestureRecognizers: const <Factory<
-                    OneSequenceGestureRecognizer>>{},
-              ),
+              child: Obx(() => controller.internetController.isOnline.value
+                  ? WebViewWidget(
+                      controller: controller.webViewController,
+                    )
+                  : const ErrorScreen(
+                      details: "No Internet Connection",
+                    )),
             ),
             Obx(() => controller.isLoading.value
                 ? showFullPageLoading(controller.status)

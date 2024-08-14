@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
+import 'package:nust/app/modules/widgets/error_widget.dart';
 import 'package:nust/app/resources/color_manager.dart';
 import 'package:nust/app/routes/app_pages.dart';
 
@@ -189,16 +190,13 @@ Widget buildStoryContainer(
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
                 ),
-                child: Image.network(
-                  story['imageUrl']!,
-                  width: Get.width * 0.6,
-                  height: 120,
-                  fit: BoxFit.fitHeight,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.image,
-                        size: 100); // Placeholder icon
-                  },
-                ),
+                child: Image.network(story['imageUrl']!,
+                    width: Get.width * 0.6,
+                    height: 120,
+                    fit: BoxFit.fitHeight,
+                    errorBuilder: (context, error, stackTrace) => ErrorScreen(
+                          details: error.toString(),
+                        )),
               ),
             ],
           ),
