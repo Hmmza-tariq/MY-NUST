@@ -20,7 +20,7 @@ class WebView extends GetView<WebController> {
             SizedBox(
               width: Get.width,
               height: Get.height,
-              child: Obx(() => controller.internetController.isOnline.value
+              child: Obx(() => !controller.isError.value
                   ? WebViewWidget(
                       controller: controller.webViewController,
                     )

@@ -36,7 +36,7 @@ class AboutView extends GetView<AboutController> {
                     const Spacer(),
                     IconButton(
                       icon: SvgPicture.asset(
-                        AssetsManager.settings_bg1,
+                        AssetsManager.settings,
                         width: 32,
                       ),
                       onPressed: () {
