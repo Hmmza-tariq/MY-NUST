@@ -146,6 +146,48 @@ class HomeWebButton extends StatelessWidget {
   }
 }
 
+class HomeCampusButton extends StatelessWidget {
+  const HomeCampusButton({
+    super.key,
+    required this.url,
+    required this.image,
+    required this.isAsset,
+  });
+  final String url;
+  final String image;
+  final bool isAsset;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeController themeController = Get.find();
+    return InkWell(
+      onTap: () {
+        Get.toNamed(Routes.WEB, parameters: {'url': url});
+      },
+      child: Obx(() => Container(
+            padding: const EdgeInsets.all(10),
+            width: Get.width * 0.4,
+            decoration: BoxDecoration(
+              color: themeController.theme.cardTheme.color,
+              border: Border.all(color: ColorManager.primary, width: 2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: isAsset
+                ? Image.asset(
+                    image,
+                    height: 50,
+                    width: 50,
+                  )
+                : Image.network(
+                    image,
+                    height: 50,
+                    width: 50,
+                  ),
+          )),
+    );
+  }
+}
+
 Widget buildLoadingContainer(int index, int activePage) {
   return AnimatedContainer(
     duration: const Duration(milliseconds: 400),
@@ -167,6 +209,8 @@ Widget buildLoadingContainer(int index, int activePage) {
 
 Widget buildStoryContainer(
     Map<String, String?> story, int index, int activePage) {
+  String imageUrl = story['imageUrl'] ?? '';
+
   return AnimatedContainer(
     duration: const Duration(milliseconds: 400),
     width: Get.width * 0.6,
@@ -182,7 +226,7 @@ Widget buildStoryContainer(
             : Alignment.centerRight,
     child: Stack(
       children: [
-        if (story['imageUrl'] != null && story['imageUrl']!.isNotEmpty)
+        if (imageUrl != '')
           Column(
             children: [
               ClipRRect(
@@ -193,7 +237,7 @@ Widget buildStoryContainer(
                 child: Image.network(story['imageUrl']!,
                     width: Get.width * 0.6,
                     height: 120,
-                    fit: BoxFit.fitHeight,
+                    fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => ClipRRect(
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(12),
@@ -219,6 +263,22 @@ Widget buildStoryContainer(
 
 Widget buildStoryDetails(
     Map<String, String?> story, int index, int activePage) {
+  String category = story['category'] ?? '';
+  String title = story['title'] ?? '';
+  String link = story['link'] ?? '';
+
+  String campus = '';
+  try {
+    campus = link
+        .split(".edu")[0]
+        .replaceAll("https://", "")
+        .replaceAll(".", " ")
+        .toUpperCase();
+  } catch (e) {
+    campus = '';
+  }
+  category = category == '' ? 'Top $campus Stories' : category;
+
   return Container(
     padding: const EdgeInsets.all(8),
     width: Get.width * 0.58,
@@ -247,23 +307,24 @@ Widget buildStoryDetails(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                story['category']!,
+                category,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const Spacer(),
-              InkWell(
-                child: const Icon(
-                  Icons.open_in_new_rounded,
-                  color: ColorManager.black,
-                  size: 18,
+              if (link != '')
+                InkWell(
+                  child: const Icon(
+                    Icons.open_in_new_rounded,
+                    color: ColorManager.black,
+                    size: 18,
+                  ),
+                  onTap: () {
+                    Get.toNamed(Routes.WEB,
+                        parameters: {'url': story['link'].toString()});
+                  },
                 ),
-                onTap: () {
-                  Get.toNamed(Routes.WEB,
-                      parameters: {'url': story['link'].toString()});
-                },
-              ),
               const SizedBox(width: 10),
             ],
           ),
@@ -271,7 +332,7 @@ Widget buildStoryDetails(
           width: Get.width * 0.6,
           height: 80,
           child: Text(
-            story['title']!,
+            title,
             maxLines: 4,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
@@ -294,12 +355,12 @@ class HomeCampusWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final HomeController controller = Get.find();
     return Obx(() => CustomButton(
-          title: '${controller.selectedCampus.value} Campus',
+          title: '${controller.campusController.selectedCampus.value} Campus',
           color: controller.themeController.theme.scaffoldBackgroundColor,
           textColor: controller.themeController.isDarkMode.value
               ? ColorManager.white
               : ColorManager.black,
-          widthFactor: .5,
+          widthFactor: .46,
           onPressed: () => Get.defaultDialog(
             title: 'Select Campus',
             titleStyle: TextStyle(
@@ -309,7 +370,9 @@ class HomeCampusWidget extends StatelessWidget {
             backgroundColor:
                 controller.themeController.theme.scaffoldBackgroundColor,
             content: SizedBox(
-              height: (controller.campuses.length / 3).round() * (80),
+              height:
+                  (controller.campusController.campuses.length / 3).round() *
+                      (80),
               width: Get.width * 0.9,
               child: GridView(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -321,21 +384,29 @@ class HomeCampusWidget extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  ...controller.campuses.map((campus) => CustomButton(
-                      isBold: false,
-                      title: campus,
-                      onPressed: () {
-                        controller.selectedCampus.value = campus;
-                        Get.back();
-                      },
-                      color: campus == controller.selectedCampus.value
-                          ? ColorManager.primary
-                          : controller.themeController.theme.cardTheme.color!,
-                      textColor: campus == controller.selectedCampus.value
-                          ? ColorManager.white
-                          : controller.themeController.theme.appBarTheme
-                              .titleTextStyle!.color!,
-                      widthFactor: .2)),
+                  ...controller.campusController.campuses.map((campus) =>
+                      CustomButton(
+                          isBold: false,
+                          title: campus,
+                          onPressed: () {
+                            controller.campusController.selectedCampus.value =
+                                campus;
+                            controller.fetchStories();
+                            Get.back();
+                          },
+                          color: campus ==
+                                  controller
+                                      .campusController.selectedCampus.value
+                              ? ColorManager.primary
+                              : controller
+                                  .themeController.theme.cardTheme.color!,
+                          textColor: campus ==
+                                  controller
+                                      .campusController.selectedCampus.value
+                              ? ColorManager.white
+                              : controller.themeController.theme.appBarTheme
+                                  .titleTextStyle!.color!,
+                          widthFactor: .2)),
                 ],
               ),
             ),

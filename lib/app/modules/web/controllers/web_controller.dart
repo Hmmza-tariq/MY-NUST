@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/authentication_controller.dart';
 import 'package:nust/app/controllers/internet_controller.dart';
-import 'package:nust/app/modules/widgets/loading.dart';
 import 'package:nust/app/resources/color_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -46,7 +45,7 @@ class WebController extends GetxController {
             String url = request.url;
             debugPrint('url $url');
             if (shouldPreventNavigation(url)) {
-              snackbar('Navigation to $url is not allowed.');
+              // snackbar('Navigation to $url is not allowed.');
               return NavigationDecision.prevent;
             }
             return NavigationDecision.navigate;
