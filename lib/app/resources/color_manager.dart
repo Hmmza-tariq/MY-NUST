@@ -71,8 +71,8 @@ class ColorManager {
   static const Color errorDark = Color(0xFFCF6679);
 
   static final gradientColor = LinearGradient(
-    begin: Alignment.bottomCenter,
-    end: Alignment.topCenter,
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
     colors: List.generate(5, (index) => primary.withOpacity(0.1 * (index + 1))),
   );
 }

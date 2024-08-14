@@ -1,8 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:nust/app/modules/widgets/error_widget.dart';
+import 'package:nust/app/resources/assets_manager.dart';
 import 'package:nust/app/resources/color_manager.dart';
 import 'package:nust/app/routes/app_pages.dart';
 
@@ -34,7 +36,11 @@ class HomeSmallButton extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
               color: themeController.theme.cardTheme.color,
-              border: Border.all(color: ColorManager.primary, width: 2),
+              border: Border.all(
+                  color: themeController.isDarkMode.value
+                      ? ColorManager.lightestPrimary
+                      : ColorManager.darkPrimary,
+                  width: 2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
@@ -44,12 +50,19 @@ class HomeSmallButton extends StatelessWidget {
                   icon,
                   height: 30,
                   width: 50,
+                  colorFilter: ColorFilter.mode(
+                      themeController.isDarkMode.value
+                          ? ColorManager.lightestPrimary
+                          : ColorManager.darkPrimary,
+                      BlendMode.srcIn),
                 ),
                 // const SizedBox(width: 10),
                 Text(
                   title,
-                  style: const TextStyle(
-                      color: ColorManager.primary,
+                  style: TextStyle(
+                      color: themeController.isDarkMode.value
+                          ? ColorManager.lightestPrimary
+                          : ColorManager.darkPrimary,
                       fontSize: 12,
                       fontWeight: FontWeight.bold),
                 ),
@@ -82,7 +95,11 @@ class HomeLargeButton extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
               color: themeController.theme.cardTheme.color,
-              border: Border.all(color: ColorManager.primary, width: 2),
+              border: Border.all(
+                  color: themeController.isDarkMode.value
+                      ? ColorManager.lightestPrimary
+                      : ColorManager.darkPrimary,
+                  width: 2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
@@ -92,14 +109,19 @@ class HomeLargeButton extends StatelessWidget {
                   icon,
                   height: 50,
                   width: 50,
-                  colorFilter: const ColorFilter.mode(
-                      ColorManager.primary, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(
+                      themeController.isDarkMode.value
+                          ? ColorManager.lightestPrimary
+                          : ColorManager.darkPrimary,
+                      BlendMode.srcIn),
                 ),
                 const SizedBox(width: 10),
                 Text(
                   title,
-                  style: const TextStyle(
-                      color: ColorManager.primary,
+                  style: TextStyle(
+                      color: themeController.isDarkMode.value
+                          ? ColorManager.lightestPrimary
+                          : ColorManager.darkPrimary,
                       fontSize: 20,
                       fontWeight: FontWeight.bold),
                 ),
@@ -128,18 +150,25 @@ class HomeWebButton extends StatelessWidget {
       },
       child: Obx(() => Container(
             padding: const EdgeInsets.all(10),
-            width: Get.width * 0.4,
+            width: Get.width * 0.44,
             decoration: BoxDecoration(
               color: themeController.theme.cardTheme.color,
-              border: Border.all(color: ColorManager.primary, width: 2),
+              border: Border.all(
+                  color: themeController.isDarkMode.value
+                      ? ColorManager.lightestPrimary
+                      : ColorManager.darkPrimary,
+                  width: 2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: SvgPicture.asset(
               image,
               height: 50,
               width: 50,
-              colorFilter:
-                  const ColorFilter.mode(ColorManager.primary, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(
+                  themeController.isDarkMode.value
+                      ? ColorManager.lightestPrimary
+                      : ColorManager.darkPrimary,
+                  BlendMode.srcIn),
             ),
           )),
     );
@@ -160,29 +189,78 @@ class HomeCampusButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeController themeController = Get.find();
-    return InkWell(
-      onTap: () {
-        Get.toNamed(Routes.WEB, parameters: {'url': url});
-      },
-      child: Obx(() => Container(
+    final HomeController controller = Get.find();
+    return Obx(
+      () => InkWell(
+          onTap: () {
+            if (!controller.isLoading.value) {
+              Get.toNamed(Routes.WEB, parameters: {'url': url});
+            }
+          },
+          child: Container(
             padding: const EdgeInsets.all(10),
-            width: Get.width * 0.4,
+            width: Get.width * 0.44,
             decoration: BoxDecoration(
-              color: themeController.theme.cardTheme.color,
+              // color: themeController.isDarkMode.value
+              //     ? ColorManager.lightGrey2
+              //     : ColorManager.lightGrey,
+              gradient: ColorManager.gradientColor,
               border: Border.all(color: ColorManager.primary, width: 2),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: isAsset
-                ? Image.asset(
-                    image,
-                    height: 50,
-                    width: 50,
-                  )
-                : Image.network(
-                    image,
-                    height: 50,
-                    width: 50,
-                  ),
+            child: controller.isLoading.value
+                ? SizedBox(height: 50, width: 50, child: showLoading())
+                : isAsset
+                    ? Image.asset(
+                        image,
+                        height: 50,
+                        width: 50,
+                        color: themeController.isDarkMode.value
+                            ? ColorManager.white
+                            : null,
+                      )
+                    : CachedNetworkImage(
+                        imageUrl: image,
+                        height: 50,
+                        width: 50,
+                        placeholder: (context, url) => SizedBox(
+                          height: 50,
+                          width: 50,
+                          child: showLoading(),
+                        ),
+                        errorWidget: (context, url, error) => SizedBox(
+                          height: 50,
+                          width: 50,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                AssetsManager.transparentLogo,
+                                height: 40,
+                                width: 40,
+                                color: themeController.isDarkMode.value
+                                    ? ColorManager.white
+                                    : null,
+                              ),
+                              const SizedBox(width: 5),
+                              SizedBox(
+                                width: 50,
+                                child: Text(
+                                    controller
+                                        .campusController.selectedCampus.value,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: themeController.isDarkMode.value
+                                            ? ColorManager.white
+                                            : ColorManager.black,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
           )),
     );
   }
@@ -234,11 +312,13 @@ Widget buildStoryContainer(
                   topLeft: Radius.circular(12),
                   topRight: Radius.circular(12),
                 ),
-                child: Image.network(story['imageUrl']!,
+                child: CachedNetworkImage(
+                    imageUrl: story['imageUrl']!,
                     width: Get.width * 0.6,
                     height: 120,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => ClipRRect(
+                    placeholder: (context, url) => showLoading(),
+                    errorWidget: (context, url, error) => ClipRRect(
                           borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(12),
                             topRight: Radius.circular(12),

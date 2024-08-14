@@ -19,9 +19,10 @@ void main() async {
   await NotificationsService().initNotifications();
 
   Get.put(AuthenticationController());
-  Get.put(CampusController());
   Get.put(InternetController());
   Get.put(AppUpdateController());
+  Get.put(CampusController());
+
   ThemeController themeController = Get.put(ThemeController());
 
   runApp(GetMaterialApp(
