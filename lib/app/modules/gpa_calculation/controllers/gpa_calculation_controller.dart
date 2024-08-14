@@ -19,17 +19,7 @@ class GpaCalculationController extends GetxController {
     "Semester 8",
     "Summer"
   ];
-  var grades = [
-    "A",
-    "B+",
-    "B"
-        "C+",
-    "C"
-        "+",
-    "B"
-        "B+",
-    "B"
-  ];
+  var grades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
   void addSemester() {
     semesters.add(Semester(
@@ -64,4 +54,6 @@ class GpaCalculationController extends GetxController {
     //   colorText: ColorManager.white,
     // );
   }
+
+  void calculateSGPA() {}
 }
