@@ -458,6 +458,10 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
       children: [
         Expanded(
           child: TextField(
+            style: TextStyle(
+              color: controller
+                  .themeController.theme.appBarTheme.titleTextStyle?.color,
+            ),
             controller: TextEditingController(
                 text: controller.courses[index].value.name),
             decoration: InputDecoration(
