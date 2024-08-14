@@ -40,14 +40,11 @@ class HomeView extends GetView<HomeController> {
                             const HomeCampusWidget(),
                             const Spacer(),
                             IconButton(
-                              icon: const Icon(
-                                Icons.refresh_rounded,
-                                color: ColorManager.primary,
-                              ),
-                              onPressed: () {
-                                controller.fetchStories();
-                              },
-                            ),
+                                icon: const Icon(
+                                  Icons.refresh_rounded,
+                                  color: ColorManager.primary,
+                                ),
+                                onPressed: controller.fetchStories),
                           ],
                         ),
                       ),
