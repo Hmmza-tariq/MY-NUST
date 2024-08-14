@@ -127,7 +127,7 @@ class HomeWebButton extends StatelessWidget {
       },
       child: Obx(() => Container(
             padding: const EdgeInsets.all(10),
-            width: Get.width * 0.4,
+            width: 100,
             decoration: BoxDecoration(
               color: themeController.theme.cardTheme.color,
               border: Border.all(color: ColorManager.primary, width: 2),
