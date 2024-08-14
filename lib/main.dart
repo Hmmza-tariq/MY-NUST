@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:nust/app/controllers/app_update_controller.dart';
 import 'package:nust/app/controllers/authentication_controller.dart';
 import 'package:nust/app/controllers/internet_controller.dart';
-import 'package:nust/app/controllers/stories_controller.dart';
+import 'package:nust/app/controllers/campus_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:nust/app/services/notification_service.dart';
 import 'app/modules/widgets/error_widget.dart';
@@ -19,7 +19,7 @@ void main() async {
   await NotificationsService().initNotifications();
 
   Get.put(AuthenticationController());
-  Get.put(StoriesController());
+  Get.put(CampusController());
   Get.put(InternetController());
   Get.put(AppUpdateController());
   ThemeController themeController = Get.put(ThemeController());

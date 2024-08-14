@@ -28,23 +28,26 @@ class HomeView extends GetView<HomeController> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            InkWell(
-                                onTap: () => Get.toNamed(Routes.WEB,
-                                        parameters: {
-                                          'url': 'https://nust.edu.pk/'
-                                        }),
-                                child:
-                                    Image.asset(AssetsManager.logo, width: 32)),
-                            const Spacer(),
-                            const HomeCampusWidget(),
-                            const Spacer(),
                             IconButton(
+                                onPressed: () {
+                                  Get.toNamed(Routes.WEB, parameters: {
+                                    'url':
+                                        '${controller.campusController.getCampusUrl()}/downloads'
+                                  });
+                                },
+                                icon: const Icon(
+                                  Icons.download_rounded,
+                                  color: ColorManager.primary,
+                                )),
+                            const HomeCampusWidget(),
+                            IconButton(
+                                onPressed: controller.fetchStories,
                                 icon: const Icon(
                                   Icons.refresh_rounded,
                                   color: ColorManager.primary,
-                                ),
-                                onPressed: controller.fetchStories),
+                                )),
                           ],
                         ),
                       ),
@@ -52,7 +55,8 @@ class HomeView extends GetView<HomeController> {
                       Obx(() {
                         final isLoading = controller.isLoading.value;
                         final activePage = controller.activePage.value;
-                        final topStories = controller.topStories.value;
+                        final topStories =
+                            controller.campusController.topStories.value;
 
                         return SizedBox(
                           height: 240,
@@ -91,7 +95,8 @@ class HomeView extends GetView<HomeController> {
                           activeIndex: controller.activePage.value,
                           count: controller.isLoading.value
                               ? 3
-                              : controller.topStories.value.length,
+                              : controller
+                                  .campusController.topStories.value.length,
                           onDotClicked: (index) {
                             controller.pageController.animateToPage(
                               index,
@@ -140,6 +145,25 @@ class HomeView extends GetView<HomeController> {
                         HomeWebButton(
                           image: AssetsManager.qalam,
                           url: 'https://qalam.nust.edu.pk/student/profile',
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: Get.width * 0.9,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        HomeCampusButton(
+                          isAsset: true,
+                          image: AssetsManager.nustLogo,
+                          url: controller.campusController.baseUrl,
+                        ),
+                        HomeCampusButton(
+                          isAsset: false,
+                          image: controller.campusController.logo.value,
+                          url: controller.campusController.getCampusUrl(),
                         ),
                       ],
                     ),

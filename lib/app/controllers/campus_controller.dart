@@ -5,21 +5,55 @@ import 'package:get/get.dart';
 import 'package:html/parser.dart' as htmlParser;
 import 'package:html/dom.dart';
 
-class StoriesController extends GetxController {
+class CampusController extends GetxController {
   final Dio _dio = Dio();
-  final String _baseUrl = 'https://nust.edu.pk';
+  final String baseUrl = 'https://nust.edu.pk';
+  List<String> campuses = [
+    'CEME',
+    'MCS',
+    'SMME',
+    'SEECS',
+    'PNEC',
+    'NBS',
+    'SNS',
+    'CAE',
+    'NBC',
+    'SCME',
+    'MCE',
+    'IESE',
+    'NICE',
+    'IGIS',
+    'ASAB',
+    'SADA',
+    'S3H'
+  ];
+  var selectedCampus = 'CEME'.obs;
+  var logo = ''.obs;
+  Rx<List<Map<String, String?>>> topStories =
+      Rx<List<Map<String, String?>>>([]);
 
-  Future<List<Map<String, String?>>> fetchTopStories() async {
+  Future<void> fetchTopStories() async {
     try {
-      final response = await _dio.get(_baseUrl);
-      if (response.statusCode == 200) {
-        String htmlContent = response.data;
-        return parseTopStories(htmlContent);
+      List<Map<String, String?>> data = [];
+      final mainResponse = await _dio.get(baseUrl);
+      if (mainResponse.statusCode == 200) {
+        String htmlContent = mainResponse.data;
+        parseTopStories(htmlContent).forEach((element) {
+          data.add(element);
+        });
       }
+      final otherResponse = await _dio.get(getCampusUrl());
+      if (otherResponse.statusCode == 200) {
+        String htmlContent = otherResponse.data;
+        parseTopStories(htmlContent).forEach((element) {
+          data.add(element);
+        });
+        parseLogo(htmlContent);
+      }
+      topStories.value = data;
     } catch (e) {
       debugPrint('Error fetching top stories: $e');
     }
-    return [];
   }
 
   List<Map<String, String?>> parseTopStories(String htmlContent) {
@@ -64,11 +98,28 @@ class StoriesController extends GetxController {
     }
     final seenStories = <String>{};
     stories.retainWhere((story) {
-      final storyKey = '${story['title']}${story['imageUrl']}';
+      final storyKey = '${story['imageUrl']}';
       return seenStories.add(storyKey);
     });
 
     return stories;
+  }
+
+  void parseLogo(String htmlContent) {
+    try {
+      logo.value = htmlParser
+              .parse(htmlContent)
+              .querySelector('.logo-school')!
+              .attributes['src'] ??
+          '';
+      print(logo.value);
+    } catch (e) {
+      debugPrint('Error parsing logo: $e');
+    }
+  }
+
+  String getCampusUrl() {
+    return 'https://${selectedCampus.value}.${baseUrl.split("//")[1]}';
   }
 
   void debugPrintStories(List<Map<String, String?>> stories) {
