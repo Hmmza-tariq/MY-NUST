@@ -2,7 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nust/app/controllers/app_update_controller.dart';
 import 'package:nust/app/controllers/authentication_controller.dart';
+import 'package:nust/app/controllers/internet_controller.dart';
 import 'package:nust/app/controllers/stories_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:nust/app/services/notification_service.dart';
@@ -12,11 +14,16 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await NotificationsService().initNotifications();
+
   Get.put(AuthenticationController());
   Get.put(StoriesController());
+  Get.put(InternetController());
+  Get.put(AppUpdateController());
   ThemeController themeController = Get.put(ThemeController());
+
   runApp(GetMaterialApp(
     title: "My Nust",
     debugShowCheckedModeBanner: false,

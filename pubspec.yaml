@@ -1,7 +1,7 @@
 name: nust
 description: Nust unofficial Student app
 
-version: 2.0.0+22
+version: 1.0.0+22
 publish_to: none
 
 environment: 
@@ -21,12 +21,12 @@ dependencies:
   lottie: ^3.1.2
   webview_flutter: ^4.8.0
   flutter_email_sender: ^6.0.3
-  html: ^0.15.4
-  dropdown_button2: ^2.3.9
-  firebase_core: ^2.24.2
-  firebase_in_app_messaging: ^0.7.4+8
+  html: ^0.15.4 
+  firebase_core: ^2.24.2 
   firebase_messaging: ^14.7.10
-  url_launcher: ^6.3.0
+  url_launcher: ^6.3.0  
+  connectivity_plus: ^6.0.5
+  app_version_update: ^5.0.1
    
 
 dev_dependencies: 
