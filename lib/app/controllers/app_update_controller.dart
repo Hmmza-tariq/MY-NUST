@@ -52,7 +52,7 @@ class AppUpdateController extends GetxController {
         }
       });
     } catch (e) {
-      debugPrint(e.toString());
+      debugPrint("Error checking for updates");
     }
   }
 }
