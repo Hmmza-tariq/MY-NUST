@@ -17,134 +17,144 @@ class SettingsView extends GetView<SettingsController> {
         backgroundColor:
             controller.themeController.theme.scaffoldBackgroundColor,
         body: SafeArea(
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: ColorManager.primary,
-                    ),
-                    onPressed: () {
-                      Get.back();
-                    },
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    icon: SvgPicture.asset(
-                      AssetsManager.help,
-                      width: 32,
-                    ),
-                    onPressed: () {
-                      Get.toNamed(Routes.HELP);
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                ],
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: controller.themeController.theme.cardTheme.color,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.all(16.0),
-                margin: const EdgeInsets.all(32.0),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: ColorManager.gradientColor,
+            ),
+            child: SingleChildScrollView(
+              child: SizedBox(
+                height: Get.height,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text('Settings',
-                        style: TextStyle(
-                            color: controller.themeController.theme.appBarTheme
-                                .titleTextStyle!.color,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold)),
-                    Center(
-                      child: Image.asset(AssetsManager.settingsBanner,
-                          height: Get.height * 0.33),
+                    Row(
+                      children: [
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: ColorManager.primary,
+                          ),
+                          onPressed: () {
+                            Get.back();
+                          },
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          icon: SvgPicture.asset(
+                            AssetsManager.help,
+                            width: 32,
+                          ),
+                          onPressed: () {
+                            Get.toNamed(Routes.HELP);
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                    SettingSwitchButton(
-                      title: 'Dark Mode',
-                      subTitle: 'Toggle the app\'s theme',
-                      isSwitched: controller.themeController.isDarkMode,
-                      onChanged: controller.themeController.toggleTheme,
-                    ),
-                    const SizedBox(height: 20),
-                    SettingSwitchButton(
-                      title: 'Biometric Authentication',
-                      subTitle:
-                          'Secure your account with biometric authentication',
-                      isSwitched: controller.isBiometricEnabled,
-                      onChanged: controller.toggleBiometric,
-                    ),
-                    const SizedBox(height: 20),
-                    SettingSwitchButton(
-                      title: 'Autofill ID / Password',
-                      subTitle:
-                          'Automatically fill Credential fields of LMS and QALAM',
-                      isSwitched: controller.isAutofillEnabled,
-                      onChanged: controller.toggleAutofill,
-                    )
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: CustomButton(
-                  title: 'Reset Settings',
-                  color: ColorManager.primary,
-                  textColor: Colors.white,
-                  widthFactor: 1,
-                  onPressed: () => Get.defaultDialog(
-                    contentPadding: const EdgeInsets.all(16),
-                    title: 'Reset Settings',
-                    titleStyle: TextStyle(
-                        color: controller.themeController.theme.appBarTheme
-                            .titleTextStyle!.color),
-                    backgroundColor: controller
-                        .themeController.theme.scaffoldBackgroundColor,
-                    content: Text.rich(
-                      TextSpan(
-                        text: 'Are you sure you want to reset all settings?',
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: controller.themeController.theme.appBarTheme
-                                .titleTextStyle!.color),
-                        children: const [
-                          TextSpan(
-                              text: '\nThis action cannot be undone.',
+                    Container(
+                      decoration: BoxDecoration(
+                        color: controller.themeController.theme.cardTheme.color,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.all(16.0),
+                      margin: const EdgeInsets.all(32.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text('Settings',
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: ColorManager.error))
+                                  color: controller.themeController.theme
+                                      .appBarTheme.titleTextStyle!.color,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold)),
+                          Center(
+                            child: Image.asset(AssetsManager.settingsBanner,
+                                height: Get.height * 0.33),
+                          ),
+                          SettingSwitchButton(
+                            title: 'Dark Mode',
+                            subTitle: 'Toggle the app\'s theme',
+                            isSwitched: controller.themeController.isDarkMode,
+                            onChanged: controller.themeController.toggleTheme,
+                          ),
+                          const SizedBox(height: 20),
+                          SettingSwitchButton(
+                            title: 'Biometric Authentication',
+                            subTitle:
+                                'Secure your account with biometric authentication',
+                            isSwitched: controller.isBiometricEnabled,
+                            onChanged: controller.toggleBiometric,
+                          ),
+                          const SizedBox(height: 20),
+                          SettingSwitchButton(
+                            title: 'Autofill ID / Password',
+                            subTitle:
+                                'Automatically fill Credential fields of LMS and QALAM',
+                            isSwitched: controller.isAutofillEnabled,
+                            onChanged: controller.toggleAutofill,
+                          )
                         ],
                       ),
                     ),
-                    confirm: CustomButton(
-                        title: 'Reset',
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      child: CustomButton(
+                        title: 'Reset Settings',
                         color: ColorManager.primary,
-                        textColor: ColorManager.background2,
+                        textColor: Colors.white,
                         widthFactor: 1,
-                        onPressed: () {
-                          controller.resetSettings();
-                          Get.back();
-                        }),
-                    cancel: CustomButton(
-                        title: 'Cancel',
-                        color:
-                            controller.themeController.theme.cardTheme.color!,
-                        textColor: controller.themeController.theme.appBarTheme
-                            .titleTextStyle!.color!,
-                        widthFactor: 1,
-                        onPressed: () {
-                          Get.back();
-                        }),
-                  ),
+                        onPressed: () => Get.defaultDialog(
+                          contentPadding: const EdgeInsets.all(16),
+                          title: 'Reset Settings',
+                          titleStyle: TextStyle(
+                              color: controller.themeController.theme
+                                  .appBarTheme.titleTextStyle!.color),
+                          backgroundColor: controller
+                              .themeController.theme.scaffoldBackgroundColor,
+                          content: Text.rich(
+                            TextSpan(
+                              text:
+                                  'Are you sure you want to reset all settings?',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: controller.themeController.theme
+                                      .appBarTheme.titleTextStyle!.color),
+                              children: const [
+                                TextSpan(
+                                    text: '\nThis action cannot be undone.',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: ColorManager.error))
+                              ],
+                            ),
+                          ),
+                          confirm: CustomButton(
+                              title: 'Reset',
+                              color: ColorManager.primary,
+                              textColor: ColorManager.background2,
+                              widthFactor: 1,
+                              onPressed: () {
+                                controller.resetSettings();
+                                Get.back();
+                              }),
+                          cancel: CustomButton(
+                              title: 'Cancel',
+                              color: controller
+                                  .themeController.theme.cardTheme.color!,
+                              textColor: controller.themeController.theme
+                                  .appBarTheme.titleTextStyle!.color!,
+                              widthFactor: 1,
+                              onPressed: () {
+                                Get.back();
+                              }),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         )));
   }

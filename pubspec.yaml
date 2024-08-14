@@ -27,6 +27,8 @@ dependencies:
   url_launcher: ^6.3.0  
   connectivity_plus: ^6.0.5
   app_version_update: 4.0.0
+  custom_refresh_indicator: ^4.0.1
+  cached_network_image: ^3.4.1
    
 
 dev_dependencies: 

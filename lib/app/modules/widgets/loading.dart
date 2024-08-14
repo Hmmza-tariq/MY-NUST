@@ -48,6 +48,7 @@ Widget showLoading() {
     AssetsManager.loading,
     width: Get.width * 0.5,
     height: Get.width * 0.5,
+    frameRate: FrameRate.max,
   );
 }
 
