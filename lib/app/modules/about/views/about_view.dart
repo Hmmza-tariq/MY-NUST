@@ -3,6 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
 import 'package:nust/app/resources/color_manager.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../resources/assets_manager.dart';
 import '../../../routes/app_pages.dart';
@@ -24,7 +26,7 @@ class AboutView extends GetView<AboutController> {
             physics: const BouncingScrollPhysics(),
             child: SafeArea(
               child: SizedBox(
-                height: Get.height,
+                // height: Get.height,
                 child: Column(
                   children: [
                     Row(
@@ -165,7 +167,10 @@ class AboutView extends GetView<AboutController> {
                           Row(
                             children: [
                               InkWell(
-                                onTap: () {},
+                                onTap: () {
+                                  launchUrl(Uri.parse(
+                                      "https://sites.google.com/view/my-nust-terms-and-conditions/home"));
+                                },
                                 child: const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -193,7 +198,10 @@ class AboutView extends GetView<AboutController> {
                           Row(
                             children: [
                               InkWell(
-                                onTap: () {},
+                                onTap: () {
+                                  launchUrl(Uri.parse(
+                                      "https://sites.google.com/view/my-nust-terms-and-conditions/home"));
+                                },
                                 child: const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -253,7 +261,10 @@ class AboutView extends GetView<AboutController> {
                           Row(
                             children: [
                               InkWell(
-                                onTap: () {},
+                                onTap: () {
+                                  launchUrl(Uri.parse(
+                                      "https://github.com/Hmmza-tariq/My-NUST-request-"));
+                                },
                                 child: const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -286,7 +297,11 @@ class AboutView extends GetView<AboutController> {
                         textColor: ColorManager.background2,
                         widthFactor: 1,
                         margin: 32,
-                        onPressed: () {}),
+                        onPressed: () {
+                          Share.share(
+                            'Check out this cool NUST App available on PlayStore!🔥 \nDownload now: https://play.google.com/store/apps/details?id=com.hexagone.mynust&pcampaignid=web_share',
+                          );
+                        }),
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Row(
@@ -297,13 +312,19 @@ class AboutView extends GetView<AboutController> {
                               color: ColorManager.primary,
                               textColor: ColorManager.background2,
                               widthFactor: .4,
-                              onPressed: () {}),
+                              onPressed: () {
+                                launchUrl(Uri.parse(
+                                    "https://play.google.com/store/apps/details?id=com.hexagone.mynust&pcampaignid=web_share"));
+                              }),
                           CustomButton(
                               title: 'App Store',
                               color: ColorManager.primary,
                               textColor: ColorManager.background2,
                               widthFactor: .4,
-                              onPressed: () {}),
+                              onPressed: () {
+                                launchUrl(Uri.parse(
+                                    "https://apps.apple.com/us/app/my-nust/id1580134134"));
+                              }),
                         ],
                       ),
                     ),
