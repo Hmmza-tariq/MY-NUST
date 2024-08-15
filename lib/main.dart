@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/app_update_controller.dart';
 import 'package:nust/app/controllers/authentication_controller.dart';
+import 'package:nust/app/controllers/database_controller.dart';
 import 'package:nust/app/controllers/internet_controller.dart';
 import 'package:nust/app/controllers/campus_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
@@ -18,18 +19,29 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await NotificationsService().initNotifications();
 
-  Get.put(AuthenticationController());
+  DatabaseController databaseController = Get.put(DatabaseController());
+  await databaseController.initialize();
+
+  ThemeController themeController = Get.put(ThemeController());
+  AuthenticationController authenticationController =
+      Get.put(AuthenticationController());
+
   Get.put(InternetController());
   Get.put(AppUpdateController());
   Get.put(CampusController());
 
-  ThemeController themeController = Get.put(ThemeController());
+  bool authenticated = false;
+  if (authenticationController.isBiometricEnabled.value == true) {
+    authenticated = await authenticationController.authenticate();
+  } else {
+    authenticated = true;
+  }
 
   runApp(GetMaterialApp(
     title: "My Nust",
     debugShowCheckedModeBanner: false,
     theme: themeController.theme,
-    initialRoute: AppPages.INITIAL,
+    initialRoute: authenticated ? AppPages.INITIAL : AppPages.AUTHENTICATE,
     getPages: AppPages.routes,
     scrollBehavior: const MaterialScrollBehavior().copyWith(
       dragDevices: {

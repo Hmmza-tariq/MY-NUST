@@ -80,18 +80,30 @@ class SettingsView extends GetView<SettingsController> {
                           const SizedBox(height: 20),
                           SettingSwitchButton(
                             title: 'Biometric Authentication',
-                            subTitle:
-                                'Secure your account with biometric authentication',
-                            isSwitched: controller.isBiometricEnabled,
-                            onChanged: controller.toggleBiometric,
+                            subTitle: controller
+                                    .authenticationController.supportState.value
+                                ? 'Secure your account with biometric authentication'
+                                : 'Biometric authentication is not supported on this device',
+                            isSwitched: controller
+                                    .authenticationController.supportState.value
+                                ? controller
+                                    .authenticationController.isBiometricEnabled
+                                : false.obs,
+                            onChanged: controller
+                                    .authenticationController.supportState.value
+                                ? controller
+                                    .authenticationController.toggleBiometric
+                                : null,
                           ),
                           const SizedBox(height: 20),
                           SettingSwitchButton(
                             title: 'Autofill ID / Password',
                             subTitle:
                                 'Automatically fill Credential fields of LMS and QALAM',
-                            isSwitched: controller.isAutofillEnabled,
-                            onChanged: controller.toggleAutofill,
+                            isSwitched: controller
+                                .authenticationController.isAutofillEnabled,
+                            onChanged: controller
+                                .authenticationController.toggleAutofill,
                           )
                         ],
                       ),

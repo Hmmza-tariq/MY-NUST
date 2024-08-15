@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../controllers/aggregate_calculation_controller.dart';
 
 class AggregateCalculationView extends GetView<AggregateCalculationController> {
-  const AggregateCalculationView({Key? key}) : super(key: key);
+  const AggregateCalculationView({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

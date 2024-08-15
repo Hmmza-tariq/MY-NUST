@@ -1,5 +1,9 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:get/get.dart';
 
+import '../modules/Authentication/bindings/authentication_binding.dart';
+import '../modules/Authentication/views/authentication_view.dart';
 import '../modules/Help/bindings/help_binding.dart';
 import '../modules/Help/views/help_view.dart';
 import '../modules/Settings/bindings/settings_binding.dart';
@@ -20,8 +24,8 @@ part 'app_routes.dart';
 class AppPages {
   AppPages._();
 
-  // ignore: constant_identifier_names
   static const INITIAL = Routes.HOME;
+  static const AUTHENTICATE = Routes.AUTHENTICATION;
 
   static final routes = [
     GetPage(
@@ -72,5 +76,12 @@ class AppPages {
         binding: AggregateCalculationBinding(),
         transition: Transition.fadeIn,
         transitionDuration: const Duration(milliseconds: 300)),
+    GetPage(
+      name: _Paths.AUTHENTICATION,
+      page: () => const AuthenticationView(),
+      binding: AuthenticationBinding(),
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
   ];
 }
