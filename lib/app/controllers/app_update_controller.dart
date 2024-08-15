@@ -1,5 +1,6 @@
 import 'package:app_version_update/app_version_update.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/modules/widgets/custom_button.dart';
 import 'package:nust/app/resources/color_manager.dart';
@@ -7,8 +8,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 class AppUpdateController extends GetxController {
   var isUpdateAvailable = false.obs;
-  final appleId = '';
-  final playStoreId = 'com.hexagone.mynust';
+  final appleId = dotenv.env['APP_STORE_ID'];
+  final playStoreId = dotenv.env['PLAY_STORE_ID'];
 
   @override
   void onInit() {

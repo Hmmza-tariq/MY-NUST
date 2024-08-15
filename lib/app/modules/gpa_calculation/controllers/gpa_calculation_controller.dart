@@ -1,14 +1,21 @@
+import 'package:confetti/confetti.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/database_controller.dart';
 import 'package:nust/app/data/course.dart';
 import 'package:nust/app/data/semester.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
-
-import '../../../resources/color_manager.dart';
+import 'package:nust/app/resources/color_manager.dart';
+import 'package:share_files_and_screenshot_widgets/share_files_and_screenshot_widgets.dart';
 
 class GpaCalculationController extends GetxController {
   ThemeController themeController = Get.find();
   DatabaseController databaseController = Get.find();
+  ConfettiController confettiController = ConfettiController();
+  ScrollController scrollController = ScrollController();
+  GlobalKey previewContainer = GlobalKey();
+
   var isCGPA = true.obs;
   var semesters = <Rx<Semester>>[].obs;
   var courses = <Rx<Course>>[].obs;
@@ -35,8 +42,8 @@ class GpaCalculationController extends GetxController {
   void addSemester() {
     semesters.add(Semester(
       name: semesterNames[semesters.length.clamp(0, semesterNames.length - 1)],
-      credit: 0,
-      gpa: 0,
+      credit: 1,
+      gpa: 4,
     ).obs);
     saveSemesters();
   }
@@ -44,8 +51,8 @@ class GpaCalculationController extends GetxController {
   void addCourse() {
     courses.add(Course(
       name: "Course ${courses.length + 1}",
-      credit: 0,
-      gpa: 0,
+      credit: 1,
+      gpa: 4,
     ).obs);
     saveCourses();
   }
@@ -58,13 +65,7 @@ class GpaCalculationController extends GetxController {
       totalGPA += semester.value.gpa * semester.value.credit;
     }
     double cgpa = totalGPA / totalCredit;
-    Get.snackbar(
-      "CGPA",
-      cgpa.toStringAsFixed(2),
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: ColorManager.primary,
-      colorText: ColorManager.white,
-    );
+    showResult(true, cgpa);
   }
 
   void calculateSGPA() {
@@ -75,13 +76,7 @@ class GpaCalculationController extends GetxController {
       totalGPA += course.value.gpa * course.value.credit;
     }
     double sgpa = totalGPA / totalCredit;
-    Get.snackbar(
-      "SGPA",
-      sgpa.toStringAsFixed(2),
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: ColorManager.primary,
-      colorText: ColorManager.white,
-    );
+    showResult(false, sgpa);
   }
 
   void saveSemesters() {
@@ -100,5 +95,250 @@ class GpaCalculationController extends GetxController {
   void loadCourses() {
     var loadedCourses = databaseController.getCourses();
     courses.assignAll(loadedCourses.map((c) => c.obs));
+  }
+
+  String getGrade(double gpa) {
+    if (gpa >= 3.7) return 'A';
+    if (gpa >= 3.3) return 'B+';
+    if (gpa >= 3.0) return 'B';
+    if (gpa >= 2.7) return 'C+';
+    if (gpa >= 2.3) return 'C';
+    if (gpa >= 2.0) return 'D+';
+    if (gpa >= 1.7) return 'D';
+    return 'F';
+  }
+
+  void showResult(bool isCGPA, double result) async {
+    confettiController.play();
+
+    final List<Color> colors = [
+      ColorManager.cyan,
+      ColorManager.orange,
+      ColorManager.green,
+      ColorManager.pink,
+      ColorManager.warning,
+      ColorManager.primary,
+      ColorManager.secondary,
+    ];
+
+    List<PieChartSectionData> sections = [];
+    List<Widget> details = [];
+
+    if (isCGPA) {
+      for (int i = 0; i < semesters.length; i++) {
+        var semester = semesters[i];
+        sections.add(PieChartSectionData(
+          color: colors[i % colors.length],
+          value: semester.value.gpa * semester.value.credit,
+          title: semester.value.name,
+          radius: Get.width * 0.14,
+          titleStyle: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: themeController.isDarkMode.value
+                ? ColorManager.lightGrey1
+                : ColorManager.black,
+          ),
+          titlePositionPercentageOffset: 0.5,
+        ));
+        details.add(
+          ListTile(
+            leading: Icon(Icons.school, color: colors[i % colors.length]),
+            title: Text(
+              semester.value.name,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: themeController.theme.appBarTheme.titleTextStyle?.color,
+              ),
+            ),
+            subtitle: Text('GPA: ${semester.value.gpa.toStringAsFixed(2)}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color:
+                      themeController.theme.appBarTheme.titleTextStyle?.color,
+                )),
+            trailing: Text(
+              '${semester.value.credit} Credits',
+              style: TextStyle(
+                fontSize: 14,
+                color: themeController.theme.appBarTheme.titleTextStyle?.color,
+              ),
+            ),
+          ),
+        );
+      }
+    } else {
+      for (int i = 0; i < courses.length; i++) {
+        var course = courses[i];
+        sections.add(PieChartSectionData(
+          color: colors[i % colors.length],
+          value: course.value.gpa * course.value.credit,
+          title: course.value.name,
+          radius: Get.width * 0.14,
+          titleStyle: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: themeController.isDarkMode.value
+                ? ColorManager.lightGrey1
+                : ColorManager.black,
+          ),
+          titlePositionPercentageOffset: .5,
+        ));
+        details.add(
+          ListTile(
+            leading: Icon(Icons.book, color: colors[i % colors.length]),
+            title: Text(
+              course.value.name,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: themeController.theme.appBarTheme.titleTextStyle?.color,
+              ),
+            ),
+            subtitle: Text('Grade: ${getGrade(course.value.gpa)}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color:
+                      themeController.theme.appBarTheme.titleTextStyle?.color,
+                )),
+            trailing: Text(
+              '${course.value.credit} Credits',
+              style: TextStyle(
+                fontSize: 14,
+                color: themeController.theme.appBarTheme.titleTextStyle?.color,
+              ),
+            ),
+          ),
+        );
+      }
+    }
+
+    await Get.bottomSheet(
+      backgroundColor: themeController.theme.scaffoldBackgroundColor,
+      isScrollControlled: true,
+      SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: Get.height * 0.68,
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        color: themeController.isDarkMode.value
+                            ? ColorManager.lightGrey1
+                            : ColorManager.black,
+                      ),
+                      onPressed: Get.back,
+                    ),
+                    Container(
+                      width: 100,
+                      height: 4,
+                      // margin: const EdgeInsets.only(top: 8),
+                      decoration: BoxDecoration(
+                        color: themeController.isDarkMode.value
+                            ? ColorManager.lightGrey1
+                            : ColorManager.black,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.share,
+                        color: themeController.isDarkMode.value
+                            ? ColorManager.lightGrey1
+                            : ColorManager.black,
+                      ),
+                      onPressed: () async {
+                        await captureScreenShot(isCGPA ? "CGPA" : "SGPA");
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              RepaintBoundary(
+                key: previewContainer,
+                child: Container(
+                  color: themeController.theme.scaffoldBackgroundColor,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: Get.height * 0.36,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            PieChart(PieChartData(
+                              sections: sections,
+                              centerSpaceRadius: 80,
+                              sectionsSpace: 2,
+                              borderData: FlBorderData(show: false),
+                            )),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  isCGPA ? "Your CGPA" : "Your SGPA",
+                                  style: themeController
+                                      .theme.appBarTheme.titleTextStyle,
+                                ),
+                                Text(
+                                  result.toStringAsFixed(2),
+                                  style: themeController
+                                      .theme.textTheme.headlineMedium
+                                      ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: ColorManager.primary,
+                                    fontSize: 40,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Divider(
+                          color: themeController.isDarkMode.value
+                              ? ColorManager.lightGrey1
+                              : ColorManager.black,
+                        ),
+                      ),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxHeight: Get.height * 0.2,
+                        ),
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                          child: Column(
+                            children: details,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    confettiController.stop();
+  }
+
+  Future<bool> captureScreenShot(String type) async {
+    await ShareFilesAndScreenshotWidgets().shareScreenshot(
+        previewContainer, 1000, "Logo", "result.png", "image/png",
+        text:
+            "Hey! Check this out. I calculated my expected $type using 'My NUST' app.");
+    return true;
   }
 }
