@@ -19,7 +19,7 @@ class HelpView extends GetView<HelpController> {
             gradient: ColorManager.gradientColor,
           ),
           child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             child: SafeArea(
               child: SizedBox(
                 height: Get.height,

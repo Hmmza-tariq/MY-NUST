@@ -109,11 +109,13 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Add Semesters to Calculate CGPA",
+                    "Add Semester to Calculate\nCGPA",
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       color: controller.themeController.theme.appBarTheme
                           .titleTextStyle?.color,
                       fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -123,9 +125,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                     textColor: ColorManager.white,
                     widthFactor: 0.4,
                     isBold: false,
-                    onPressed: () {
-                      controller.addSemester();
-                    },
+                    onPressed: controller.addSemester,
                   ),
                 ],
               ),
@@ -148,11 +148,13 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Add Course to Calculate SGPA",
+                    "Add Course to Calculate\nSGPA",
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       color: controller.themeController.theme.appBarTheme
                           .titleTextStyle?.color,
                       fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -162,9 +164,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                     textColor: ColorManager.white,
                     widthFactor: 0.4,
                     isBold: false,
-                    onPressed: () {
-                      controller.addCourse();
-                    },
+                    onPressed: controller.addCourse,
                   ),
                 ],
               ),
@@ -253,6 +253,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
               controller.semesters[index].update((semester) {
                 semester?.name = value;
               });
+              controller.saveSemesters();
             }
           },
         ),
@@ -264,6 +265,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
           ),
           onPressed: () {
             controller.semesters.removeAt(index);
+            controller.saveSemesters();
           },
         ),
       ],
@@ -303,6 +305,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                   controller.semesters[index].update((semester) {
                     semester?.credit--;
                   });
+                  controller.saveSemesters();
                 }
               },
               child: Icon(
@@ -322,6 +325,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                   controller.semesters[index].update((semester) {
                     semester?.credit = value.toInt();
                   });
+                  controller.saveSemesters();
                 },
               ),
             ),
@@ -331,6 +335,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                   controller.semesters[index].update((semester) {
                     semester?.credit++;
                   });
+                  controller.saveSemesters();
                 }
               },
               child: Icon(
@@ -380,6 +385,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                     semester?.gpa =
                         double.parse(semester.gpa.toStringAsFixed(2));
                   });
+                  controller.saveSemesters();
                 }
               },
               child: Icon(
@@ -399,6 +405,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                   controller.semesters[index].update((semester) {
                     semester?.gpa = value;
                   });
+                  controller.saveSemesters();
                 },
               ),
             ),
@@ -410,6 +417,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                     semester?.gpa =
                         double.parse(semester.gpa.toStringAsFixed(2));
                   });
+                  controller.saveSemesters();
                 }
               },
               child: Icon(
@@ -435,9 +443,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
             textColor: ColorManager.white,
             widthFactor: 0.4,
             isBold: false,
-            onPressed: () {
-              controller.addSemester();
-            },
+            onPressed: controller.addSemester,
           ),
           const Spacer(),
           CustomButton(
@@ -478,6 +484,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
               controller.courses[index].update((course) {
                 course?.name = value;
               });
+              controller.saveCourses();
             },
           ),
         ),
@@ -489,6 +496,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
           ),
           onPressed: () {
             controller.courses.removeAt(index);
+            controller.saveCourses();
           },
         ),
       ],
@@ -528,6 +536,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                   controller.courses[index].update((course) {
                     course?.credit--;
                   });
+                  controller.saveCourses();
                 }
               },
               child: Icon(
@@ -547,6 +556,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                   controller.courses[index].update((course) {
                     course?.credit = value.toInt();
                   });
+                  controller.saveCourses();
                 },
               ),
             ),
@@ -556,6 +566,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                   controller.courses[index].update((course) {
                     course?.credit++;
                   });
+                  controller.saveCourses();
                 }
               },
               child: Icon(
@@ -608,6 +619,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                   controller.courses[index].update((course) {
                     course?.gpa = (gpa - 0.5).clamp(0.0, 4.0);
                   });
+                  controller.saveCourses();
                 }
               },
             ),
@@ -622,6 +634,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                   controller.courses[index].update((course) {
                     course?.gpa = value;
                   });
+                  controller.saveCourses();
                 },
               ),
             ),
@@ -634,6 +647,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                   controller.courses[index].update((course) {
                     course?.gpa = (gpa + 0.5).clamp(0.0, 4.0);
                   });
+                  controller.saveCourses();
                 }
               },
             ),

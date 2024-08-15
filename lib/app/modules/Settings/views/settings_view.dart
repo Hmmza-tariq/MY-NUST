@@ -22,6 +22,7 @@ class SettingsView extends GetView<SettingsController> {
               gradient: ColorManager.gradientColor,
             ),
             child: SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
               child: SizedBox(
                 height: Get.height,
                 child: Column(
