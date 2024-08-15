@@ -2,13 +2,14 @@ import 'dart:convert';
 
 import 'package:encrypt_shared_preferences/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 
 import '../data/course.dart';
 import '../data/semester.dart';
 
 class DatabaseController extends GetxController {
-  final String key = "1111111111111111";
+  final String key = dotenv.env['DATABASE_KEY'] ?? 'key';
   late EncryptedSharedPreferences sharedPref;
 
   Future<void> initialize() async {

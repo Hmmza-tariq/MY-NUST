@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 // ignore: library_prefixes
 import 'package:html/parser.dart' as htmlParser;
@@ -8,7 +9,7 @@ import 'package:nust/app/controllers/database_controller.dart';
 
 class CampusController extends GetxController {
   final Dio _dio = Dio();
-  final String baseUrl = 'https://nust.edu.pk';
+  final String baseUrl = dotenv.env['BASE_URL'] ?? '';
   List<String> campuses = [
     'CEME',
     'MCS',

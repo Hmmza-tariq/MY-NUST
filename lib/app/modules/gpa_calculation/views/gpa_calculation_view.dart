@@ -1,7 +1,9 @@
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/modules/widgets/custom_button.dart';
 import '../../../resources/color_manager.dart';
+import '../../widgets/confetti.dart';
 import '../controllers/gpa_calculation_controller.dart';
 
 class GpaCalculationView extends GetView<GpaCalculationController> {
@@ -14,14 +16,12 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
             backgroundColor:
                 controller.themeController.theme.scaffoldBackgroundColor,
             body: SafeArea(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: ColorManager.gradientColor,
-                ),
-                child: SingleChildScrollView(
-                  child: SizedBox(
-                    height: Get.height,
-                    width: Get.width,
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: ColorManager.gradientColor,
+                    ),
                     child: Column(
                       children: [
                         Row(
@@ -87,13 +87,70 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        controller.isCGPA.value
-                            ? _buildCGPASection(context)
-                            : _buildSGPASection(context),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: controller.isCGPA.value
+                                ? _buildCGPASection(context)
+                                : _buildSGPASection(context),
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                ),
+                  if ((controller.isCGPA.value &&
+                          controller.semesters.isNotEmpty) ||
+                      (!controller.isCGPA.value &&
+                          controller.courses.isNotEmpty))
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: _buildBottomButtons(),
+                    ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: ConfettiWidget(
+                      confettiController: controller.confettiController,
+                      blastDirectionality: BlastDirectionality.explosive,
+                      minBlastForce: 10,
+                      maxBlastForce: 20,
+                      numberOfParticles: 20,
+                      colors: const [
+                        ColorManager.primary,
+                        ColorManager.secondary,
+                      ],
+                      createParticlePath: drawHexagons,
+                    ),
+                  ),
+                  if ((controller.isCGPA.value &&
+                          controller.semesters.length > 2) ||
+                      (!controller.isCGPA.value &&
+                          controller.courses.length > 2))
+                    Positioned(
+                      bottom: 80,
+                      right: 0,
+                      left: 0,
+                      child: IconButton(
+                        onPressed: () {
+                          controller.scrollController.animateTo(
+                            controller
+                                .scrollController.position.maxScrollExtent,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        style: IconButton.styleFrom(
+                          shape: const CircleBorder(),
+                          backgroundColor:
+                              ColorManager.primary.withOpacity(0.4),
+                          // fixedSize: const Size(32, 32)
+                        ),
+                        icon: Icon(
+                          Icons.arrow_downward_rounded,
+                          color: ColorManager.white.withOpacity(0.6),
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           )),
@@ -132,6 +189,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
             )
           : ListView.builder(
               itemCount: controller.semesters.length,
+              controller: controller.scrollController,
               itemBuilder: (context, index) {
                 return _buildSemesterItem(index);
               },
@@ -171,6 +229,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
             )
           : ListView.builder(
               itemCount: controller.courses.length,
+              controller: controller.scrollController,
               itemBuilder: (context, index) {
                 return _buildCourseItem(index);
               },
@@ -199,7 +258,8 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                 ],
               )),
         ),
-        if (index == controller.semesters.length - 1) _buildAddSemesterButton(),
+        if (index == controller.semesters.length - 1)
+          const SizedBox(height: 100),
       ],
     );
   }
@@ -225,7 +285,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                 ],
               )),
         ),
-        if (index == controller.courses.length - 1) _buildAddCourseButton(),
+        if (index == controller.courses.length - 1) const SizedBox(height: 100),
       ],
     );
   }
@@ -301,7 +361,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
           children: [
             InkWell(
               onTap: () {
-                if (controller.semesters[index].value.credit > 0) {
+                if (controller.semesters[index].value.credit > 1) {
                   controller.semesters[index].update((semester) {
                     semester?.credit--;
                   });
@@ -317,9 +377,9 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
             Expanded(
               child: Slider(
                 value: controller.semesters[index].value.credit.toDouble(),
-                min: 0,
+                min: 1,
                 max: 21,
-                divisions: 21,
+                divisions: 20,
                 label: controller.semesters[index].value.credit.toString(),
                 onChanged: (value) {
                   controller.semesters[index].update((semester) {
@@ -379,7 +439,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
           children: [
             InkWell(
               onTap: () {
-                if (controller.semesters[index].value.gpa > 0) {
+                if (controller.semesters[index].value.gpa > .01) {
                   controller.semesters[index].update((semester) {
                     semester?.gpa -= 0.01;
                     semester?.gpa =
@@ -397,13 +457,13 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
             Expanded(
               child: Slider(
                 value: controller.semesters[index].value.gpa,
-                min: 0,
+                min: 0.01,
                 max: 4,
-                divisions: 400,
+                divisions: 399,
                 label: controller.semesters[index].value.gpa.toString(),
                 onChanged: (value) {
                   controller.semesters[index].update((semester) {
-                    semester?.gpa = value;
+                    semester?.gpa = double.parse(value.toStringAsFixed(2));
                   });
                   controller.saveSemesters();
                 },
@@ -432,33 +492,6 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
     );
   }
 
-  Widget _buildAddSemesterButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32),
-      child: Row(
-        children: [
-          CustomButton(
-            title: "Add Semester",
-            color: ColorManager.primary,
-            textColor: ColorManager.white,
-            widthFactor: 0.4,
-            isBold: false,
-            onPressed: controller.addSemester,
-          ),
-          const Spacer(),
-          CustomButton(
-            title: "Calculate",
-            color: ColorManager.primary,
-            textColor: ColorManager.white,
-            widthFactor: 0.4,
-            isBold: false,
-            onPressed: controller.calculateCGPA,
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildCourseNameField(int index) {
     return Row(
       children: [
@@ -476,9 +509,9 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                 color: controller
                     .themeController.theme.appBarTheme.titleTextStyle?.color,
               ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
             ),
             onChanged: (value) {
               controller.courses[index].update((course) {
@@ -532,7 +565,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
           children: [
             InkWell(
               onTap: () {
-                if (controller.courses[index].value.credit > 0) {
+                if (controller.courses[index].value.credit > 1) {
                   controller.courses[index].update((course) {
                     course?.credit--;
                   });
@@ -548,9 +581,9 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
             Expanded(
               child: Slider(
                 value: controller.courses[index].value.credit.toDouble(),
-                min: 0,
+                min: 1,
                 max: 6,
-                divisions: 6,
+                divisions: 5,
                 label: controller.courses[index].value.credit.toString(),
                 onChanged: (value) {
                   controller.courses[index].update((course) {
@@ -657,20 +690,32 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
     );
   }
 
-  Widget _buildAddCourseButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32),
+  Widget _buildBottomButtons() {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        gradient: ColorManager.gradientColor,
+        boxShadow: [
+          BoxShadow(
+            color: controller.themeController.isDarkMode.value
+                ? ColorManager.transparent
+                : ColorManager.shadow,
+            blurRadius: 10,
+            offset: const Offset(0, -3),
+          ),
+        ],
+      ),
       child: Row(
         children: [
           CustomButton(
-            title: "Add Course",
+            title: controller.isCGPA.value ? "Add Semester" : "Add Course",
             color: ColorManager.primary,
             textColor: ColorManager.white,
             widthFactor: 0.4,
             isBold: false,
-            onPressed: () {
-              controller.addCourse();
-            },
+            onPressed: controller.isCGPA.value
+                ? controller.addSemester
+                : controller.addCourse,
           ),
           const Spacer(),
           CustomButton(
@@ -679,7 +724,9 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
             textColor: ColorManager.white,
             widthFactor: 0.4,
             isBold: false,
-            onPressed: controller.calculateSGPA,
+            onPressed: controller.isCGPA.value
+                ? controller.calculateCGPA
+                : controller.calculateSGPA,
           ),
         ],
       ),
