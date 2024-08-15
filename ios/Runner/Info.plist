@@ -51,5 +51,8 @@
 		<dict>  
 			<key>NSAllowsArbitraryLoads</key><true/>  
 		</dict>
+		<key>NSFaceIDUsageDescription</key>
+		<string>App requires FaceID permission to authenticate user.</string>
+		 </string>
 	</dict>
 </plist>

@@ -24,7 +24,7 @@ class AboutView extends GetView<AboutController> {
             physics: const BouncingScrollPhysics(),
             child: SafeArea(
               child: SizedBox(
-                // height: Get.height,
+                height: Get.height,
                 child: Column(
                   children: [
                     Row(

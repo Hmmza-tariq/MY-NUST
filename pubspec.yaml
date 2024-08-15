@@ -29,6 +29,8 @@ dependencies:
   app_version_update: 4.0.0
   custom_refresh_indicator: ^4.0.1
   cached_network_image: ^3.4.1
+  local_auth: ^2.3.0
+  encrypt_shared_preferences: ^0.7.5
    
 
 dev_dependencies: 

@@ -107,7 +107,7 @@ class WebController extends GetxController {
       ''');
     }
 
-    if (authenticationController.autoFill) {
+    if (authenticationController.isAutofillEnabled.value) {
       autoFillLoginDetails(url);
     }
   }

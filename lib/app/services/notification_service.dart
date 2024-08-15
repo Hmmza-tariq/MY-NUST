@@ -15,7 +15,7 @@ class NotificationsService {
         debugPrint('token: $fCMToken');
       }
     } catch (e) {
-      debugPrint('error: $e');
+      debugPrint('error initializing notification: $e');
     }
   }
 }

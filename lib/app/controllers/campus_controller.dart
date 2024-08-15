@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 // ignore: library_prefixes
 import 'package:html/parser.dart' as htmlParser;
 import 'package:html/dom.dart';
+import 'package:nust/app/controllers/database_controller.dart';
 
 class CampusController extends GetxController {
   final Dio _dio = Dio();
@@ -31,6 +32,19 @@ class CampusController extends GetxController {
   var logo = ''.obs;
   Rx<List<Map<String, String?>>> topStories =
       Rx<List<Map<String, String?>>>([]);
+
+  DatabaseController databaseController = Get.find();
+
+  @override
+  void onInit() {
+    super.onInit();
+    selectedCampus.value = databaseController.getCampus();
+  }
+
+  void setCampus(String campus) {
+    selectedCampus.value = campus;
+    databaseController.setCampus(campus);
+  }
 
   Future<void> fetchTopStories() async {
     try {
@@ -112,7 +126,6 @@ class CampusController extends GetxController {
               .querySelector('.logo-school')!
               .attributes['src'] ??
           '';
-      print(logo.value);
     } catch (e) {
       debugPrint('Error parsing logo: $e');
     }
