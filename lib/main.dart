@@ -24,7 +24,7 @@ void main() async {
   Get.put(CampusController());
 
   ThemeController themeController = Get.put(ThemeController());
-//
+
   runApp(GetMaterialApp(
     title: "My Nust",
     debugShowCheckedModeBanner: false,
