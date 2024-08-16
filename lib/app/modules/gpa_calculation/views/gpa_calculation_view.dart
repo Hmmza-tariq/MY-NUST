@@ -106,7 +106,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                       child: _buildBottomButtons(),
                     ),
                   Align(
-                    alignment: Alignment.center,
+                    alignment: Alignment.topCenter,
                     child: ConfettiWidget(
                       confettiController: controller.confettiController,
                       blastDirectionality: BlastDirectionality.explosive,

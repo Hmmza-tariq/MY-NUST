@@ -130,7 +130,8 @@ class GpaCalculationController extends GetxController {
         sections.add(PieChartSectionData(
           color: colors[i % colors.length],
           value: semester.value.gpa * semester.value.credit,
-          title: semester.value.name,
+          title:
+              "${semester.value.name}\n${semester.value.gpa.toStringAsFixed(2)}",
           radius: Get.width * 0.14,
           titleStyle: TextStyle(
             fontSize: 14,
@@ -174,7 +175,7 @@ class GpaCalculationController extends GetxController {
         sections.add(PieChartSectionData(
           color: colors[i % colors.length],
           value: course.value.gpa * course.value.credit,
-          title: course.value.name,
+          title: "${course.value.name}\n${getGrade(course.value.gpa)}",
           radius: Get.width * 0.14,
           titleStyle: TextStyle(
             fontSize: 14,
@@ -263,68 +264,87 @@ class GpaCalculationController extends GetxController {
                   ],
                 ),
               ),
-              RepaintBoundary(
-                key: previewContainer,
-                child: Container(
-                  color: themeController.theme.scaffoldBackgroundColor,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: Get.height * 0.36,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            PieChart(PieChartData(
-                              sections: sections,
-                              centerSpaceRadius: 80,
-                              sectionsSpace: 2,
-                              borderData: FlBorderData(show: false),
-                            )),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  isCGPA ? "Your CGPA" : "Your SGPA",
-                                  style: themeController
-                                      .theme.appBarTheme.titleTextStyle,
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  RepaintBoundary(
+                    key: previewContainer,
+                    child: Container(
+                      color: themeController.theme.scaffoldBackgroundColor,
+                      height: Get.height * 0.36,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          PieChart(PieChartData(
+                            sections: sections,
+                            centerSpaceRadius: 80,
+                            sectionsSpace: 2,
+                            borderData: FlBorderData(show: false),
+                          )),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                isCGPA ? "Your CGPA" : "Your SGPA",
+                                style: themeController
+                                    .theme.appBarTheme.titleTextStyle,
+                              ),
+                              Text(
+                                result.toStringAsFixed(2),
+                                style: themeController
+                                    .theme.textTheme.headlineMedium
+                                    ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: ColorManager.primary,
+                                  fontSize: 40,
                                 ),
-                                Text(
-                                  result.toStringAsFixed(2),
-                                  style: themeController
-                                      .theme.textTheme.headlineMedium
-                                      ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: ColorManager.primary,
-                                    fontSize: 40,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Divider(
-                          color: themeController.isDarkMode.value
-                              ? ColorManager.lightGrey1
-                              : ColorManager.black,
-                        ),
-                      ),
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxHeight: Get.height * 0.2,
-                        ),
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                          child: Column(
-                            children: details,
+                              ),
+                            ],
                           ),
-                        ),
+                          Positioned(
+                            top: Get.height * 0.018,
+                            right: 16,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  gradient: ColorManager.gradientColor),
+                              alignment: Alignment.center,
+                              child: Text("My NUST",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: !themeController.isDarkMode.value
+                                        ? ColorManager.black
+                                        : ColorManager.white,
+                                  )),
+                            ),
+                          )
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Divider(
+                      color: themeController.isDarkMode.value
+                          ? ColorManager.lightGrey1
+                          : ColorManager.black,
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: Get.height * 0.24,
+                    ),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                      child: Column(
+                        children: details,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
