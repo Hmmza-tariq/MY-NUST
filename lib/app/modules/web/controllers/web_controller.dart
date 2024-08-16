@@ -119,7 +119,7 @@ class WebController extends GetxController {
         var password = document.getElementById('password');
         if (username && password) {
           username.value = '${authenticationController.id}';
-          password.value = '${authenticationController.pass}';
+          password.value = '${authenticationController.lmsPassword}';
         }
       ''');
     } else if (url.contains("qalam.nust.edu.pk")) {
@@ -128,7 +128,7 @@ class WebController extends GetxController {
         var password = document.getElementById('password');
         if (login && password) {
           login.value = '${authenticationController.id}';
-          password.value = '${authenticationController.pass}';
+          password.value = '${authenticationController.qalamPassword}';
         }
       ''');
     }

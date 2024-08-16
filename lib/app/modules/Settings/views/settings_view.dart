@@ -103,8 +103,157 @@ class SettingsView extends GetView<SettingsController> {
                                 'Automatically fill Credential fields of LMS and QALAM',
                             isSwitched: controller
                                 .authenticationController.isAutofillEnabled,
-                            onChanged: controller
-                                .authenticationController.toggleAutofill,
+                            onChanged: (bool value) {
+                              if (value) {
+                                TextEditingController idController =
+                                    TextEditingController(
+                                        text: controller
+                                            .authenticationController.id.value);
+                                TextEditingController lmsPasswordController =
+                                    TextEditingController(
+                                        text: controller
+                                            .authenticationController
+                                            .lmsPassword
+                                            .value);
+                                TextEditingController qalamPasswordController =
+                                    TextEditingController(
+                                        text: controller
+                                            .authenticationController
+                                            .qalamPassword
+                                            .value);
+                                Get.defaultDialog(
+                                  title: 'Add Credentials',
+                                  titleStyle: TextStyle(
+                                      color: controller.themeController.theme
+                                          .appBarTheme.titleTextStyle!.color),
+                                  backgroundColor: controller.themeController
+                                      .theme.scaffoldBackgroundColor,
+                                  content: Column(
+                                    children: [
+                                      TextField(
+                                        controller: idController,
+                                        style: TextStyle(
+                                            color: controller
+                                                .themeController
+                                                .theme
+                                                .appBarTheme
+                                                .titleTextStyle!
+                                                .color),
+                                        decoration: InputDecoration(
+                                          labelText: 'ID',
+                                          labelStyle: TextStyle(
+                                              color: controller
+                                                  .themeController
+                                                  .theme
+                                                  .appBarTheme
+                                                  .titleTextStyle!
+                                                  .color),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: controller
+                                                    .themeController
+                                                    .theme
+                                                    .appBarTheme
+                                                    .titleTextStyle!
+                                                    .color!),
+                                          ),
+                                        ),
+                                      ),
+                                      TextField(
+                                        controller: lmsPasswordController,
+                                        style: TextStyle(
+                                            color: controller
+                                                .themeController
+                                                .theme
+                                                .appBarTheme
+                                                .titleTextStyle!
+                                                .color),
+                                        decoration: InputDecoration(
+                                          labelText: 'LMS Password',
+                                          labelStyle: TextStyle(
+                                              color: controller
+                                                  .themeController
+                                                  .theme
+                                                  .appBarTheme
+                                                  .titleTextStyle!
+                                                  .color),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: controller
+                                                    .themeController
+                                                    .theme
+                                                    .appBarTheme
+                                                    .titleTextStyle!
+                                                    .color!),
+                                          ),
+                                        ),
+                                      ),
+                                      TextField(
+                                        controller: qalamPasswordController,
+                                        style: TextStyle(
+                                            color: controller
+                                                .themeController
+                                                .theme
+                                                .appBarTheme
+                                                .titleTextStyle!
+                                                .color),
+                                        decoration: InputDecoration(
+                                          labelText: 'QALAM Password',
+                                          labelStyle: TextStyle(
+                                              color: controller
+                                                  .themeController
+                                                  .theme
+                                                  .appBarTheme
+                                                  .titleTextStyle!
+                                                  .color),
+                                          focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: controller
+                                                    .themeController
+                                                    .theme
+                                                    .appBarTheme
+                                                    .titleTextStyle!
+                                                    .color!),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  confirm: CustomButton(
+                                      title: 'Save',
+                                      color: ColorManager.primary,
+                                      textColor: ColorManager.background2,
+                                      widthFactor: 1,
+                                      onPressed: () {
+                                        controller.authenticationController
+                                            .setCredentials(
+                                                idController.text,
+                                                lmsPasswordController.text,
+                                                qalamPasswordController.text);
+                                        controller.authenticationController
+                                            .isAutofillEnabled.value = true;
+                                        Get.back();
+                                      }),
+                                  cancel: CustomButton(
+                                      title: 'Cancel',
+                                      color: controller.themeController.theme
+                                          .cardTheme.color!,
+                                      textColor: controller
+                                          .themeController
+                                          .theme
+                                          .appBarTheme
+                                          .titleTextStyle!
+                                          .color!,
+                                      widthFactor: 1,
+                                      onPressed: () {
+                                        Get.back();
+                                      }),
+                                );
+                              } else {
+                                controller.authenticationController
+                                    .isAutofillEnabled.value = false;
+                              }
+                            },
                           )
                         ],
                       ),
