@@ -37,17 +37,20 @@ class AggregateCalculationView extends GetView<AggregateCalculationController> {
                         const SizedBox(width: 8),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Aggregate Calculation is coming soon!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: controller.themeController.theme.appBarTheme
-                            .titleTextStyle!.color,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                    const Spacer(),
+                    Center(
+                      child: Text(
+                        'Aggregate Calculation is coming soon!',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: controller.themeController.theme.appBarTheme
+                              .titleTextStyle!.color,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
+                    const Spacer(),
                   ],
                 ),
               ),
