@@ -10,7 +10,7 @@ class AssetsManager {
   static const String nustLogo = "$IMAGE_PATH/nust-logo.png";
   static const String error = "$IMAGE_PATH/error.png";
   static const String settingsBanner = "$IMAGE_PATH/settings.png";
-  static const String helpBanner = "$IMAGE_PATH/help.png";
+  static const String helpBanner = "$IMAGE_PATH/feedback.png";
   static const String aboutBanner = "$IMAGE_PATH/aboutUs.png";
 
   static const String lms = "$ICON_PATH/lms.svg";

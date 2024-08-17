@@ -2,21 +2,32 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/authentication_controller.dart';
 import 'package:nust/app/controllers/internet_controller.dart';
+import 'package:nust/app/modules/widgets/loading.dart';
 import 'package:nust/app/resources/color_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import '../../../controllers/download_controller.dart';
 
 class WebController extends GetxController {
   String url = Get.parameters['url'] ?? '';
   var isLoading = true.obs;
   var isError = false.obs;
+  var canPop = false.obs;
   late WebViewController webViewController;
   var status = 0.obs;
   AuthenticationController authenticationController = Get.find();
   InternetController internetController = Get.find();
+  final DownloadController downloadController = Get.put(DownloadController());
+
   @override
   void onInit() {
     super.onInit();
     initializeWebView();
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    webViewController.loadRequest(Uri.parse('about:blank'));
   }
 
   void initializeWebView() {
@@ -44,10 +55,17 @@ class WebController extends GetxController {
           onNavigationRequest: (NavigationRequest request) async {
             String url = request.url;
             debugPrint('url $url');
-            if (shouldPreventNavigation(url)) {
-              // snackbar('Navigation to $url is not allowed.');
+
+            if (await handleFileDownload(url)) {
               return NavigationDecision.prevent;
             }
+
+            if (shouldPreventNavigation(url)) {
+              debugPrint('Preventing navigation to $url');
+              snackbar('Navigation to external sites is not allowed');
+              return NavigationDecision.prevent;
+            }
+
             return NavigationDecision.navigate;
           },
         ),
@@ -60,9 +78,22 @@ class WebController extends GetxController {
       internetController.noInternetDialog(reload);
     } else {
       webViewController.loadRequest(Uri.parse(url));
+      canPop.value = false;
     }
 
     checkInternet();
+  }
+
+  Future<bool> handleFileDownload(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (uri.path.endsWith('.pdf') ||
+        uri.path.endsWith('.docx') ||
+        uri.path.endsWith('.jpg')) {
+      debugPrint('Downloading file from $url');
+      downloadController.download(url, 0);
+      return true;
+    }
+    return false;
   }
 
   void checkInternet() {

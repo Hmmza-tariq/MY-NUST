@@ -12,166 +12,72 @@ import '../home/controllers/home_controller.dart';
 import 'custom_button.dart';
 import 'loading.dart';
 
-class HomeSmallButton extends StatelessWidget {
-  const HomeSmallButton({
+class HomeCampusWidget extends StatelessWidget {
+  const HomeCampusWidget({
     super.key,
-    required this.title,
-    required this.icon,
-    required this.page,
   });
-  final String title;
-  final String icon;
-  final String page;
-  @override
-  Widget build(BuildContext context) {
-    final ThemeController themeController = Get.find();
-    return InkWell(
-      onTap: () {
-        Get.toNamed(page);
-      },
-      child: Obx(
-        () => Container(
-            width: Get.width * 0.23,
-            height: 70,
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            decoration: BoxDecoration(
-              color: themeController.theme.cardTheme.color,
-              border: Border.all(
-                  color: themeController.isDarkMode.value
-                      ? ColorManager.lightestPrimary
-                      : ColorManager.darkPrimary,
-                  width: 2),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset(
-                  icon,
-                  height: 30,
-                  width: 50,
-                  colorFilter: ColorFilter.mode(
-                      themeController.isDarkMode.value
-                          ? ColorManager.lightestPrimary
-                          : ColorManager.darkPrimary,
-                      BlendMode.srcIn),
-                ),
-                // const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: TextStyle(
-                      color: themeController.isDarkMode.value
-                          ? ColorManager.lightestPrimary
-                          : ColorManager.darkPrimary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
-            )),
-      ),
-    );
-  }
-}
-
-class HomeLargeButton extends StatelessWidget {
-  const HomeLargeButton({
-    super.key,
-    required this.title,
-    required this.icon,
-    required this.page,
-  });
-  final String title;
-  final String icon;
-  final String page;
-  @override
-  Widget build(BuildContext context) {
-    final ThemeController themeController = Get.find();
-    return InkWell(
-      onTap: () {
-        Get.toNamed(page);
-      },
-      child: Obx(() => Container(
-            padding: const EdgeInsets.all(10),
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            decoration: BoxDecoration(
-              color: themeController.theme.cardTheme.color,
-              border: Border.all(
-                  color: themeController.isDarkMode.value
-                      ? ColorManager.lightestPrimary
-                      : ColorManager.darkPrimary,
-                  width: 2),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset(
-                  icon,
-                  height: 50,
-                  width: 50,
-                  colorFilter: ColorFilter.mode(
-                      themeController.isDarkMode.value
-                          ? ColorManager.lightestPrimary
-                          : ColorManager.darkPrimary,
-                      BlendMode.srcIn),
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: TextStyle(
-                      color: themeController.isDarkMode.value
-                          ? ColorManager.lightestPrimary
-                          : ColorManager.darkPrimary,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          )),
-    );
-  }
-}
-
-class HomeWebButton extends StatelessWidget {
-  const HomeWebButton({
-    super.key,
-    required this.url,
-    required this.image,
-  });
-  final String url;
-  final String image;
 
   @override
   Widget build(BuildContext context) {
-    final ThemeController themeController = Get.find();
-    return InkWell(
-      onTap: () {
-        Get.toNamed(Routes.WEB, parameters: {'url': url});
-      },
-      child: Obx(() => Container(
-            padding: const EdgeInsets.all(10),
-            width: Get.width * 0.44,
-            decoration: BoxDecoration(
-              color: themeController.theme.cardTheme.color,
-              border: Border.all(
-                  color: themeController.isDarkMode.value
-                      ? ColorManager.lightestPrimary
-                      : ColorManager.darkPrimary,
-                  width: 2),
-              borderRadius: BorderRadius.circular(10),
+    final HomeController controller = Get.find();
+    return Obx(() => CustomButton(
+          title: '${controller.campusController.selectedCampus.value} Campus',
+          color: ColorManager.primary.withOpacity(.1),
+          textColor: controller.themeController.isDarkMode.value
+              ? ColorManager.white
+              : ColorManager.black,
+          widthFactor: .46,
+          verticalPadding: 8,
+          onPressed: () => Get.defaultDialog(
+            title: 'Select Campus',
+            titleStyle: TextStyle(
+              color: controller
+                  .themeController.theme.appBarTheme.titleTextStyle!.color,
             ),
-            child: SvgPicture.asset(
-              image,
-              height: 50,
-              width: 50,
-              colorFilter: ColorFilter.mode(
-                  themeController.isDarkMode.value
-                      ? ColorManager.lightestPrimary
-                      : ColorManager.darkPrimary,
-                  BlendMode.srcIn),
+            backgroundColor:
+                controller.themeController.theme.scaffoldBackgroundColor,
+            content: SizedBox(
+              height:
+                  (controller.campusController.campuses.length / 3).round() *
+                      (80),
+              width: Get.width * 0.9,
+              child: GridView(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 1.5,
+                ),
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  ...controller.campusController.campuses.map((campus) =>
+                      CustomButton(
+                          isBold: false,
+                          title: campus,
+                          onPressed: () {
+                            controller.campusController.setCampus(campus);
+                            controller.fetchStories();
+                            Get.back();
+                          },
+                          color: campus ==
+                                  controller
+                                      .campusController.selectedCampus.value
+                              ? ColorManager.primary
+                              : controller
+                                  .themeController.theme.cardTheme.color!,
+                          textColor: campus ==
+                                  controller
+                                      .campusController.selectedCampus.value
+                              ? ColorManager.white
+                              : controller.themeController.theme.appBarTheme
+                                  .titleTextStyle!.color!,
+                          widthFactor: .2)),
+                ],
+              ),
             ),
-          )),
-    );
+          ),
+        ));
   }
 }
 
@@ -205,7 +111,7 @@ class HomeCampusButton extends StatelessWidget {
               //     ? ColorManager.lightGrey2
               //     : ColorManager.lightGrey,
               gradient: ColorManager.gradientColor,
-              border: Border.all(color: ColorManager.primary, width: 2),
+              border: Border.all(color: ColorManager.darkPrimary, width: 2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: controller.isLoading.value
@@ -463,70 +369,165 @@ class BuildStoryDetails extends StatelessWidget {
   }
 }
 
-class HomeCampusWidget extends StatelessWidget {
-  const HomeCampusWidget({
+class HomeWebButton extends StatelessWidget {
+  const HomeWebButton({
     super.key,
+    required this.url,
+    required this.image,
   });
+  final String url;
+  final String image;
 
   @override
   Widget build(BuildContext context) {
-    final HomeController controller = Get.find();
-    return Obx(() => CustomButton(
-          title: '${controller.campusController.selectedCampus.value} Campus',
-          color: controller.themeController.theme.scaffoldBackgroundColor,
-          textColor: controller.themeController.isDarkMode.value
-              ? ColorManager.white
-              : ColorManager.black,
-          widthFactor: .46,
-          onPressed: () => Get.defaultDialog(
-            title: 'Select Campus',
-            titleStyle: TextStyle(
-              color: controller
-                  .themeController.theme.appBarTheme.titleTextStyle!.color,
+    final ThemeController themeController = Get.find();
+    return InkWell(
+      onTap: () {
+        Get.toNamed(Routes.WEB, parameters: {'url': url});
+      },
+      child: Obx(() => Container(
+            padding: const EdgeInsets.all(10),
+            width: Get.width * 0.44,
+            decoration: BoxDecoration(
+              color: themeController.theme.cardTheme.color,
+              border: Border.all(
+                  color: themeController.isDarkMode.value
+                      ? ColorManager.lightPrimary
+                      : ColorManager.darkPrimary,
+                  width: 2),
+              borderRadius: BorderRadius.circular(10),
             ),
-            backgroundColor:
-                controller.themeController.theme.scaffoldBackgroundColor,
-            content: SizedBox(
-              height:
-                  (controller.campusController.campuses.length / 3).round() *
-                      (80),
-              width: Get.width * 0.9,
-              child: GridView(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 1.5,
+            child: SvgPicture.asset(
+              image,
+              height: 50,
+              width: 50,
+              colorFilter: ColorFilter.mode(
+                  themeController.isDarkMode.value
+                      ? ColorManager.lightPrimary
+                      : ColorManager.darkPrimary,
+                  BlendMode.srcIn),
+            ),
+          )),
+    );
+  }
+}
+
+class HomeSmallButton extends StatelessWidget {
+  const HomeSmallButton({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.page,
+  });
+  final String title;
+  final String icon;
+  final String page;
+  @override
+  Widget build(BuildContext context) {
+    final ThemeController themeController = Get.find();
+    return InkWell(
+      onTap: () {
+        Get.toNamed(page);
+      },
+      child: Obx(
+        () => Container(
+            width: Get.width * 0.23,
+            height: 70,
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              color: themeController.theme.cardTheme.color,
+              border: Border.all(
+                  color: themeController.isDarkMode.value
+                      ? ColorManager.lightPrimary
+                      : ColorManager.darkPrimary,
+                  width: 2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  icon,
+                  height: 30,
+                  width: 50,
+                  colorFilter: ColorFilter.mode(
+                      themeController.isDarkMode.value
+                          ? ColorManager.lightPrimary
+                          : ColorManager.darkPrimary,
+                      BlendMode.srcIn),
                 ),
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  ...controller.campusController.campuses.map((campus) =>
-                      CustomButton(
-                          isBold: false,
-                          title: campus,
-                          onPressed: () {
-                            controller.campusController.setCampus(campus);
-                            controller.fetchStories();
-                            Get.back();
-                          },
-                          color: campus ==
-                                  controller
-                                      .campusController.selectedCampus.value
-                              ? ColorManager.primary
-                              : controller
-                                  .themeController.theme.cardTheme.color!,
-                          textColor: campus ==
-                                  controller
-                                      .campusController.selectedCampus.value
-                              ? ColorManager.white
-                              : controller.themeController.theme.appBarTheme
-                                  .titleTextStyle!.color!,
-                          widthFactor: .2)),
-                ],
-              ),
+                // const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                      color: themeController.isDarkMode.value
+                          ? ColorManager.lightPrimary
+                          : ColorManager.darkPrimary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            )),
+      ),
+    );
+  }
+}
+
+class HomeLargeButton extends StatelessWidget {
+  const HomeLargeButton({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.page,
+  });
+  final String title;
+  final String icon;
+  final String page;
+  @override
+  Widget build(BuildContext context) {
+    final ThemeController themeController = Get.find();
+    return InkWell(
+      onTap: () {
+        Get.toNamed(page);
+      },
+      child: Obx(() => Container(
+            padding: const EdgeInsets.all(10),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              color: themeController.theme.cardTheme.color,
+              border: Border.all(
+                  color: themeController.isDarkMode.value
+                      ? ColorManager.lightPrimary
+                      : ColorManager.darkPrimary,
+                  width: 2),
+              borderRadius: BorderRadius.circular(10),
             ),
-          ),
-        ));
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  icon,
+                  height: 50,
+                  width: 50,
+                  colorFilter: ColorFilter.mode(
+                      themeController.isDarkMode.value
+                          ? ColorManager.lightPrimary
+                          : ColorManager.darkPrimary,
+                      BlendMode.srcIn),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                      color: themeController.isDarkMode.value
+                          ? ColorManager.lightPrimary
+                          : ColorManager.darkPrimary,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          )),
+    );
   }
 }

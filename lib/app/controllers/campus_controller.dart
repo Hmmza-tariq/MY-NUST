@@ -29,7 +29,7 @@ class CampusController extends GetxController {
     'SADA',
     'S3H'
   ];
-  var selectedCampus = 'CEME'.obs;
+  var selectedCampus = 'SEECS'.obs;
   var logo = ''.obs;
   Rx<List<Map<String, String?>>> topStories =
       Rx<List<Map<String, String?>>>([]);
