@@ -120,6 +120,13 @@ class HomeView extends GetView<HomeController> {
                             ),
                             itemCount: isLoading ? 3 : topStories.length,
                             itemBuilder: (context, index, realIndex) {
+                              if (!controller
+                                  .internetController.isOnline.value) {
+                                return Center(
+                                  child: BuildNoInternetContainer(
+                                      index: index, activePage: activePage),
+                                );
+                              }
                               if (isLoading) {
                                 return Center(
                                   child: BuildLoadingContainer(
