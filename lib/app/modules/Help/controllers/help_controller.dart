@@ -9,7 +9,12 @@ class HelpController extends GetxController {
   final mailController = TextEditingController();
   final messageController = TextEditingController();
   var state = "idle".obs;
-  final formKey = GlobalKey<FormState>();
+
+  // @override
+  // void onClose() {
+  //   formKey = GlobalKey<FormState>();
+  //   super.onClose();
+  // }
 
   void sendEmail() async {
     state.value = "sending";
@@ -42,6 +47,13 @@ class HelpController extends GetxController {
     }
 
     if (state.value == "success") {
+      Get.snackbar(
+        "Success",
+        "Your message has been sent successfully",
+        backgroundColor: themeController.theme.primaryColor.withOpacity(0.4),
+        colorText: themeController.theme.appBarTheme.titleTextStyle!.color!
+            .withOpacity(0.8),
+      );
       mailController.clear();
       messageController.clear();
       nameController.clear();

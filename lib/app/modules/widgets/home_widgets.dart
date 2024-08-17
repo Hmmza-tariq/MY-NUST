@@ -37,19 +37,17 @@ class HomeCampusWidget extends StatelessWidget {
             backgroundColor:
                 controller.themeController.theme.scaffoldBackgroundColor,
             content: SizedBox(
-              height:
-                  (controller.campusController.campuses.length / 3).round() *
-                      (80),
+              height: Get.height * 0.4,
               width: Get.width * 0.9,
               child: GridView(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
-                  childAspectRatio: 1.5,
+                  childAspectRatio: Get.width * .005,
                 ),
                 shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+                // physics: const NeverScrollableScrollPhysics(),
                 children: [
                   ...controller.campusController.campuses.map((campus) =>
                       CustomButton(
@@ -105,7 +103,7 @@ class HomeCampusButton extends StatelessWidget {
           },
           child: Container(
             padding: const EdgeInsets.all(10),
-            width: Get.width * 0.44,
+            width: Get.width * 0.46,
             decoration: BoxDecoration(
               // color: themeController.isDarkMode.value
               //     ? ColorManager.lightGrey2
@@ -387,7 +385,7 @@ class HomeWebButton extends StatelessWidget {
       },
       child: Obx(() => Container(
             padding: const EdgeInsets.all(10),
-            width: Get.width * 0.44,
+            width: Get.width * 0.46,
             decoration: BoxDecoration(
               color: themeController.theme.cardTheme.color,
               border: Border.all(
@@ -412,67 +410,6 @@ class HomeWebButton extends StatelessWidget {
   }
 }
 
-class HomeSmallButton extends StatelessWidget {
-  const HomeSmallButton({
-    super.key,
-    required this.title,
-    required this.icon,
-    required this.page,
-  });
-  final String title;
-  final String icon;
-  final String page;
-  @override
-  Widget build(BuildContext context) {
-    final ThemeController themeController = Get.find();
-    return InkWell(
-      onTap: () {
-        Get.toNamed(page);
-      },
-      child: Obx(
-        () => Container(
-            width: Get.width * 0.23,
-            height: 70,
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            decoration: BoxDecoration(
-              color: themeController.theme.cardTheme.color,
-              border: Border.all(
-                  color: themeController.isDarkMode.value
-                      ? ColorManager.lightPrimary
-                      : ColorManager.darkPrimary,
-                  width: 2),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset(
-                  icon,
-                  height: 30,
-                  width: 50,
-                  colorFilter: ColorFilter.mode(
-                      themeController.isDarkMode.value
-                          ? ColorManager.lightPrimary
-                          : ColorManager.darkPrimary,
-                      BlendMode.srcIn),
-                ),
-                // const SizedBox(width: 10),
-                Text(
-                  title,
-                  style: TextStyle(
-                      color: themeController.isDarkMode.value
-                          ? ColorManager.lightPrimary
-                          : ColorManager.darkPrimary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold),
-                ),
-              ],
-            )),
-      ),
-    );
-  }
-}
-
 class HomeLargeButton extends StatelessWidget {
   const HomeLargeButton({
     super.key,
@@ -492,7 +429,7 @@ class HomeLargeButton extends StatelessWidget {
       },
       child: Obx(() => Container(
             padding: const EdgeInsets.all(10),
-            margin: const EdgeInsets.symmetric(horizontal: 20),
+            width: Get.width * 0.96,
             decoration: BoxDecoration(
               color: themeController.theme.cardTheme.color,
               border: Border.all(
@@ -528,6 +465,67 @@ class HomeLargeButton extends StatelessWidget {
               ],
             ),
           )),
+    );
+  }
+}
+
+class HomeSmallButton extends StatelessWidget {
+  const HomeSmallButton({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.page,
+  });
+  final String title;
+  final String icon;
+  final String page;
+  @override
+  Widget build(BuildContext context) {
+    final ThemeController themeController = Get.find();
+    return InkWell(
+      onTap: () {
+        Get.toNamed(page);
+      },
+      child: Obx(
+        () => Container(
+            width: Get.width * 0.31,
+            height: 70,
+            // margin: const EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              color: themeController.theme.cardTheme.color,
+              border: Border.all(
+                  color: themeController.isDarkMode.value
+                      ? ColorManager.lightPrimary
+                      : ColorManager.darkPrimary,
+                  width: 2),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  icon,
+                  height: 30,
+                  width: 50,
+                  colorFilter: ColorFilter.mode(
+                      themeController.isDarkMode.value
+                          ? ColorManager.lightPrimary
+                          : ColorManager.darkPrimary,
+                      BlendMode.srcIn),
+                ),
+                // const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                      color: themeController.isDarkMode.value
+                          ? ColorManager.lightPrimary
+                          : ColorManager.darkPrimary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            )),
+      ),
     );
   }
 }
