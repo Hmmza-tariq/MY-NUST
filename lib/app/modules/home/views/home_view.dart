@@ -1,5 +1,6 @@
 import 'package:carousel_slider_plus/carousel_slider_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/resources/assets_manager.dart';
 import 'package:nust/app/routes/app_pages.dart';
@@ -58,16 +59,16 @@ class HomeView extends GetView<HomeController> {
                                           '${controller.campusController.getCampusUrl()}/downloads'
                                     });
                                   },
-                                  icon: const Icon(
-                                    Icons.download_rounded,
-                                    color: ColorManager.primary,
+                                  icon: SvgPicture.asset(
+                                    AssetsManager.download,
+                                    width: 40,
                                   )),
                               const HomeCampusWidget(),
                               IconButton(
                                   onPressed: controller.fetchStories,
-                                  icon: const Icon(
-                                    Icons.refresh_rounded,
-                                    color: ColorManager.primary,
+                                  icon: SvgPicture.asset(
+                                    AssetsManager.refresh,
+                                    width: 40,
                                   )),
                             ],
                           ),

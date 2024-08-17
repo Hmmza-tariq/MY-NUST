@@ -20,6 +20,8 @@ class AssetsManager {
   static const String settings = "$ICON_PATH/settings.svg";
   static const String help = "$ICON_PATH/help.svg";
   static const String about = "$ICON_PATH/about.svg";
+  static const String refresh = "$ICON_PATH/refresh.svg";
+  static const String download = "$ICON_PATH/download.svg";
 
   static const String loading = "$LOTTIE_PATH/loading.json";
 }

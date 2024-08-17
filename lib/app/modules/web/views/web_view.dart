@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/modules/widgets/error_widget.dart';
 import 'package:nust/app/modules/widgets/loading.dart';
+import 'package:nust/app/resources/assets_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../resources/color_manager.dart';
 import '../controllers/web_controller.dart';
@@ -56,8 +58,12 @@ class WebView extends GetView<WebController> {
                     backgroundColor: ColorManager.primary.withOpacity(0.5),
                     elevation: 0,
                     highlightElevation: 0,
-                    child: const Icon(Icons.refresh_rounded,
-                        color: ColorManager.white),
+                    child: SvgPicture.asset(
+                      AssetsManager.refresh,
+                      width: 40,
+                      colorFilter: const ColorFilter.mode(
+                          ColorManager.background2, BlendMode.srcIn),
+                    ),
                   ),
           ),
         ));
