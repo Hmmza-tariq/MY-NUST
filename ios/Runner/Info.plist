@@ -53,6 +53,24 @@
 		</dict>
 		<key>NSFaceIDUsageDescription</key>
 		<string>App requires FaceID permission to authenticate user.</string>
-		 </string>
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>fetch</string>
+			<string>remote-notification</string>
+		</array>
+		<key>FirebaseAppDelegateProxyEnabled</key>
+		<false/>
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<true/>
+		</dict>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>We need access to your photo library to save downloaded files.</string>
+		<key>NSCameraUsageDescription</key>
+		<string>We need access to your camera to take pictures.</string>
+		<key>NSDocumentsFolderUsageDescription</key>
+		<string>We need access to your files to save downloaded documents.</string>
+
 	</dict>
 </plist>

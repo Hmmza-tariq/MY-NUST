@@ -60,8 +60,9 @@ void snackbar(String message) {
   Get.snackbar(
     'Error',
     message,
-    snackPosition: SnackPosition.BOTTOM,
-    backgroundColor: ColorManager.error,
+    duration: const Duration(seconds: 1),
+    snackPosition: SnackPosition.TOP,
+    backgroundColor: ColorManager.error.withOpacity(0.8),
     colorText: ColorManager.white,
   );
 }

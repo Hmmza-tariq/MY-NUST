@@ -30,7 +30,7 @@ if (keystorePropertiesFile.exists()) {
    
 android {
     namespace = "com.hexagone.mynust"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 33
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

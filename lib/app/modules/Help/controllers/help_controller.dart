@@ -8,8 +8,11 @@ class HelpController extends GetxController {
   final nameController = TextEditingController();
   final mailController = TextEditingController();
   final messageController = TextEditingController();
+  var state = "idle".obs;
+  final formKey = GlobalKey<FormState>();
+
   void sendEmail() async {
-    bool success = false;
+    state.value = "sending";
     final emailPattern =
         RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
 
@@ -18,41 +21,34 @@ class HelpController extends GetxController {
     bool isValidMessage = messageController.text.isNotEmpty;
     bool error = !isValidEmail || !isValidMessage;
     if (error) {
-      success = false;
-      // Toast().errorToast(context, 'Invalid Email or Message');
+      state.value = "error";
+      return;
     } else {
       final Email email = Email(
         body:
             'Dear Team Hexag⬡ne,\n\nI am writing to request assistance with using My NUST.\n\n${messageController.text}\n\nBest regards,\n${nameController.text}',
         subject: 'Help needed using My NUST',
-        recipients: ['hexagone.playstore@gmail.com'],
+        recipients: ['HexagonePk@gmail.com'],
         isHTML: false,
       );
 
       try {
         await FlutterEmailSender.send(email);
-        success = true;
+        state.value = "success";
       } catch (error) {
-        success = false;
+        state.value = "error";
+        debugPrint("Error sending email: $error");
       }
     }
 
-    // setState(() {
-    //   isLoading = false;
-    //   buttonText = success ? 'Success' : 'Failed';
-    if (success) {
+    if (state.value == "success") {
       mailController.clear();
       messageController.clear();
       nameController.clear();
     }
-    // });
 
-    // Future.delayed(const Duration(seconds: 3), () {
-    //   setState(() {
-    //     error = false;
-
-    //     buttonText = 'Send';
-    //   });
-    // });
+    Future.delayed(const Duration(seconds: 3), () {
+      state.value = "idle";
+    });
   }
 }

@@ -18,14 +18,15 @@ class HelpView extends GetView<HelpController> {
           decoration: BoxDecoration(
             gradient: ColorManager.gradientColor,
           ),
+          height: Get.height,
           child: SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            child: SafeArea(
-              child: SizedBox(
-                height: Get.height,
-                child: Column(
-                  children: [
-                    Row(
+            physics: const BouncingScrollPhysics(),
+            child: Form(
+              key: controller.formKey,
+              child: Column(
+                children: [
+                  SafeArea(
+                    child: Row(
                       children: [
                         const SizedBox(width: 8),
                         IconButton(
@@ -50,109 +51,120 @@ class HelpView extends GetView<HelpController> {
                         const SizedBox(width: 8),
                       ],
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: controller.themeController.theme.cardTheme.color,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.all(16.0),
-                      margin: const EdgeInsets.all(32.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text('Help',
-                              style: TextStyle(
-                                  color: controller.themeController.theme
-                                      .appBarTheme.titleTextStyle!.color,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold)),
-                          Center(
-                              child: Image.asset(AssetsManager.helpBanner,
-                                  height: Get.height * 0.33)),
-                          Text("We're here to help you",
-                              style: TextStyle(
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: controller.themeController.theme.cardTheme.color,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.all(16.0),
+                    margin: const EdgeInsets.all(32.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text('Help',
+                            style: TextStyle(
                                 color: controller.themeController.theme
                                     .appBarTheme.titleTextStyle!.color,
-                                fontSize: 18,
-                              )),
-                          const SizedBox(height: 20),
-                          TextFormField(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold)),
+                        Center(
+                            child: Image.asset(AssetsManager.helpBanner,
+                                height: Get.height * 0.33)),
+                        Text(
+                            "Need help? Want to report a bug? Post an Ad? Request a feature? We're here to help!",
+                            textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: controller.themeController.isDarkMode.value
-                                  ? ColorManager.white
-                                  : ColorManager.black,
-                            ),
-                            decoration: const InputDecoration(
-                              labelText: 'Name (Optional)',
-                              hintText: 'Enter your name',
-                              hintStyle:
-                                  TextStyle(color: ColorManager.lightGrey),
-                              labelStyle:
-                                  TextStyle(color: ColorManager.lightGrey2),
-                              prefixIcon: Icon(
-                                Icons.person_outline,
-                                color: ColorManager.lightGrey2,
-                              ),
+                              color: controller.themeController.theme
+                                  .appBarTheme.titleTextStyle!.color,
+                              fontSize: 14,
+                            )),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: controller.nameController,
+                          style: TextStyle(
+                            color: controller.themeController.isDarkMode.value
+                                ? ColorManager.white
+                                : ColorManager.black,
+                          ),
+                          decoration: const InputDecoration(
+                            labelText: 'Name (Optional)',
+                            hintText: 'Enter your name',
+                            hintStyle: TextStyle(color: ColorManager.lightGrey),
+                            labelStyle:
+                                TextStyle(color: ColorManager.lightGrey2),
+                            prefixIcon: Icon(
+                              Icons.person_outline,
+                              color: ColorManager.lightGrey2,
                             ),
                           ),
-                          const SizedBox(height: 20),
-                          TextFormField(
-                            validator: (value) =>
-                                !GetUtils.isEmail(value.toString())
-                                    ? 'Enter a valid email'
-                                    : null,
-                            keyboardType: TextInputType.emailAddress,
-                            style: TextStyle(
-                              color: controller.themeController.isDarkMode.value
-                                  ? ColorManager.white
-                                  : ColorManager.black,
-                            ),
-                            decoration: const InputDecoration(
-                              labelText: 'Email',
-                              hintText: 'Enter your email',
-                              hintStyle:
-                                  TextStyle(color: ColorManager.lightGrey),
-                              labelStyle:
-                                  TextStyle(color: ColorManager.lightGrey2),
-                              prefixIcon: Icon(
-                                Icons.email_outlined,
-                                color: ColorManager.lightGrey2,
-                              ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: controller.mailController,
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'Email is required'
+                              : !GetUtils.isEmail(value)
+                                  ? 'Enter a valid email'
+                                  : null,
+                          keyboardType: TextInputType.emailAddress,
+                          style: TextStyle(
+                            color: controller.themeController.isDarkMode.value
+                                ? ColorManager.white
+                                : ColorManager.black,
+                          ),
+                          decoration: const InputDecoration(
+                            labelText: 'Email',
+                            hintText: 'Enter your email',
+                            hintStyle: TextStyle(color: ColorManager.lightGrey),
+                            labelStyle:
+                                TextStyle(color: ColorManager.lightGrey2),
+                            prefixIcon: Icon(
+                              Icons.email_outlined,
+                              color: ColorManager.lightGrey2,
                             ),
                           ),
-                          const SizedBox(height: 20),
-                          TextFormField(
-                            style: TextStyle(
-                              color: controller.themeController.isDarkMode.value
-                                  ? ColorManager.white
-                                  : ColorManager.black,
-                            ),
-                            decoration: const InputDecoration(
-                              labelText: 'Message',
-                              hintText: 'Enter your message',
-                              hintStyle:
-                                  TextStyle(color: ColorManager.lightGrey),
-                              labelStyle:
-                                  TextStyle(color: ColorManager.lightGrey2),
-                              prefixIcon: Icon(
-                                Icons.message_outlined,
-                                color: ColorManager.lightGrey2,
-                              ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: controller.messageController,
+                          validator: (value) => value == null || value.isEmpty
+                              ? 'Message is required'
+                              : null,
+                          style: TextStyle(
+                            color: controller.themeController.isDarkMode.value
+                                ? ColorManager.white
+                                : ColorManager.black,
+                          ),
+                          decoration: const InputDecoration(
+                            labelText: 'Message',
+                            hintText: 'Enter your message',
+                            hintStyle: TextStyle(color: ColorManager.lightGrey),
+                            labelStyle:
+                                TextStyle(color: ColorManager.lightGrey2),
+                            prefixIcon: Icon(
+                              Icons.message_outlined,
+                              color: ColorManager.lightGrey2,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    CustomButton(
-                      title: 'Send',
-                      color: ColorManager.primary,
-                      textColor: ColorManager.background2,
-                      widthFactor: 1,
-                      onPressed: controller.sendEmail,
-                      margin: 32,
-                    ),
-                  ],
-                ),
+                  ),
+                  CustomButton(
+                    title: 'Send',
+                    color: ColorManager.primary,
+                    textColor: ColorManager.background2,
+                    widthFactor: 1,
+                    onPressed: () {
+                      if (controller.formKey.currentState?.validate() ??
+                          false) {
+                        controller.sendEmail();
+                      }
+                    },
+                    margin: 32,
+                  ),
+                ],
               ),
             ),
           ),

@@ -11,41 +11,55 @@ class WebView extends GetView<WebController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ColorManager.background1,
-      body: SafeArea(
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            SizedBox(
-              width: Get.width,
-              height: Get.height,
-              child: Obx(() => !controller.isError.value
-                  ? WebViewWidget(
-                      controller: controller.webViewController,
-                    )
-                  : const ErrorScreen(
-                      details: "No Internet Connection",
-                    )),
+    return Obx(() => PopScope(
+          canPop: controller.canPop.value,
+          onPopInvokedWithResult: (pop, result) {
+            controller.webViewController.canGoBack().then((value) {
+              if (value) {
+                controller.canPop.value = true;
+                controller.webViewController.goBack();
+              } else {
+                controller.canPop.value = false;
+                Get.back();
+              }
+            });
+          },
+          child: Scaffold(
+            backgroundColor: ColorManager.background1,
+            body: SafeArea(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    width: Get.width,
+                    height: Get.height,
+                    child: !controller.isError.value
+                        ? WebViewWidget(
+                            controller: controller.webViewController,
+                          )
+                        : const ErrorScreen(
+                            details: "No Internet Connection",
+                          ),
+                  ),
+                  controller.isLoading.value
+                      ? showFullPageLoading(controller.status)
+                      : const SizedBox(),
+                ],
+              ),
             ),
-            Obx(() => controller.isLoading.value
-                ? showFullPageLoading(controller.status)
-                : const SizedBox()),
-          ],
-        ),
-      ),
-      floatingActionButton: Obx(() => controller.isLoading.value
-          ? const SizedBox()
-          : FloatingActionButton(
-              onPressed: () {
-                controller.reload();
-              },
-              backgroundColor: ColorManager.primary.withOpacity(0.5),
-              elevation: 0,
-              highlightElevation: 0,
-              child:
-                  const Icon(Icons.refresh_rounded, color: ColorManager.white),
-            )),
-    );
+            floatingActionButton: controller.isLoading.value
+                ? const SizedBox()
+                : FloatingActionButton(
+                    onPressed: () {
+                      controller.reload();
+                    },
+                    backgroundColor: ColorManager.primary.withOpacity(0.5),
+                    elevation: 0,
+                    highlightElevation: 0,
+                    child: const Icon(Icons.refresh_rounded,
+                        color: ColorManager.white),
+                  ),
+          ),
+        ));
   }
 }

@@ -11,6 +11,7 @@ class CustomButton extends StatelessWidget {
     required this.widthFactor,
     this.margin,
     this.isBold,
+    this.verticalPadding,
   });
   final String title;
   final void Function()? onPressed;
@@ -18,6 +19,7 @@ class CustomButton extends StatelessWidget {
   final Color textColor;
   final double widthFactor;
   final double? margin;
+  final double? verticalPadding;
   final bool? isBold;
   @override
   Widget build(BuildContext context) {
@@ -28,12 +30,14 @@ class CustomButton extends StatelessWidget {
           style: ElevatedButton.styleFrom(
               elevation: 0,
               backgroundColor: color,
+              shadowColor: color,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide(color: color)),
               fixedSize: Size.fromWidth(Get.width * widthFactor),
               padding: EdgeInsets.symmetric(
-                  horizontal: isBold == false ? 16 : 32, vertical: 16)),
+                  horizontal: isBold == false ? 16 : 32,
+                  vertical: verticalPadding ?? 16)),
           child: Text(title,
               style: TextStyle(
                   fontSize: isBold == false ? 14 : 18,
