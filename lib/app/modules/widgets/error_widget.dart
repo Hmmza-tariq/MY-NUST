@@ -10,10 +10,12 @@ class ErrorScreen extends StatelessWidget {
     required this.details,
     this.height,
     this.width,
+    this.roundedBorder,
   });
   final String details;
   final double? height;
   final double? width;
+  final bool? roundedBorder;
   @override
   Widget build(BuildContext context) {
     ThemeController themeController = Get.find();
@@ -21,7 +23,8 @@ class ErrorScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: themeController.theme.scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius:
+            roundedBorder == true ? BorderRadius.circular(12.0) : null,
       ),
       // padding: const EdgeInsets.all(10.0),
       // margin: const EdgeInsets.all(10.0),
@@ -37,9 +40,10 @@ class ErrorScreen extends StatelessWidget {
           if (details.isNotEmpty)
             Text(
               details,
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: themeController.theme.appBarTheme.titleTextStyle!.color,
-                fontSize: 20,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
             ),

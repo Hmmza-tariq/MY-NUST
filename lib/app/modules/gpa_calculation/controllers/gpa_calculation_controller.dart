@@ -39,6 +39,12 @@ class GpaCalculationController extends GetxController {
     loadCourses();
   }
 
+  @override
+  void onClose() {
+    scrollController.dispose();
+    super.onClose();
+  }
+
   void addSemester() {
     semesters.add(Semester(
       name: semesterNames[semesters.length.clamp(0, semesterNames.length - 1)],

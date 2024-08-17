@@ -24,9 +24,10 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                     ),
                     child: Column(
                       children: [
+                        const SizedBox(height: 16),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const SizedBox(width: 8),
                             IconButton(
                               icon: const Icon(
                                 Icons.arrow_back_ios_new_rounded,
@@ -36,55 +37,55 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                                 Get.back();
                               },
                             ),
-                            const Spacer(),
-                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.all(8.0),
+                              width: Get.width * 0.7,
+                              decoration: BoxDecoration(
+                                color: controller
+                                    .themeController.theme.cardTheme.color,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  CustomButton(
+                                    title: "CGPA",
+                                    color: controller.isCGPA.value
+                                        ? ColorManager.primary
+                                        : controller.themeController.theme
+                                            .cardTheme.color!,
+                                    textColor: !controller.isCGPA.value &&
+                                            !controller.themeController
+                                                .isDarkMode.value
+                                        ? ColorManager.black
+                                        : ColorManager.white,
+                                    widthFactor: 0.3,
+                                    onPressed: () {
+                                      controller.isCGPA.value = true;
+                                    },
+                                  ),
+                                  CustomButton(
+                                    title: "SGPA",
+                                    color: controller.isCGPA.value
+                                        ? controller.themeController.theme
+                                            .cardTheme.color!
+                                        : ColorManager.primary,
+                                    textColor: controller.isCGPA.value &&
+                                            !controller.themeController
+                                                .isDarkMode.value
+                                        ? ColorManager.black
+                                        : ColorManager.white,
+                                    widthFactor: 0.3,
+                                    onPressed: () {
+                                      controller.isCGPA.value = false;
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const IconButton(icon: SizedBox(), onPressed: null),
                           ],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(8.0),
-                          width: Get.width * 0.7,
-                          decoration: BoxDecoration(
-                            color: controller
-                                .themeController.theme.cardTheme.color,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              CustomButton(
-                                title: "CGPA",
-                                color: controller.isCGPA.value
-                                    ? ColorManager.primary
-                                    : controller
-                                        .themeController.theme.cardTheme.color!,
-                                textColor: !controller.isCGPA.value &&
-                                        !controller
-                                            .themeController.isDarkMode.value
-                                    ? ColorManager.black
-                                    : ColorManager.white,
-                                widthFactor: 0.3,
-                                onPressed: () {
-                                  controller.isCGPA.value = true;
-                                },
-                              ),
-                              CustomButton(
-                                title: "SGPA",
-                                color: controller.isCGPA.value
-                                    ? controller
-                                        .themeController.theme.cardTheme.color!
-                                    : ColorManager.primary,
-                                textColor: controller.isCGPA.value &&
-                                        !controller
-                                            .themeController.isDarkMode.value
-                                    ? ColorManager.black
-                                    : ColorManager.white,
-                                widthFactor: 0.3,
-                                onPressed: () {
-                                  controller.isCGPA.value = false;
-                                },
-                              ),
-                            ],
-                          ),
                         ),
                         const SizedBox(height: 16),
                         Expanded(

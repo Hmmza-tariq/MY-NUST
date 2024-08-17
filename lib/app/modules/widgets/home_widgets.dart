@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
+import 'package:nust/app/data/entities/lines.dart';
 import 'package:nust/app/modules/widgets/error_widget.dart';
 import 'package:nust/app/resources/assets_manager.dart';
 import 'package:nust/app/resources/color_manager.dart';
@@ -189,6 +192,57 @@ class BuildLoadingContainer extends StatelessWidget {
   }
 }
 
+class BuildNoInternetContainer extends StatelessWidget {
+  const BuildNoInternetContainer({
+    super.key,
+    required this.index,
+    required this.activePage,
+  });
+  final int index;
+  final int activePage;
+
+  @override
+  Widget build(BuildContext context) {
+    return HomeSliderItem(
+      index: index,
+      activePage: activePage,
+      child: Column(
+        children: [
+          ErrorScreen(
+            roundedBorder: true,
+            details: "No Internet Connection",
+            height: (Get.height * .2).clamp(80, 100),
+            width: Get.width * 0.6,
+          ),
+          SizedBox(
+              width: Get.width * 0.6,
+              height: index != activePage ? 50 : 80,
+              child: Text.rich(
+                TextSpan(
+                  text: index != activePage ? "" : 'Random fact:\n',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: ColorManager.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: lines[Random().nextInt(lines.length)],
+                      style: TextStyle(
+                        fontSize: index != activePage ? 10 : 14,
+                        color: ColorManager.black,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+}
+
 class BuildStoryContainer extends StatelessWidget {
   const BuildStoryContainer({
     super.key,
@@ -237,6 +291,7 @@ class BuildStoryContainer extends StatelessWidget {
                             index: index,
                             activePage: activePage,
                             child: ErrorScreen(
+                              roundedBorder: true,
                               details: "",
                               height: Get.height * .1,
                               width: Get.width * 0.6,
