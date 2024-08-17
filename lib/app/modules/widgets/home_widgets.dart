@@ -181,20 +181,9 @@ class BuildLoadingContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 400),
-      width: Get.width * 0.5,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: index == activePage ? Colors.amber : ColorManager.lightGrey,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      alignment: index == activePage
-          ? Alignment.center
-          : index > activePage
-              ? Alignment.centerLeft
-              : Alignment.centerRight,
+    return HomeSliderItem(
+      index: index,
+      activePage: activePage,
       child: showLoading(),
     );
   }
@@ -240,18 +229,16 @@ class BuildStoryContainer extends StatelessWidget {
                   ),
                   child: CachedNetworkImage(
                       imageUrl: story['imageUrl']!,
-                      width: Get.width * 0.6,
+                      width: Get.width,
                       height: 120,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => showLoading(),
-                      errorWidget: (context, url, error) => ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(12),
-                              topRight: Radius.circular(12),
-                            ),
+                      errorWidget: (context, url, error) => HomeSliderItem(
+                            index: index,
+                            activePage: activePage,
                             child: ErrorScreen(
                               details: "",
-                              height: 120,
+                              height: Get.height * .1,
                               width: Get.width * 0.6,
                             ),
                           )),
@@ -265,6 +252,38 @@ class BuildStoryContainer extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class HomeSliderItem extends StatelessWidget {
+  const HomeSliderItem({
+    super.key,
+    required this.index,
+    required this.activePage,
+    this.child,
+  });
+
+  final int index;
+  final int activePage;
+  final Widget? child;
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 400),
+      width: Get.width * 0.5,
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: index == activePage ? Colors.amber : ColorManager.lightGrey,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      alignment: index == activePage
+          ? Alignment.center
+          : index > activePage
+              ? Alignment.centerLeft
+              : Alignment.centerRight,
+      child: child,
     );
   }
 }
