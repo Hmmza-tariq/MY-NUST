@@ -301,26 +301,26 @@ class AboutView extends GetView<AboutController> {
                         'Check out this cool NUST App available on PlayStore!🔥 \nDownload now: https://play.google.com/store/apps/details?id=com.hexagone.mynust&pcampaignid=web_share',
                       );
                     }),
-                Padding(
+                Container(
                   padding: const EdgeInsets.symmetric(vertical: 16),
+                  margin: const EdgeInsets.symmetric(horizontal: 32),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       CustomButton(
                           title: 'Play Store',
                           color: ColorManager.primary,
                           textColor: ColorManager.background2,
-                          widthFactor: .45,
+                          widthFactor: .4,
                           onPressed: () {
                             launchUrl(Uri.parse(
                                 "https://play.google.com/store/apps/details?id=com.hexagone.mynust&pcampaignid=web_share"));
                           }),
-                      SizedBox(width: Get.width * 0.03),
                       CustomButton(
                           title: 'App Store',
                           color: ColorManager.primary,
                           textColor: ColorManager.background2,
-                          widthFactor: .45,
+                          widthFactor: .4,
                           onPressed: () {
                             launchUrl(Uri.parse(
                                 "https://apps.apple.com/us/app/my-nust/id1580134134"));
