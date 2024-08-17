@@ -45,10 +45,14 @@ class HomeController extends GetxController {
     }
 
     isLoading.value = true;
+    pageController.animateToPage(0);
+    activePage.value = 0;
     try {
       await campusController.fetchTopStories();
     } finally {
       isLoading.value = false;
+      pageController.animateToPage(0);
+      activePage.value = 0;
     }
   }
 }

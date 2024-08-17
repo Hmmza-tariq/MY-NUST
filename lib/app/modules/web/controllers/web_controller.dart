@@ -4,6 +4,7 @@ import 'package:nust/app/controllers/authentication_controller.dart';
 import 'package:nust/app/controllers/internet_controller.dart';
 import 'package:nust/app/modules/widgets/loading.dart';
 import 'package:nust/app/resources/color_manager.dart';
+import 'package:webview_cookie_manager/webview_cookie_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../controllers/download_controller.dart';
 
@@ -17,6 +18,7 @@ class WebController extends GetxController {
   AuthenticationController authenticationController = Get.find();
   InternetController internetController = Get.find();
   final DownloadController downloadController = Get.put(DownloadController());
+  final cookieManager = WebviewCookieManager(); // Add a cookie manager
 
   @override
   void onInit() {
@@ -42,10 +44,12 @@ class WebController extends GetxController {
           onPageStarted: (String url) {
             isLoading.value = true;
           },
-          onPageFinished: (String url) {
+          onPageFinished: (String url) async {
             isLoading.value = false;
             isError.value = false;
             runJavaScriptOnPageLoad(url);
+            final cookies = await cookieManager.getCookies(url);
+            downloadController.setCookies(cookies);
           },
           onWebResourceError: (WebResourceError error) {
             isError.value = true;
@@ -56,7 +60,7 @@ class WebController extends GetxController {
             String url = request.url;
             debugPrint('url $url');
 
-            if (await handleFileDownload(url)) {
+            if (await handleFileDownload(request)) {
               return NavigationDecision.prevent;
             }
 
@@ -84,12 +88,16 @@ class WebController extends GetxController {
     checkInternet();
   }
 
-  Future<bool> handleFileDownload(String url) async {
+  Future<bool> handleFileDownload(NavigationRequest request) async {
+    String url = request.url;
     final Uri uri = Uri.parse(url);
     if (uri.path.endsWith('.pdf') ||
         uri.path.endsWith('.docx') ||
+        uri.path.endsWith('.ppt') ||
+        uri.path.endsWith('.pptx') ||
         uri.path.endsWith('.jpg')) {
       debugPrint('Downloading file from $url');
+
       downloadController.download(url, 0);
       return true;
     }

@@ -1,54 +1,67 @@
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
+
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:get/get.dart';
-import 'package:nust/app/services/notification_service.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class DownloadController extends GetxController {
   final _progressList = <double>[].obs;
+  List<Cookie> _cookies = [];
 
-  double currentProgress(int index) {
-    if (index >= _progressList.length) {
-      _progressList
-          .addAll(List.generate(index - _progressList.length + 1, (_) => 0.0));
-    }
-    return _progressList[index];
+  final ReceivePort _port = ReceivePort();
+
+  @override
+  void onInit() {
+    super.onInit();
+    IsolateNameServer.registerPortWithName(
+        _port.sendPort, 'downloader_send_port');
+    _port.listen((dynamic data) {
+      String id = data[0];
+      int progress = data[2];
+
+      int index = _getTaskIndex(id);
+      if (index != -1) {
+        _progressList[index] = progress / 100.0;
+      }
+    });
+    FlutterDownloader.registerCallback(callback);
+  }
+
+  @override
+  void onClose() {
+    IsolateNameServer.removePortNameMapping('downloader_send_port');
+    super.onClose();
+  }
+
+  void setCookies(List<Cookie> cookies) {
+    _cookies = cookies;
   }
 
   Future<void> download(String url, int index) async {
     if (!await _requestPermission(Permission.storage)) return;
-    LocalNotificationManager notificationService = LocalNotificationManager();
 
     final fileName = url.split('/').last;
 
-    // Get the path to the "Downloads" directory
-    Directory downloadsDirectory = Directory('/storage/emulated/0/Download');
-    final filePath = '${downloadsDirectory.path}/$fileName';
-    debugPrint('File path: $filePath');
-    final dio = Dio();
+    Directory? downloadsDirectory = Platform.isAndroid
+        ? await getExternalStorageDirectory()
+        : await getApplicationDocumentsDirectory();
 
-    try {
-      await dio.download(url, filePath, onReceiveProgress: (count, total) {
-        final progress = (count / total);
-        _progressList[index] = progress;
-        notificationService.createNotification(
-            total.toInt(), (progress * 100).toInt(), index);
-      });
+    final cookieHeader =
+        _cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
 
-      notificationService.createNotification(100, 100, index,
-          completed: true, fileName: fileName);
-    } on DioException catch (e) {
-      debugPrint("DioException caught: ${e.type}, ${e.message}");
-      if (e.response != null) {
-        debugPrint("Response data: ${e.response?.data}");
-        debugPrint("Response headers: ${e.response?.headers}");
-        debugPrint("Response request: ${e.response?.requestOptions}");
-      }
-    } catch (e) {
-      debugPrint("Unexpected error: $e");
-    }
+    await FlutterDownloader.enqueue(
+      url: url,
+      headers: {'Cookie': cookieHeader},
+      savedDir: downloadsDirectory!.path,
+      fileName: fileName,
+      showNotification: true,
+      saveInPublicStorage: true,
+      openFileFromNotification: true,
+    );
   }
 
   Future<bool> _requestPermission(Permission permission) async {
@@ -66,4 +79,15 @@ class DownloadController extends GetxController {
       return result == PermissionStatus.granted;
     }
   }
+
+  int _getTaskIndex(String taskId) {
+    return -1;
+  }
+}
+
+@pragma('vm:entry-point')
+void callback(String id, int status, int progress) {
+  final SendPort send =
+      IsolateNameServer.lookupPortByName('downloader_send_port')!;
+  send.send([id, status, progress]);
 }

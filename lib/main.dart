@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/app_update_controller.dart';
 import 'package:nust/app/controllers/authentication_controller.dart';
@@ -38,6 +39,8 @@ void main() async {
   } else {
     authenticated = true;
   }
+
+  await FlutterDownloader.initialize(debug: false, ignoreSsl: true);
 
   runApp(GetMaterialApp(
     title: "My Nust",

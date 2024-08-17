@@ -36,6 +36,7 @@ class HomeView extends GetView<HomeController> {
                       ],
                     ),
             ),
+            alignment: Alignment.center,
             height: Get.height,
             child: SingleChildScrollView(
               child: Column(
