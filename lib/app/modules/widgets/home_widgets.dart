@@ -197,7 +197,7 @@ class BuildLoadingContainer extends StatelessWidget {
     return HomeSliderItem(
       index: index,
       activePage: activePage,
-      child: showLoading(),
+      child: heightLoading((Get.height * .2).clamp(80, 100)),
     );
   }
 }
@@ -216,38 +216,11 @@ class BuildNoInternetContainer extends StatelessWidget {
     return HomeSliderItem(
       index: index,
       activePage: activePage,
-      child: Column(
-        children: [
-          ErrorScreen(
-            roundedBorder: true,
-            details: "No Internet Connection",
-            height: (Get.height * .2).clamp(80, 100),
-            width: Get.width * 0.6,
-          ),
-          SizedBox(
-              width: Get.width * 0.6,
-              height: index != activePage ? 50 : 80,
-              child: Text.rich(
-                TextSpan(
-                  text: index != activePage ? "" : 'Random fact:\n',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: ColorManager.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: lines[Random().nextInt(lines.length)],
-                      style: TextStyle(
-                        fontSize: index != activePage ? 10 : 14,
-                        color: ColorManager.black,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-        ],
+      child: ErrorScreen(
+        roundedBorder: true,
+        details: "No Internet Connection",
+        height: (Get.height * .2).clamp(80, 100),
+        width: Get.width * 0.6,
       ),
     );
   }
@@ -326,12 +299,12 @@ class HomeSliderItem extends StatelessWidget {
     super.key,
     required this.index,
     required this.activePage,
-    this.child,
+    required this.child,
   });
 
   final int index;
   final int activePage;
-  final Widget? child;
+  final Widget child;
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
@@ -348,7 +321,34 @@ class HomeSliderItem extends StatelessWidget {
           : index > activePage
               ? Alignment.centerLeft
               : Alignment.centerRight,
-      child: child,
+      child: Column(
+        children: [
+          child,
+          SizedBox(
+              width: Get.width * 0.6,
+              height: index != activePage ? 50 : 80,
+              child: Text.rich(
+                TextSpan(
+                  text: index != activePage ? "" : 'Random fact:\n',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: ColorManager.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: lines[Random().nextInt(lines.length)],
+                      style: TextStyle(
+                        fontSize: index != activePage ? 10 : 14,
+                        color: ColorManager.black,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ],
+      ),
     );
   }
 }
