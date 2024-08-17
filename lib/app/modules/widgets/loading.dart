@@ -52,6 +52,14 @@ Widget showLoading() {
   );
 }
 
+Widget heightLoading(double height) {
+  return Lottie.asset(
+    AssetsManager.loading,
+    height: height,
+    frameRate: FrameRate.max,
+  );
+}
+
 void closeLoading() {
   if (Get.isDialogOpen ?? false) Get.back();
 }
