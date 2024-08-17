@@ -113,6 +113,13 @@ ThemeData getDarkTheme() {
       primarySwatch: const MaterialColor(
           ColorManager.primaryValue, ColorManager.colorSwatch),
     ),
+    primaryTextTheme: const TextTheme(
+      titleLarge: TextStyle(
+        color: ColorManager.white,
+        fontSize: AppSize.s16,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
     dividerColor: Colors.transparent,
     cardTheme: CardTheme(
       color: ColorManager.darkCard,

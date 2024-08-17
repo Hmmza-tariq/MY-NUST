@@ -11,6 +11,8 @@ class HelpView extends GetView<HelpController> {
   const HelpView({super.key});
   @override
   Widget build(BuildContext context) {
+    GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
     return Obx(() => Scaffold(
         backgroundColor:
             controller.themeController.theme.scaffoldBackgroundColor,
@@ -22,7 +24,7 @@ class HelpView extends GetView<HelpController> {
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Form(
-              key: controller.formKey,
+              key: formKey,
               child: Column(
                 children: [
                   SafeArea(
@@ -157,8 +159,7 @@ class HelpView extends GetView<HelpController> {
                     textColor: ColorManager.background2,
                     widthFactor: 1,
                     onPressed: () {
-                      if (controller.formKey.currentState?.validate() ??
-                          false) {
+                      if (formKey.currentState?.validate() ?? false) {
                         controller.sendEmail();
                       }
                     },

@@ -1,34 +1,31 @@
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:nust/app/services/notification_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class DownloadController extends GetxController {
   final _progressList = <double>[].obs;
 
   double currentProgress(int index) {
-    try {
-      return _progressList[index];
-    } catch (e) {
-      _progressList.add(0.0);
-      return 0;
+    if (index >= _progressList.length) {
+      _progressList
+          .addAll(List.generate(index - _progressList.length + 1, (_) => 0.0));
     }
+    return _progressList[index];
   }
 
   Future<void> download(String url, int index) async {
     if (!await _requestPermission(Permission.storage)) return;
-    NotificationService notificationService = NotificationService();
+    LocalNotificationManager notificationService = LocalNotificationManager();
 
     final fileName = url.split('/').last;
 
-    Directory? downloadsDirectory = Platform.isAndroid
-        ? await getExternalStorageDirectory()
-        : await getApplicationDocumentsDirectory();
-
-    final filePath = '${downloadsDirectory!.path}/$fileName';
+    // Get the path to the "Downloads" directory
+    Directory downloadsDirectory = Directory('/storage/emulated/0/Download');
+    final filePath = '${downloadsDirectory.path}/$fileName';
     debugPrint('File path: $filePath');
     final dio = Dio();
 
@@ -43,77 +40,30 @@ class DownloadController extends GetxController {
       notificationService.createNotification(100, 100, index,
           completed: true, fileName: fileName);
     } on DioException catch (e) {
-      debugPrint("Error downloading file: $e");
+      debugPrint("DioException caught: ${e.type}, ${e.message}");
+      if (e.response != null) {
+        debugPrint("Response data: ${e.response?.data}");
+        debugPrint("Response headers: ${e.response?.headers}");
+        debugPrint("Response request: ${e.response?.requestOptions}");
+      }
+    } catch (e) {
+      debugPrint("Unexpected error: $e");
     }
   }
 
   Future<bool> _requestPermission(Permission permission) async {
-    debugPrint('status: ${await permission.status}');
-    if (await permission.isGranted) {
+    final plugin = DeviceInfoPlugin();
+    final android = await plugin.androidInfo;
+
+    final storageStatus = android.version.sdkInt < 33
+        ? await Permission.storage.request()
+        : PermissionStatus.granted;
+
+    if (storageStatus == PermissionStatus.granted) {
       return true;
     } else {
-      debugPrint('Requesting permission: $permission');
       var result = await permission.request();
-      debugPrint('result: $result');
       return result == PermissionStatus.granted;
     }
-  }
-}
-
-class NotificationService {
-  static final NotificationService _notificationService =
-      NotificationService._internal();
-  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-  final AndroidInitializationSettings _androidInitializationSettings =
-      const AndroidInitializationSettings('ic_launcher');
-
-  factory NotificationService() {
-    return _notificationService;
-  }
-
-  NotificationService._internal() {
-    init();
-  }
-
-  void init() async {
-    final InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: _androidInitializationSettings,
-    );
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  }
-
-  void createNotification(int count, int progress, int id,
-      {bool completed = false, String? fileName}) {
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'progress_channel',
-      'Progress Channel',
-      channelDescription: 'Shows download progress',
-      channelShowBadge: false,
-      importance: Importance.max,
-      priority: Priority.high,
-      onlyAlertOnce: true,
-      showProgress: true,
-      maxProgress: count,
-      progress: progress,
-    );
-
-    var platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    String title =
-        completed ? 'Download Complete' : 'Downloading ${fileName ?? 'file'}';
-    String body = completed
-        ? '$fileName has been downloaded successfully.'
-        : 'Progress: $progress%';
-
-    _flutterLocalNotificationsPlugin.show(
-      id,
-      title,
-      body,
-      platformChannelSpecifics,
-      payload: completed ? fileName : null,
-    );
   }
 }

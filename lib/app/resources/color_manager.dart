@@ -63,7 +63,7 @@ class ColorManager {
   );
 
   static const Color backgroundDark = Color(0xFF1E1E1E);
-  static const Color primaryDark = Color(0xFFBB86FC);
+  static const Color primaryDark = Color(0xFF0051AA);
   static const Color darkGrey1 = Color(0xFF2A2A2A);
   static const Color darkCard = Color(0xFF333333);
   static const Color darkShadow = Color.fromARGB(100, 60, 60, 60);
