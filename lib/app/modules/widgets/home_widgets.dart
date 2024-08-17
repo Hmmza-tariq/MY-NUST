@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -10,7 +9,6 @@ import 'package:nust/app/modules/widgets/error_widget.dart';
 import 'package:nust/app/resources/assets_manager.dart';
 import 'package:nust/app/resources/color_manager.dart';
 import 'package:nust/app/routes/app_pages.dart';
-
 import '../home/controllers/home_controller.dart';
 import 'custom_button.dart';
 import 'loading.dart';
@@ -23,14 +21,26 @@ class HomeCampusWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HomeController controller = Get.find();
-    return Obx(() => CustomButton(
-          title: '${controller.campusController.selectedCampus.value} Campus',
-          color: ColorManager.primary.withOpacity(.1),
-          textColor: controller.themeController.isDarkMode.value
-              ? ColorManager.white
-              : ColorManager.black,
-          widthFactor: .46,
-          verticalPadding: 8,
+    return Obx(() => ElevatedButton(
+          style: ElevatedButton.styleFrom(
+              elevation: 0,
+              backgroundColor: ColorManager.transparent,
+              shadowColor: ColorManager.primary.withOpacity(.1),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(
+                    color: ColorManager.primary.withOpacity(.5), width: 2),
+              ),
+              fixedSize: Size.fromWidth(Get.width * .46),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8)),
+          child: Text(
+              "${controller.campusController.selectedCampus.value} Campus",
+              style: TextStyle(
+                  fontSize: 18,
+                  color: controller.themeController.isDarkMode.value
+                      ? ColorManager.white
+                      : ColorManager.black,
+                  fontWeight: FontWeight.bold)),
           onPressed: () => Get.defaultDialog(
             title: 'Select Campus',
             titleStyle: TextStyle(
