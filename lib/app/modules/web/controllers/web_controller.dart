@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/authentication_controller.dart';
 import 'package:nust/app/controllers/internet_controller.dart';
+import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:nust/app/modules/widgets/loading.dart';
 import 'package:nust/app/resources/color_manager.dart';
 import 'package:webview_cookie_manager/webview_cookie_manager.dart';
@@ -19,17 +20,11 @@ class WebController extends GetxController {
   InternetController internetController = Get.find();
   final DownloadController downloadController = Get.put(DownloadController());
   final cookieManager = WebviewCookieManager(); // Add a cookie manager
-
+  ThemeController themeController = Get.find();
   @override
   void onInit() {
     super.onInit();
     initializeWebView();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-    webViewController.loadRequest(Uri.parse('about:blank'));
   }
 
   void initializeWebView() {
@@ -58,7 +53,6 @@ class WebController extends GetxController {
           },
           onNavigationRequest: (NavigationRequest request) async {
             String url = request.url;
-            debugPrint('url $url');
 
             if (await handleFileDownload(request)) {
               return NavigationDecision.prevent;
@@ -94,11 +88,19 @@ class WebController extends GetxController {
     if (uri.path.endsWith('.pdf') ||
         uri.path.endsWith('.docx') ||
         uri.path.endsWith('.ppt') ||
+        uri.path.endsWith('.jpg') ||
+        uri.path.endsWith('.jpeg') ||
+        uri.path.endsWith('.png') ||
         uri.path.endsWith('.pptx') ||
         uri.path.endsWith('.jpg')) {
-      debugPrint('Downloading file from $url');
-
+      Get.snackbar(
+        "Downloading",
+        "${url.split('/').last} is being downloaded",
+        backgroundColor: ColorManager.primary.withOpacity(0.4),
+        colorText: ColorManager.secondary,
+      );
       downloadController.download(url, 0);
+
       return true;
     }
     return false;
