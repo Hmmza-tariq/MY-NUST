@@ -43,6 +43,7 @@ dependencies:
   device_info_plus: ^10.1.2
   flutter_downloader: ^1.11.8
   webview_cookie_manager: ^2.0.6
+  background_downloader: ^8.5.3
    
 
 dev_dependencies: 
