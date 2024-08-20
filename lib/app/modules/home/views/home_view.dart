@@ -127,19 +127,19 @@ class HomeView extends GetView<HomeController> {
                                   child: BuildNoInternetContainer(
                                       index: index, activePage: activePage),
                                 );
-                              }
-                              if (isLoading) {
+                              } else if (isLoading) {
                                 return Center(
                                   child: BuildLoadingContainer(
                                       index: index, activePage: activePage),
                                 );
+                              } else {
+                                final story = topStories[index];
+                                return BuildStoryContainer(
+                                    isLast: index == topStories.length - 1,
+                                    story: story,
+                                    index: index,
+                                    activePage: activePage);
                               }
-
-                              final story = topStories[index];
-                              return BuildStoryContainer(
-                                  story: story,
-                                  index: index,
-                                  activePage: activePage);
                             },
                           ),
                         );

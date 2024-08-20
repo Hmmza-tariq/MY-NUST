@@ -29,7 +29,7 @@ class HomeCampusWidget extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
                 side: BorderSide(
-                    color: ColorManager.primary.withOpacity(.5), width: 2),
+                    color: ColorManager.primary.withOpacity(1), width: 2),
               ),
               fixedSize: Size.fromWidth(Get.width * .46),
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8)),
@@ -232,11 +232,12 @@ class BuildStoryContainer extends StatelessWidget {
     required this.story,
     required this.index,
     required this.activePage,
+    required this.isLast,
   });
   final Map<String, String?> story;
   final int index;
   final int activePage;
-
+  final bool isLast;
   @override
   Widget build(BuildContext context) {
     String imageUrl = story['imageUrl'] ?? '';
@@ -254,42 +255,156 @@ class BuildStoryContainer extends StatelessWidget {
           : index > activePage
               ? Alignment.centerLeft
               : Alignment.centerRight,
-      child: Stack(
-        children: [
-          if (imageUrl != '')
-            Column(
+      child: isLast
+          ? Stack(
               children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
-                  child: CachedNetworkImage(
-                      imageUrl: story['imageUrl']!,
+                Column(
+                  children: [
+                    SizedBox(
                       width: Get.width,
                       height: 120,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => showLoading(),
-                      errorWidget: (context, url, error) => HomeSliderItem(
-                            index: index,
-                            activePage: activePage,
-                            child: ErrorScreen(
-                              roundedBorder: true,
-                              details: "",
-                              height: Get.height * .1,
-                              width: Get.width * 0.6,
+                      child: Row(
+                        children: [
+                          Image.asset(
+                            AssetsManager.logo,
+                            width: Get.width * 0.25,
+                            fit: BoxFit.fitHeight,
+                          ),
+                          const Spacer(),
+                          Image.asset(
+                            AssetsManager.hexagone,
+                            width: Get.width * 0.25,
+                            fit: BoxFit.fitHeight,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                Positioned(
+                  bottom: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    width: Get.width * 0.58,
+                    height: activePage == index ? 120 : 100,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          ColorManager.transparent,
+                          ColorManager.background2.withOpacity(.5),
+                          ColorManager.background1.withOpacity(.5),
+                        ],
+                      ),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(12),
+                        bottomRight: Radius.circular(12),
+                      ),
+                    ),
+                    alignment: Alignment.bottomCenter,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (activePage == index)
+                          const Text.rich(
+                            TextSpan(
+                              text: "My NUST",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: " a one stop solution for NUSTians!\n",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                                TextSpan(
+                                    text: "\nWant to post something?",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.normal,
+                                    )),
+                                TextSpan(
+                                  text: " Contact us!",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
-                          )),
+                          ),
+
+                        // Row(
+                        //   mainAxisSize: MainAxisSize.min,
+                        //   children: [
+                        //     const Text(
+                        //       "My NUST",
+                        //       style: TextStyle(
+                        //         fontWeight: FontWeight.bold,
+                        //       ),
+                        //     ),
+                        //     const Spacer(),
+                        //     InkWell(
+                        //       child: const Icon(
+                        //         Icons.open_in_new_rounded,
+                        //         color: ColorManager.black,
+                        //         size: 18,
+                        //       ),
+                        //       onTap: () {
+                        //         Get.toNamed(Routes.HELP);
+                        //       },
+                        //     ),
+                        //     const SizedBox(width: 10),
+                        //   ],
+                        // ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            )
+          : Stack(
+              children: [
+                if (imageUrl != '')
+                  Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          topRight: Radius.circular(12),
+                        ),
+                        child: CachedNetworkImage(
+                            imageUrl: story['imageUrl']!,
+                            width: Get.width,
+                            height: 120,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => showLoading(),
+                            errorWidget: (context, url, error) =>
+                                HomeSliderItem(
+                                  index: index,
+                                  activePage: activePage,
+                                  child: ErrorScreen(
+                                    roundedBorder: true,
+                                    details: "",
+                                    height: Get.height * .1,
+                                    width: Get.width * 0.6,
+                                  ),
+                                )),
+                      ),
+                    ],
+                  ),
+                Positioned(
+                  bottom: 0,
+                  child: BuildStoryDetails(
+                      story: story, index: index, activePage: activePage),
                 ),
               ],
             ),
-          Positioned(
-            bottom: 0,
-            child: BuildStoryDetails(
-                story: story, index: index, activePage: activePage),
-          ),
-        ],
-      ),
     );
   }
 }
