@@ -344,17 +344,6 @@ class BuildStoryContainer extends StatelessWidget {
                           ],
                         ),
                       ),
-                      // (activePage == index)
-                      //     ? CustomButton(
-                      //         title: "Contact Us",
-                      //         color: ColorManager.transparent,
-                      //         textColor: ColorManager.black,
-                      //         // isBold: false,
-                      //         widthFactor: .6,
-                      //         verticalPadding: 2,
-                      //         onPressed: () => Get.toNamed(Routes.HELP),
-                      //       )
-                      //     : const SizedBox(),
                       (activePage == index)
                           ? TextButton(
                               style: TextButton.styleFrom(
