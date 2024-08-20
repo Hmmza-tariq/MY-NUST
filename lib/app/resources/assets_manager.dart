@@ -6,6 +6,7 @@ const String LOTTIE_PATH = "assets/lottie";
 
 class AssetsManager {
   static const String logo = "$IMAGE_PATH/appLogo.png";
+  static const String hexagone = "$IMAGE_PATH/Hexagone.png";
   static const String transparentLogo = "$IMAGE_PATH/transparent.png";
   static const String nustLogo = "$IMAGE_PATH/nust-logo.png";
   static const String error = "$IMAGE_PATH/error.png";

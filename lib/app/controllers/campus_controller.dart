@@ -65,7 +65,15 @@ class CampusController extends GetxController {
         });
         parseLogo(htmlContent);
       }
+      data.add({
+        'title': 'NUST News',
+        'category': 'NUST',
+        'imageUrl': 'assets/images/nust_logo.png',
+        'link': baseUrl,
+      });
+      debugPrint('Fetched stories');
       topStories.value = data;
+      return;
     } catch (e) {
       debugPrint('Error fetching top stories: $e');
     }

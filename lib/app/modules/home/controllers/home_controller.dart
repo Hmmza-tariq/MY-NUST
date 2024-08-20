@@ -30,22 +30,30 @@ class HomeController extends GetxController {
   }
 
   void checkInternet() {
-    internetController.isOnline.listen((isOnline) {
-      if (isOnline) {
-        fetchStories();
-      } else {
-        internetController.noInternetDialog(fetchStories);
-      }
-    });
+    if (internetController.isOnline.value) {
+      fetchStories();
+    } else {
+      internetController.isOnline.listen((isOnline) {
+        if (isOnline) {
+          fetchStories();
+        } else {
+          internetController.noInternetDialog(fetchStories);
+        }
+      });
+    }
   }
 
-  Future<void> fetchStories() async {
+  void fetchStories() async {
     if (!internetController.isOnline.value) {
       return internetController.noInternetDialog(fetchStories);
     }
+    print('Fetching stories');
 
     isLoading.value = true;
-    pageController.animateToPage(0);
+
+    Future.delayed(const Duration(milliseconds: 300), () {
+      pageController.animateToPage(0);
+    });
     activePage.value = 0;
     try {
       await campusController.fetchTopStories();
