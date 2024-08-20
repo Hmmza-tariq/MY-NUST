@@ -35,6 +35,7 @@ class DownloadControllerAndroid extends GetxController {
   @override
   void onClose() {
     IsolateNameServer.removePortNameMapping('downloader_send_port');
+    // FlutterDownloader.re
     super.onClose();
   }
 
@@ -112,6 +113,12 @@ class DownloadControllerIOS extends GetxController {
     _initDownloader();
   }
 
+  @override
+  void onClose() {
+    bd.FileDownloader().destroy();
+    super.onClose();
+  }
+
   void _initDownloader() {
     bd.FileDownloader().trackTasks();
 
@@ -139,16 +146,11 @@ class DownloadControllerIOS extends GetxController {
 
     final fileName = url.split('/').last;
 
-    Directory? downloadsDirectory = await getDownloadsDirectory();
-
-    if (downloadsDirectory == null) {
-      debugPrint('Could not access the Downloads directory');
-      return;
-    }
+    Directory? downloadsDirectory = await getApplicationDocumentsDirectory();
 
     final cookieHeader =
         _cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
-    debugPrint('downloading: $fileName');
+    debugPrint('downloading: $fileName directory: ${downloadsDirectory.path}');
 
     final task = bd.DownloadTask(
       url: url,
@@ -161,7 +163,12 @@ class DownloadControllerIOS extends GetxController {
 
     _progressList.add(0.0);
     _taskIndexMap[task.taskId] = index;
-
+    bd.FileDownloader().configureNotification(
+        running: bd.TaskNotification('Downloading', 'file: $fileName'),
+        complete: bd.TaskNotification('Download complete', 'file: $fileName'),
+        error: bd.TaskNotification('Download failed', 'file: $fileName'),
+        paused: bd.TaskNotification('Download paused', 'file: $fileName'),
+        progressBar: true);
     await bd.FileDownloader().download(
       task,
       onProgress: (progress) {
@@ -176,30 +183,25 @@ class DownloadControllerIOS extends GetxController {
         //     "File: $fileName, progress: ${_progressList[index]}");
       },
     );
-    bd.FileDownloader().configureNotification(
-        running: bd.TaskNotification('Downloading', 'file: $fileName'),
-        complete: bd.TaskNotification('Download complete', 'file: $fileName'),
-        error: bd.TaskNotification('Download failed', 'file: $fileName'),
-        paused: bd.TaskNotification('Download paused', 'file: $fileName'),
-        progressBar: true);
   }
 
   Future<bool> _requestPermission() async {
-    var permissionType = bd.PermissionType.notifications;
-    var status = await bd.FileDownloader().permissions.status(permissionType);
-    if (status != bd.PermissionStatus.granted) {
-      status = await bd.FileDownloader().permissions.request(permissionType);
-      debugPrint('Permission for $permissionType was $status');
+    var notificationPermission = await bd.FileDownloader()
+        .permissions
+        .status(bd.PermissionType.notifications);
+    if (notificationPermission != bd.PermissionStatus.granted) {
+      notificationPermission = await bd.FileDownloader()
+          .permissions
+          .request(bd.PermissionType.notifications);
     }
 
-    permissionType = bd.PermissionType.iosAddToPhotoLibrary;
-    status = await bd.FileDownloader().permissions.status(permissionType);
-    if (status != bd.PermissionStatus.granted) {
-      status = await bd.FileDownloader().permissions.request(permissionType);
-      debugPrint('Permission for $permissionType was $status');
+    print('notification permission: $notificationPermission');
+    var storageStatus = await ph.Permission.storage.status;
+    if (storageStatus != ph.PermissionStatus.granted) {
+      storageStatus = await ph.Permission.storage.request();
     }
 
-    return status == bd.PermissionStatus.granted;
+    return storageStatus.isGranted;
   }
 
   int _getTaskIndex(String taskId) {

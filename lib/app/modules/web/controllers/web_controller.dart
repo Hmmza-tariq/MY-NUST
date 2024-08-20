@@ -32,6 +32,12 @@ class WebController extends GetxController {
     initializeWebView();
   }
 
+  @override
+  void onClose() {
+    super.onClose();
+    downloadControllerIOS.dispose();
+  }
+
   void initializeWebView() {
     webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
