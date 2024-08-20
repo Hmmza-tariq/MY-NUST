@@ -71,6 +71,13 @@
 		<string>We need access to your camera to take pictures.</string>
 		<key>NSDocumentsFolderUsageDescription</key>
 		<string>We need access to your files to save downloaded documents.</string>
-
+		<key>UISupportsDocumentBrowser</key>
+		<true/>
+		<key>LSSupportsOpeningDocumentsInPlace</key>
+		<true/>
+		<key>UIFileSharingEnabled</key>
+		<true/>
+		<key>FDAllFilesDownloadedMessage</key>
+		<string>File(s) have been downloaded</string>
 	</dict>
 </plist>

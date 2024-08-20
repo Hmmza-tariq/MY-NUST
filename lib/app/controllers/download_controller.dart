@@ -3,6 +3,7 @@ import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
@@ -52,6 +53,7 @@ class DownloadController extends GetxController {
 
     final cookieHeader =
         _cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
+    debugPrint('downloading: $fileName');
 
     await FlutterDownloader.enqueue(
       url: url,
@@ -61,17 +63,27 @@ class DownloadController extends GetxController {
       showNotification: true,
       saveInPublicStorage: true,
       openFileFromNotification: true,
-    );
+    ).then((id) {
+      print('downloaded $id');
+      // if (id != null) FlutterDownloader.open(taskId: id);
+    });
   }
 
   Future<bool> _requestPermission(Permission permission) async {
     final plugin = DeviceInfoPlugin();
-    final android = await plugin.androidInfo;
-
-    final storageStatus = android.version.sdkInt < 33
-        ? await Permission.storage.request()
-        : PermissionStatus.granted;
-
+    late PermissionStatus storageStatus;
+    if (Platform.isIOS) {
+      storageStatus = await permission.request();
+    } else {
+      final android = await plugin.androidInfo;
+      storageStatus = android.version.sdkInt < 33
+          ? await Permission.storage.request()
+          : PermissionStatus.granted;
+    }
+    print("notification permission: ${await Permission.notification.status}");
+    if (await Permission.notification.status == PermissionStatus.denied) {
+      await Permission.notification.request();
+    }
     if (storageStatus == PermissionStatus.granted) {
       return true;
     } else {
