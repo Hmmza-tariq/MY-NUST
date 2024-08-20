@@ -386,8 +386,7 @@ void addCredentials(SettingsController controller) {
                   idController.text,
                   lmsPasswordController.text,
                   qalamPasswordController.text);
-              controller.authenticationController.isAutofillEnabled.value =
-                  true;
+              controller.authenticationController.toggleAutofill(true);
               Get.back();
             })),
     cancel: Obx(() => CustomButton(
