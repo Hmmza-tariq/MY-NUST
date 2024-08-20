@@ -71,7 +71,6 @@ class CampusController extends GetxController {
         'imageUrl': 'assets/images/nust_logo.png',
         'link': baseUrl,
       });
-      debugPrint('Fetched stories');
       topStories.value = data;
       return;
     } catch (e) {

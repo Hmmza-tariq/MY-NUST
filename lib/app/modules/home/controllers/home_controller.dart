@@ -47,7 +47,6 @@ class HomeController extends GetxController {
     if (!internetController.isOnline.value) {
       return internetController.noInternetDialog(fetchStories);
     }
-    print('Fetching stories');
 
     isLoading.value = true;
 
