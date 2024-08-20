@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/authentication_controller.dart';
@@ -18,8 +20,11 @@ class WebController extends GetxController {
   var status = 0.obs;
   AuthenticationController authenticationController = Get.find();
   InternetController internetController = Get.find();
-  final DownloadController downloadController = Get.put(DownloadController());
-  final cookieManager = WebviewCookieManager(); // Add a cookie manager
+  final DownloadControllerAndroid downloadControllerAndroid =
+      Get.put(DownloadControllerAndroid());
+  final DownloadControllerIOS downloadControllerIOS =
+      Get.put(DownloadControllerIOS());
+  final cookieManager = WebviewCookieManager();
   ThemeController themeController = Get.find();
   @override
   void onInit() {
@@ -44,7 +49,8 @@ class WebController extends GetxController {
             isError.value = false;
             runJavaScriptOnPageLoad(url);
             final cookies = await cookieManager.getCookies(url);
-            downloadController.setCookies(cookies);
+            downloadControllerAndroid.setCookies(cookies);
+            downloadControllerIOS.setCookies(cookies);
           },
           onWebResourceError: (WebResourceError error) {
             isError.value = true;
@@ -93,14 +99,17 @@ class WebController extends GetxController {
         uri.path.endsWith('.png') ||
         uri.path.endsWith('.pptx') ||
         uri.path.endsWith('.jpg')) {
-      Get.snackbar(
-        "Downloading",
-        "${url.split('/').last} is being downloaded",
-        backgroundColor: ColorManager.primary.withOpacity(0.4),
-        colorText: ColorManager.secondary,
-      );
-      downloadController.download(url, 0);
-
+      // Get.snackbar(
+      //   "Downloading",
+      //   "${url.split('/').last} is being downloaded",
+      //   backgroundColor: ColorManager.primary.withOpacity(0.4),
+      //   colorText: ColorManager.secondary,
+      // );
+      if (Platform.isAndroid) {
+        downloadControllerAndroid.download(url, 0);
+      } else {
+        downloadControllerIOS.download(url, 0);
+      }
       return true;
     }
     return false;
