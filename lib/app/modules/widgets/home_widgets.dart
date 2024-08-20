@@ -256,116 +256,100 @@ class BuildStoryContainer extends StatelessWidget {
               ? Alignment.centerLeft
               : Alignment.centerRight,
       child: isLast
-          ? Stack(
+          ? Column(
               children: [
-                Column(
-                  children: [
-                    SizedBox(
-                      width: Get.width,
-                      height: 120,
-                      child: Row(
-                        children: [
-                          Image.asset(
-                            AssetsManager.logo,
-                            width: Get.width * 0.25,
-                            fit: BoxFit.fitHeight,
-                          ),
-                          const Spacer(),
-                          Image.asset(
-                            AssetsManager.hexagone,
-                            width: Get.width * 0.25,
-                            fit: BoxFit.fitHeight,
-                          ),
-                        ],
-                      ),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  width: Get.width * 0.6,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12),
                     ),
-                  ],
+                    color: activePage == index
+                        ? ColorManager.primaryDark
+                        : ColorManager.transparent,
+                  ),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        AssetsManager.logo,
+                        width: Get.width * 0.25,
+                        fit: BoxFit.fitHeight,
+                      ),
+                      const Spacer(),
+                      const Icon(
+                        Icons.close_rounded,
+                        color: ColorManager.white,
+                        size: 10,
+                      ),
+                      const Spacer(),
+                      Image.asset(
+                        AssetsManager.hexagone_blue,
+                        width: Get.width * 0.25,
+                        fit: BoxFit.fitHeight,
+                      ),
+                    ],
+                  ),
                 ),
-                Positioned(
-                  bottom: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    width: Get.width * 0.58,
-                    height: activePage == index ? 120 : 100,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          ColorManager.transparent,
-                          ColorManager.background2.withOpacity(.5),
-                          ColorManager.background1.withOpacity(.5),
-                        ],
-                      ),
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(12),
-                        bottomRight: Radius.circular(12),
-                      ),
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  width: Get.width * 0.58,
+                  height: index == activePage ? 90 : 60,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        ColorManager.transparent,
+                        ColorManager.background2.withOpacity(.5),
+                        ColorManager.background1.withOpacity(.5),
+                      ],
                     ),
-                    alignment: Alignment.bottomCenter,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(12),
+                      bottomRight: Radius.circular(12),
+                    ),
+                  ),
+                  alignment: Alignment.bottomCenter,
+                  child: Text.rich(
+                    TextSpan(
+                      text: "My NUST",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
                       children: [
-                        if (activePage == index)
-                          const Text.rich(
-                            TextSpan(
-                              text: "My NUST",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: " a one stop solution for NUSTians!\n",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                                TextSpan(
-                                    text: "\nWant to post something?",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.normal,
-                                    )),
-                                TextSpan(
-                                  text: " Contact us!",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
+                        const TextSpan(
+                          text: " a one stop solution for NUSTians!\n",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal,
                           ),
-
-                        // Row(
-                        //   mainAxisSize: MainAxisSize.min,
-                        //   children: [
-                        //     const Text(
-                        //       "My NUST",
-                        //       style: TextStyle(
-                        //         fontWeight: FontWeight.bold,
-                        //       ),
-                        //     ),
-                        //     const Spacer(),
-                        //     InkWell(
-                        //       child: const Icon(
-                        //         Icons.open_in_new_rounded,
-                        //         color: ColorManager.black,
-                        //         size: 18,
-                        //       ),
-                        //       onTap: () {
-                        //         Get.toNamed(Routes.HELP);
-                        //       },
-                        //     ),
-                        //     const SizedBox(width: 10),
-                        //   ],
-                        // ),
+                        ),
+                        (activePage == index)
+                            ? const TextSpan(
+                                text: "\nWant to post something?",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.normal,
+                                ))
+                            : const TextSpan(),
+                        (activePage == index)
+                            ? const TextSpan(
+                                text: " Contact us!",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            : const TextSpan(),
                       ],
                     ),
                   ),
-                )
+                ),
               ],
             )
           : Stack(
