@@ -29,7 +29,7 @@ class HomeCampusWidget extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
                 side: BorderSide(
-                    color: ColorManager.primary.withOpacity(1), width: 2),
+                    color: ColorManager.darkPrimary.withOpacity(.8), width: 2),
               ),
               fixedSize: Size.fromWidth(Get.width * .46),
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8)),
@@ -122,7 +122,8 @@ class HomeCampusButton extends StatelessWidget {
               //     ? ColorManager.lightGrey2
               //     : ColorManager.lightGrey,
               gradient: ColorManager.gradientColor,
-              border: Border.all(color: ColorManager.darkPrimary, width: 2),
+              border: Border.all(
+                  color: ColorManager.darkPrimary.withOpacity(.2), width: 2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: controller.isLoading.value
@@ -286,7 +287,7 @@ class BuildStoryContainer extends StatelessWidget {
                       ),
                       const Spacer(),
                       Image.asset(
-                        AssetsManager.hexagone_blue,
+                        AssetsManager.hexagone,
                         width: Get.width * 0.25,
                         fit: BoxFit.fitHeight,
                       ),
@@ -573,8 +574,8 @@ class HomeWebButton extends StatelessWidget {
               color: themeController.theme.cardTheme.color,
               border: Border.all(
                   color: themeController.isDarkMode.value
-                      ? ColorManager.lightPrimary
-                      : ColorManager.darkPrimary,
+                      ? ColorManager.lightPrimary.withOpacity(.2)
+                      : ColorManager.darkPrimary.withOpacity(.4),
                   width: 2),
               borderRadius: BorderRadius.circular(10),
             ),
@@ -617,8 +618,8 @@ class HomeLargeButton extends StatelessWidget {
               color: themeController.theme.cardTheme.color,
               border: Border.all(
                   color: themeController.isDarkMode.value
-                      ? ColorManager.lightPrimary
-                      : ColorManager.darkPrimary,
+                      ? ColorManager.lightPrimary.withOpacity(.2)
+                      : ColorManager.darkPrimary.withOpacity(.4),
                   width: 2),
               borderRadius: BorderRadius.circular(10),
             ),
@@ -678,8 +679,8 @@ class HomeSmallButton extends StatelessWidget {
               color: themeController.theme.cardTheme.color,
               border: Border.all(
                   color: themeController.isDarkMode.value
-                      ? ColorManager.lightPrimary
-                      : ColorManager.darkPrimary,
+                      ? ColorManager.lightPrimary.withOpacity(.2)
+                      : ColorManager.darkPrimary.withOpacity(.4),
                   width: 2),
               borderRadius: BorderRadius.circular(10),
             ),
