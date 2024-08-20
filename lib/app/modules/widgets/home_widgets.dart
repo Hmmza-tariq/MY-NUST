@@ -296,9 +296,9 @@ class BuildStoryContainer extends StatelessWidget {
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   width: Get.width * 0.58,
-                  height: index == activePage ? 90 : 60,
+                  height: activePage == index ? 110 : 60,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
@@ -315,40 +315,60 @@ class BuildStoryContainer extends StatelessWidget {
                     ),
                   ),
                   alignment: Alignment.bottomCenter,
-                  child: Text.rich(
-                    TextSpan(
-                      text: "My NUST",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      children: [
-                        const TextSpan(
-                          text: " a one stop solution for NUSTians!\n",
-                          style: TextStyle(
+                  child: Column(
+                    children: [
+                      Text.rich(
+                        TextSpan(
+                          text: "My NUST",
+                          style: const TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight.bold,
                           ),
+                          children: [
+                            const TextSpan(
+                              text: " a one stop solution for NUSTians! ",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            TextSpan(
+                              text: (activePage == index)
+                                  ? "Want to post something?"
+                                  : "",
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
                         ),
-                        (activePage == index)
-                            ? const TextSpan(
-                                text: "\nWant to post something?",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.normal,
-                                ))
-                            : const TextSpan(),
-                        (activePage == index)
-                            ? const TextSpan(
-                                text: " Contact us!",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )
-                            : const TextSpan(),
-                      ],
-                    ),
+                      ),
+                      // (activePage == index)
+                      //     ? CustomButton(
+                      //         title: "Contact Us",
+                      //         color: ColorManager.transparent,
+                      //         textColor: ColorManager.black,
+                      //         // isBold: false,
+                      //         widthFactor: .6,
+                      //         verticalPadding: 2,
+                      //         onPressed: () => Get.toNamed(Routes.HELP),
+                      //       )
+                      //     : const SizedBox(),
+                      (activePage == index)
+                          ? TextButton(
+                              style: TextButton.styleFrom(
+                                  shape: BeveledRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8)),
+                                  foregroundColor: ColorManager.black),
+                              onPressed: () => Get.toNamed(Routes.HELP),
+                              child: const Text(
+                                "Contact us",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            )
+                          : const SizedBox(),
+                    ],
                   ),
                 ),
               ],
