@@ -62,6 +62,10 @@ class HomeView extends GetView<HomeController> {
                                   icon: SvgPicture.asset(
                                     AssetsManager.download,
                                     width: 40,
+                                    colorFilter: ColorFilter.mode(
+                                        ColorManager.darkPrimary
+                                            .withOpacity(.8),
+                                        BlendMode.srcIn),
                                   )),
                               const HomeCampusWidget(),
                               IconButton(
@@ -69,6 +73,10 @@ class HomeView extends GetView<HomeController> {
                                   icon: SvgPicture.asset(
                                     AssetsManager.refresh,
                                     width: 40,
+                                    colorFilter: ColorFilter.mode(
+                                        ColorManager.darkPrimary
+                                            .withOpacity(.8),
+                                        BlendMode.srcIn),
                                   )),
                             ],
                           ),

@@ -66,6 +66,8 @@ void main() async {
   ));
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return ErrorScreen(
+      width: 10,
+      height: 10,
       details: details.exceptionAsString(),
     );
   };
