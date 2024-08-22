@@ -250,153 +250,153 @@ void addCredentials(SettingsController controller) {
   TextEditingController qalamPasswordController = TextEditingController(
       text: controller.authenticationController.qalamPassword.value);
   var isReadInfo = false.obs;
-  Get.defaultDialog(
-    title: "",
-    titlePadding: EdgeInsets.zero,
-    titleStyle: TextStyle(
-        color:
-            controller.themeController.theme.appBarTheme.titleTextStyle!.color),
+  Get.dialog(Dialog(
     backgroundColor: controller.themeController.theme.scaffoldBackgroundColor,
-    content: Obx(() => Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    child: Obx(() => SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                      isReadInfo.value == true
-                          ? 'Why do we need your credentials?'
-                          : 'Add Credentials',
-                      style: TextStyle(
-                          color: controller.themeController.theme.appBarTheme
-                              .titleTextStyle!.color,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 20),
-                  isReadInfo.value == true
-                      ? Column(
-                          children: [
-                            Text(
-                                'We need your credentials to autofill the login fields of LMS and QALAM. Your credentials are stored securely on your device and are not shared with anyone.',
-                                style: TextStyle(
-                                    color: controller.themeController.theme
-                                        .appBarTheme.titleTextStyle!.color,
-                                    fontSize: 14)),
-                            const SizedBox(height: 8),
-                            Text(
-                                'We take your data security seriously. However, please be aware that any issues related to this data are beyond our control. It is your responsibility to keep your device secure and ensure the safety of your login credentials.',
-                                style: TextStyle(
-                                    color: controller.themeController.theme
-                                        .appBarTheme.titleTextStyle!.color,
-                                    fontSize: 14)),
-                            const SizedBox(height: 8),
-                            Text(
-                                'If you are not comfortable with this, you can disable this feature at any time.',
-                                style: TextStyle(
-                                    color: controller.themeController.theme
-                                        .appBarTheme.titleTextStyle!.color,
-                                    fontSize: 14)),
-                          ],
-                        )
-                      : Column(
-                          children: [
-                            TextField(
-                              controller: idController,
-                              style: TextStyle(
-                                  color: controller.themeController.theme
-                                      .appBarTheme.titleTextStyle!.color),
-                              decoration: InputDecoration(
-                                labelText: 'ID',
-                                labelStyle: TextStyle(
-                                    color: controller.themeController.theme
-                                        .appBarTheme.titleTextStyle!.color),
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: controller.themeController.theme
-                                          .appBarTheme.titleTextStyle!.color!),
-                                ),
-                              ),
-                            ),
-                            TextField(
-                              controller: lmsPasswordController,
-                              style: TextStyle(
-                                  color: controller.themeController.theme
-                                      .appBarTheme.titleTextStyle!.color),
-                              decoration: InputDecoration(
-                                labelText: 'LMS Password',
-                                labelStyle: TextStyle(
-                                    color: controller.themeController.theme
-                                        .appBarTheme.titleTextStyle!.color),
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: controller.themeController.theme
-                                          .appBarTheme.titleTextStyle!.color!),
-                                ),
-                              ),
-                            ),
-                            TextField(
-                              controller: qalamPasswordController,
-                              style: TextStyle(
-                                  color: controller.themeController.theme
-                                      .appBarTheme.titleTextStyle!.color),
-                              decoration: InputDecoration(
-                                labelText: 'QALAM Password',
-                                labelStyle: TextStyle(
-                                    color: controller.themeController.theme
-                                        .appBarTheme.titleTextStyle!.color),
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: controller.themeController.theme
-                                          .appBarTheme.titleTextStyle!.color!),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                  SizedBox(
+                    width: Get.width * 0.6,
+                    child: Text(
+                        isReadInfo.value == true
+                            ? 'Why do we need your credentials?'
+                            : 'Add Credentials',
+                        style: TextStyle(
+                            color: controller.themeController.theme.appBarTheme
+                                .titleTextStyle!.color,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold)),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                        isReadInfo.value == false
+                            ? Icons.info_outline
+                            : Icons.cancel_outlined,
+                        color: controller.themeController.theme.appBarTheme
+                            .titleTextStyle!.color),
+                    onPressed: () {
+                      isReadInfo.value = !isReadInfo.value;
+                    },
+                  ),
                 ],
               ),
-            ),
-            Positioned(
-              right: 0,
-              top: 0,
-              child: IconButton(
-                icon: Icon(
-                    isReadInfo.value == false
-                        ? Icons.info_outline
-                        : Icons.close,
-                    color: controller.themeController.theme.appBarTheme
-                        .titleTextStyle!.color),
-                onPressed: () {
-                  isReadInfo.value = !isReadInfo.value;
-                },
-              ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              isReadInfo.value == true
+                  ? Column(
+                      children: [
+                        Text(
+                            'We need your credentials to autofill the login fields of LMS and QALAM. Your credentials are stored securely on your device and are not shared with anyone.',
+                            style: TextStyle(
+                                color: controller.themeController.theme
+                                    .appBarTheme.titleTextStyle!.color,
+                                fontSize: 14)),
+                        const SizedBox(height: 8),
+                        Text(
+                            'We take your data security seriously. However, please be aware that any issues related to this data are beyond our control. It is your responsibility to keep your device secure and ensure the safety of your login credentials.',
+                            style: TextStyle(
+                                color: controller.themeController.theme
+                                    .appBarTheme.titleTextStyle!.color,
+                                fontSize: 14)),
+                        const SizedBox(height: 8),
+                        Text(
+                            'If you are not comfortable with this, you can disable this feature at any time.',
+                            style: TextStyle(
+                                color: controller.themeController.theme
+                                    .appBarTheme.titleTextStyle!.color,
+                                fontSize: 14)),
+                      ],
+                    )
+                  : Column(
+                      children: [
+                        TextField(
+                          controller: idController,
+                          style: TextStyle(
+                              color: controller.themeController.theme
+                                  .appBarTheme.titleTextStyle!.color),
+                          decoration: InputDecoration(
+                            labelText: 'ID',
+                            labelStyle: TextStyle(
+                                color: controller.themeController.theme
+                                    .appBarTheme.titleTextStyle!.color),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: controller.themeController.theme
+                                      .appBarTheme.titleTextStyle!.color!),
+                            ),
+                          ),
+                        ),
+                        TextField(
+                          controller: lmsPasswordController,
+                          style: TextStyle(
+                              color: controller.themeController.theme
+                                  .appBarTheme.titleTextStyle!.color),
+                          decoration: InputDecoration(
+                            labelText: 'LMS Password',
+                            labelStyle: TextStyle(
+                                color: controller.themeController.theme
+                                    .appBarTheme.titleTextStyle!.color),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: controller.themeController.theme
+                                      .appBarTheme.titleTextStyle!.color!),
+                            ),
+                          ),
+                        ),
+                        TextField(
+                          controller: qalamPasswordController,
+                          style: TextStyle(
+                              color: controller.themeController.theme
+                                  .appBarTheme.titleTextStyle!.color),
+                          decoration: InputDecoration(
+                            labelText: 'QALAM Password',
+                            labelStyle: TextStyle(
+                                color: controller.themeController.theme
+                                    .appBarTheme.titleTextStyle!.color),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                  color: controller.themeController.theme
+                                      .appBarTheme.titleTextStyle!.color!),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+              const SizedBox(height: 20),
+              isReadInfo.value == true
+                  ? const SizedBox()
+                  : CustomButton(
+                      title: 'Save',
+                      color: ColorManager.primary,
+                      textColor: ColorManager.background2,
+                      widthFactor: 1,
+                      onPressed: () {
+                        controller.authenticationController.setCredentials(
+                            idController.text,
+                            lmsPasswordController.text,
+                            qalamPasswordController.text);
+                        controller.authenticationController
+                            .toggleAutofill(true);
+                        Get.back();
+                      }),
+              const SizedBox(height: 10),
+              CustomButton(
+                  title: isReadInfo.value == true ? "Close" : 'Cancel',
+                  color: controller.themeController.theme.cardTheme.color!,
+                  textColor: controller
+                      .themeController.theme.appBarTheme.titleTextStyle!.color!,
+                  widthFactor: 1,
+                  onPressed: () {
+                    isReadInfo.value == true
+                        ? isReadInfo.value = false
+                        : Get.back();
+                  }),
+            ],
+          ),
         )),
-    confirm: Obx(() => isReadInfo.value == true
-        ? const SizedBox()
-        : CustomButton(
-            title: 'Save',
-            color: ColorManager.primary,
-            textColor: ColorManager.background2,
-            widthFactor: 1,
-            onPressed: () {
-              controller.authenticationController.setCredentials(
-                  idController.text,
-                  lmsPasswordController.text,
-                  qalamPasswordController.text);
-              controller.authenticationController.toggleAutofill(true);
-              Get.back();
-            })),
-    cancel: Obx(() => CustomButton(
-        title: isReadInfo.value == true ? "Close" : 'Cancel',
-        color: controller.themeController.theme.cardTheme.color!,
-        textColor:
-            controller.themeController.theme.appBarTheme.titleTextStyle!.color!,
-        widthFactor: 1,
-        onPressed: () {
-          isReadInfo.value == true ? isReadInfo.value = false : Get.back();
-        })),
-  );
+  ));
 }
