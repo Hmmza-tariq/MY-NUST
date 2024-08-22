@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -167,8 +169,8 @@ class AboutView extends GetView<AboutController> {
                         children: [
                           InkWell(
                             onTap: () {
-                              launchUrl(Uri.parse(
-                                  "https://sites.google.com/view/my-nust-terms-and-conditions/home"));
+                              launchUrl(
+                                  Uri.parse(controller.privacyPolicyLink));
                             },
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -198,8 +200,8 @@ class AboutView extends GetView<AboutController> {
                         children: [
                           InkWell(
                             onTap: () {
-                              launchUrl(Uri.parse(
-                                  "https://sites.google.com/view/my-nust-terms-and-conditions/home"));
+                              launchUrl(
+                                  Uri.parse(controller.termsAndConditionsLink));
                             },
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -261,8 +263,7 @@ class AboutView extends GetView<AboutController> {
                         children: [
                           InkWell(
                             onTap: () {
-                              launchUrl(Uri.parse(
-                                  "https://github.com/Hmmza-tariq/My-NUST-request-"));
+                              launchUrl(Uri.parse(controller.githubLink));
                             },
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -298,7 +299,7 @@ class AboutView extends GetView<AboutController> {
                     margin: 32,
                     onPressed: () {
                       Share.share(
-                        'Check out this cool NUST App available on PlayStore!🔥 \nDownload now: https://play.google.com/store/apps/details?id=com.hexagone.mynust&pcampaignid=web_share',
+                        'Check out this cool NUST App available on ${Platform.isAndroid ? "PlayStore" : "App Store"}!🔥 \nDownload now: ${Platform.isAndroid ? controller.playStoreLink : controller.appStoreLink}',
                       );
                     }),
                 Container(
@@ -313,8 +314,7 @@ class AboutView extends GetView<AboutController> {
                           textColor: ColorManager.background2,
                           widthFactor: .4,
                           onPressed: () {
-                            launchUrl(Uri.parse(
-                                "https://play.google.com/store/apps/details?id=com.hexagone.mynust&pcampaignid=web_share"));
+                            launchUrl(Uri.parse(controller.playStoreLink));
                           }),
                       CustomButton(
                           title: 'App Store',
@@ -322,8 +322,7 @@ class AboutView extends GetView<AboutController> {
                           textColor: ColorManager.background2,
                           widthFactor: .4,
                           onPressed: () {
-                            launchUrl(Uri.parse(
-                                "https://apps.apple.com/us/app/my-nust/id1580134134"));
+                            launchUrl(Uri.parse(controller.appStoreLink));
                           }),
                     ],
                   ),

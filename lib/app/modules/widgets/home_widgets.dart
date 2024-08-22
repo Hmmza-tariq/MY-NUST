@@ -31,7 +31,7 @@ class HomeCampusWidget extends StatelessWidget {
                 side: BorderSide(
                     color: ColorManager.darkPrimary.withOpacity(.8), width: 2),
               ),
-              fixedSize: Size.fromWidth(Get.width * .46),
+              // fixedSize: Size.fromWidth(Get.width * .46),
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8)),
           child: Text(
               "${controller.campusController.selectedCampus.value} Campus",
