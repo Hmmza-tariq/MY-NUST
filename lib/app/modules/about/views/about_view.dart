@@ -98,7 +98,7 @@ class AboutView extends GetView<AboutController> {
                       ),
                       const Divider(color: ColorManager.lightGrey),
                       Text(
-                        'Important Note',
+                        'Disclaimer',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -118,6 +118,7 @@ class AboutView extends GetView<AboutController> {
                         ),
                         textAlign: TextAlign.justify,
                       ),
+                      const Divider(color: ColorManager.lightGrey),
                       Text(
                         'Privacy Policy',
                         style: TextStyle(
