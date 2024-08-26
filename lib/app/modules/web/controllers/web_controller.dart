@@ -29,6 +29,7 @@ class WebController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
     initializeWebView();
   }
 
@@ -72,7 +73,7 @@ class WebController extends GetxController {
 
             if (shouldPreventNavigation(url)) {
               debugPrint('Preventing navigation to $url');
-              snackbar('Navigation to external sites is not allowed');
+              errorSnackbar('Navigation to external sites is not allowed');
               return NavigationDecision.prevent;
             }
 
