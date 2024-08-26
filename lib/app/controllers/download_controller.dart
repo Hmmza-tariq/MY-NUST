@@ -63,7 +63,6 @@ class DownloadControllerAndroid extends GetxController {
       saveInPublicStorage: true,
       openFileFromNotification: true,
     ).then((id) {
-      print('downloaded $id');
       // if (id != null) FlutterDownloader.open(taskId: id);
     });
   }
@@ -77,8 +76,6 @@ class DownloadControllerAndroid extends GetxController {
         ? await ph.Permission.storage.request()
         : ph.PermissionStatus.granted;
 
-    print(
-        "notification permission: ${await ph.Permission.notification.status}");
     if (await ph.Permission.notification.status == ph.PermissionStatus.denied) {
       await ph.Permission.notification.request();
     }
@@ -176,7 +173,6 @@ class DownloadControllerIOS extends GetxController {
         if (taskIndex != -1) {
           _progressList[taskIndex] = progress;
         }
-        print('Progress: ${progress * 100}%');
       },
       onStatus: (status) {
         // Get.snackbar('Download Status ${status.toString()}',
@@ -195,7 +191,6 @@ class DownloadControllerIOS extends GetxController {
           .request(bd.PermissionType.notifications);
     }
 
-    print('notification permission: $notificationPermission');
     var storageStatus = await ph.Permission.storage.status;
     if (storageStatus != ph.PermissionStatus.granted) {
       storageStatus = await ph.Permission.storage.request();
