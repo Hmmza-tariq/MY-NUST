@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -25,6 +27,27 @@ Widget showFullPageLoading(RxInt percentage) {
     child: Stack(
       alignment: Alignment.center,
       children: [
+        if (Platform.isIOS)
+          Positioned(
+              top: Get.height * 0.05,
+              child: Container(
+                  width: Get.width * 0.8,
+                  decoration: BoxDecoration(
+                    color: ColorManager.white.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: ColorManager.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        spreadRadius: 5,
+                      )
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(10),
+                  child: const Text(
+                    'The content of this page is not hosted on our servers. All rights belong to the NUST administration.',
+                    textAlign: TextAlign.center,
+                  ))),
         Lottie.asset(
           AssetsManager.loading,
           width: Get.width * 0.5,
@@ -64,13 +87,24 @@ void closeLoading() {
   if (Get.isDialogOpen ?? false) Get.back();
 }
 
-void snackbar(String message) {
+void errorSnackbar(String message) {
   Get.snackbar(
     'Error',
     message,
     duration: const Duration(seconds: 1),
     snackPosition: SnackPosition.TOP,
     backgroundColor: ColorManager.error.withOpacity(0.8),
+    colorText: ColorManager.white,
+  );
+}
+
+void disclaimerSnackbar(String message) {
+  Get.snackbar(
+    'Disclaimer',
+    message,
+    duration: const Duration(seconds: 2),
+    snackPosition: SnackPosition.TOP,
+    backgroundColor: ColorManager.primary.withOpacity(0.8),
     colorText: ColorManager.white,
   );
 }
