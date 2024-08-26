@@ -35,7 +35,7 @@ class SettingsView extends GetView<SettingsController> {
                           color: ColorManager.primary,
                         ),
                         onPressed: () {
-                          Get.back();
+                          Get.offAndToNamed(Routes.HOME);
                         },
                       ),
                       const Spacer(),

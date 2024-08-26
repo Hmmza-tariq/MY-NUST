@@ -39,7 +39,7 @@ class AboutView extends GetView<AboutController> {
                           color: ColorManager.primary,
                         ),
                         onPressed: () {
-                          Get.back();
+                          Get.offAndToNamed(Routes.HOME);
                         },
                       ),
                       const Spacer(),
