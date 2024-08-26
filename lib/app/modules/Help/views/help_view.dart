@@ -37,7 +37,7 @@ class HelpView extends GetView<HelpController> {
                             color: ColorManager.primary,
                           ),
                           onPressed: () {
-                            Get.back();
+                            Get.offAndToNamed(Routes.HOME);
                           },
                         ),
                         const Spacer(),

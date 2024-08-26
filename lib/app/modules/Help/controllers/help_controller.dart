@@ -10,12 +10,6 @@ class HelpController extends GetxController {
   final messageController = TextEditingController();
   var state = "idle".obs;
 
-  // @override
-  // void onClose() {
-  //   formKey = GlobalKey<FormState>();
-  //   super.onClose();
-  // }
-
   void sendEmail() async {
     state.value = "sending";
     final emailPattern =
@@ -31,7 +25,7 @@ class HelpController extends GetxController {
     } else {
       final Email email = Email(
         body:
-            'Dear Team Hexag⬡ne,\n\nI am writing to request assistance with using My NUST.\n\n${messageController.text}\n\nBest regards,\n${nameController.text}',
+            'Dear Team Hexag⬡ne,\n\nI am writing to request assistance with using My NUST.\n\n${messageController.text}\n\nBest regards,\n${nameController.text},\n${mailController.text}',
         subject: 'Help needed using My NUST',
         recipients: ['HexagonePk@gmail.com'],
         isHTML: false,
