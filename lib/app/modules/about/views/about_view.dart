@@ -98,6 +98,27 @@ class AboutView extends GetView<AboutController> {
                       ),
                       const Divider(color: ColorManager.lightGrey),
                       Text(
+                        'Important Note',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: controller.themeController.isDarkMode.value
+                              ? ColorManager.white
+                              : ColorManager.black,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'The content, branding, and any other intellectual property related to the National University of Sciences & Technology (NUST) included in this app are owned by NUST. This app is not officially affiliated with or endorsed by NUST. The purpose of this app is to provide a convenient platform for students to access information related to NUST.',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: controller.themeController.isDarkMode.value
+                              ? ColorManager.white
+                              : ColorManager.black,
+                        ),
+                        textAlign: TextAlign.justify,
+                      ),
+                      Text(
                         'Privacy Policy',
                         style: TextStyle(
                           fontSize: 18,
