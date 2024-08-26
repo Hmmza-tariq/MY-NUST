@@ -29,7 +29,10 @@ class HomeCampusWidget extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
                 side: BorderSide(
-                    color: ColorManager.darkPrimary.withOpacity(.8), width: 2),
+                    color: controller.themeController.isDarkMode.value
+                        ? ColorManager.lightGrey1.withOpacity(.2)
+                        : ColorManager.darkPrimary.withOpacity(.4),
+                    width: 2),
               ),
               // fixedSize: Size.fromWidth(Get.width * .46),
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8)),
@@ -39,7 +42,7 @@ class HomeCampusWidget extends StatelessWidget {
                   fontSize: 18,
                   color: controller.themeController.isDarkMode.value
                       ? ColorManager.white
-                      : ColorManager.black,
+                      : ColorManager.darkPrimary,
                   fontWeight: FontWeight.bold)),
           onPressed: () => Get.defaultDialog(
             title: 'Select Campus',
@@ -118,9 +121,6 @@ class HomeCampusButton extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             width: Get.width * 0.46,
             decoration: BoxDecoration(
-              // color: themeController.isDarkMode.value
-              //     ? ColorManager.lightGrey2
-              //     : ColorManager.lightGrey,
               gradient: ColorManager.gradientColor,
               border: Border.all(
                   color: ColorManager.darkPrimary.withOpacity(.2), width: 2),
@@ -246,9 +246,12 @@ class BuildStoryContainer extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 400),
       width: Get.width * 0.6,
+      curve: Curves.easeInOut,
       margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: index == activePage ? Colors.amber : ColorManager.lightGrey,
+        color: index == activePage
+            ? ColorManager.lightGrey1
+            : ColorManager.lightGrey,
         borderRadius: BorderRadius.circular(12),
       ),
       alignment: index == activePage
@@ -418,11 +421,14 @@ class HomeSliderItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
       width: Get.width * 0.5,
       margin: const EdgeInsets.symmetric(horizontal: 4),
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: index == activePage ? Colors.amber : ColorManager.lightGrey,
+        color: index == activePage
+            ? ColorManager.lightGrey1
+            : ColorManager.lightGrey,
         borderRadius: BorderRadius.circular(12),
       ),
       alignment: index == activePage
@@ -583,7 +589,7 @@ class HomeWebButton extends StatelessWidget {
               color: themeController.theme.cardTheme.color,
               border: Border.all(
                   color: themeController.isDarkMode.value
-                      ? ColorManager.lightPrimary.withOpacity(.2)
+                      ? ColorManager.lightGrey1.withOpacity(.2)
                       : ColorManager.darkPrimary.withOpacity(.4),
                   width: 2),
               borderRadius: BorderRadius.circular(10),
@@ -594,7 +600,7 @@ class HomeWebButton extends StatelessWidget {
               width: 50,
               colorFilter: ColorFilter.mode(
                   themeController.isDarkMode.value
-                      ? ColorManager.lightPrimary
+                      ? ColorManager.lightGrey1
                       : ColorManager.darkPrimary,
                   BlendMode.srcIn),
             ),
@@ -621,38 +627,38 @@ class HomeLargeButton extends StatelessWidget {
         Get.toNamed(page);
       },
       child: Obx(() => Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             width: Get.width * 0.96,
             decoration: BoxDecoration(
               color: themeController.theme.cardTheme.color,
               border: Border.all(
                   color: themeController.isDarkMode.value
-                      ? ColorManager.lightPrimary.withOpacity(.2)
+                      ? ColorManager.lightGrey1.withOpacity(.2)
                       : ColorManager.darkPrimary.withOpacity(.4),
                   width: 2),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SvgPicture.asset(
                   icon,
-                  height: 50,
-                  width: 50,
+                  height: 56,
+                  width: 56,
                   colorFilter: ColorFilter.mode(
                       themeController.isDarkMode.value
-                          ? ColorManager.lightPrimary
+                          ? ColorManager.lightGrey1
                           : ColorManager.darkPrimary,
                       BlendMode.srcIn),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
                 Text(
                   title,
                   style: TextStyle(
                       color: themeController.isDarkMode.value
-                          ? ColorManager.lightPrimary
+                          ? ColorManager.lightGrey1
                           : ColorManager.darkPrimary,
-                      fontSize: 20,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold),
                 ),
               ],
@@ -688,7 +694,7 @@ class HomeSmallButton extends StatelessWidget {
               color: themeController.theme.cardTheme.color,
               border: Border.all(
                   color: themeController.isDarkMode.value
-                      ? ColorManager.lightPrimary.withOpacity(.2)
+                      ? ColorManager.lightGrey1.withOpacity(.2)
                       : ColorManager.darkPrimary.withOpacity(.4),
                   width: 2),
               borderRadius: BorderRadius.circular(10),
@@ -702,7 +708,7 @@ class HomeSmallButton extends StatelessWidget {
                   width: 50,
                   colorFilter: ColorFilter.mode(
                       themeController.isDarkMode.value
-                          ? ColorManager.lightPrimary
+                          ? ColorManager.lightGrey1
                           : ColorManager.darkPrimary,
                       BlendMode.srcIn),
                 ),
@@ -711,7 +717,7 @@ class HomeSmallButton extends StatelessWidget {
                   title,
                   style: TextStyle(
                       color: themeController.isDarkMode.value
-                          ? ColorManager.lightPrimary
+                          ? ColorManager.lightGrey1
                           : ColorManager.darkPrimary,
                       fontSize: 12,
                       fontWeight: FontWeight.bold),
