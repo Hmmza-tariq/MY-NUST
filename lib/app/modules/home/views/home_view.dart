@@ -16,8 +16,9 @@ class HomeView extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Obx(() => Scaffold(
-          backgroundColor:
-              controller.themeController.theme.scaffoldBackgroundColor,
+          backgroundColor: controller.themeController.isDarkMode.value
+              ? Colors.black
+              : Colors.white,
           body: Container(
             decoration: BoxDecoration(
               gradient: (controller.themeController.isDarkMode.value)
@@ -63,8 +64,10 @@ class HomeView extends GetView<HomeController> {
                                     AssetsManager.download,
                                     width: 40,
                                     colorFilter: ColorFilter.mode(
-                                        ColorManager.darkPrimary
-                                            .withOpacity(.8),
+                                        controller.themeController.isDarkMode
+                                                .value
+                                            ? ColorManager.lightGrey1
+                                            : ColorManager.darkPrimary,
                                         BlendMode.srcIn),
                                   )),
                               const HomeCampusWidget(),
@@ -74,8 +77,10 @@ class HomeView extends GetView<HomeController> {
                                     AssetsManager.refresh,
                                     width: 40,
                                     colorFilter: ColorFilter.mode(
-                                        ColorManager.darkPrimary
-                                            .withOpacity(.8),
+                                        controller.themeController.isDarkMode
+                                                .value
+                                            ? ColorManager.lightGrey1
+                                            : ColorManager.darkPrimary,
                                         BlendMode.srcIn),
                                   )),
                             ],
