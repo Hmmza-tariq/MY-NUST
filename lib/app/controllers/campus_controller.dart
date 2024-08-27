@@ -47,7 +47,7 @@ class CampusController extends GetxController {
     databaseController.setCampus(campus);
   }
 
-  Future<void> fetchTopStories() async {
+  Future<bool> fetchTopStories() async {
     try {
       List<Map<String, String?>> data = [];
       final mainResponse = await _dio.get(baseUrl);
@@ -72,9 +72,10 @@ class CampusController extends GetxController {
         'link': baseUrl,
       });
       topStories.value = data;
-      return;
+      return true;
     } catch (e) {
       debugPrint('Error fetching top stories: $e');
+      return false;
     }
   }
 

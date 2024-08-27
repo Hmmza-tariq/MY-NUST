@@ -17,6 +17,7 @@ class HomeController extends GetxController {
   final String qalamUrl = dotenv.env['QALAM_URL'] ?? '';
 
   final RxBool isLoading = true.obs;
+  final RxBool isError = false.obs;
   final RxBool isSelectingCampus = false.obs;
 
   @override
@@ -55,7 +56,7 @@ class HomeController extends GetxController {
     });
     activePage.value = 0;
     try {
-      await campusController.fetchTopStories();
+      isError.value = !await campusController.fetchTopStories();
     } finally {
       isLoading.value = false;
       pageController.animateToPage(0);
