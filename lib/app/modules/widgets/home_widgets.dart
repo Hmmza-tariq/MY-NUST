@@ -30,7 +30,7 @@ class HomeCampusWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 side: BorderSide(
                     color: controller.themeController.isDarkMode.value
-                        ? ColorManager.lightGrey1.withOpacity(.2)
+                        ? ColorManager.white
                         : ColorManager.darkPrimary.withOpacity(.4),
                     width: 2),
               ),
@@ -118,7 +118,7 @@ class HomeCampusButton extends StatelessWidget {
             }
           },
           child: Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             width: Get.width * 0.46,
             decoration: BoxDecoration(
               gradient: ColorManager.gradientColor,
