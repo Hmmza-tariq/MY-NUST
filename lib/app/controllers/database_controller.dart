@@ -95,21 +95,23 @@ class DatabaseController extends GetxController {
   }
 
   Future<void> saveCourses(List<Course> courses, String semester) async {
+    String key = "courses-${semester.replaceAll(" ", "-").toLowerCase()}";
     Map<String, dynamic> data = {
-      'courses - $semester': courses.map((course) => course.toMap()).toList(),
+      key: courses.map((course) => course.toMap()).toList(),
     };
-    sharedPref.setString('courses', jsonEncode(data));
+
+    sharedPref.setString(key, jsonEncode(data));
   }
 
   List<Course> getCourses(String semester) {
     List<Course> courses = [];
+    String key = "courses-${semester.replaceAll(" ", "-").toLowerCase()}";
     try {
-      Map<String, dynamic> data =
-          jsonDecode(sharedPref.getString('courses  - $semester') ?? '{}');
+      Map<String, dynamic> data = jsonDecode(sharedPref.getString(key) ?? '{}');
+
       if (data.isNotEmpty) {
-        courses = data['courses  - $semester']
-            .map<Course>((course) => Course.fromMap(course))
-            .toList();
+        courses =
+            data[key].map<Course>((course) => Course.fromMap(course)).toList();
       }
     } catch (e) {
       debugPrint('Error getting courses: $e');

@@ -61,6 +61,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                                         ? ColorManager.black
                                         : ColorManager.white,
                                     widthFactor: 0.3,
+                                    verticalPadding: 0,
                                     onPressed: () {
                                       controller.isCGPA.value = true;
                                     },
@@ -77,6 +78,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                                         ? ColorManager.black
                                         : ColorManager.white,
                                     widthFactor: 0.3,
+                                    verticalPadding: 0,
                                     onPressed: () {
                                       controller.isCGPA.value = false;
                                     },
@@ -219,7 +221,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
           ),
         ),
         SizedBox(
-          height: Get.height * 0.6,
+          height: Get.height * 0.73,
           child: (controller.courses.isEmpty)
               ? Center(
                   child: Column(
@@ -774,7 +776,6 @@ class SelectSemester extends StatelessWidget {
                   !controller.themeController.isDarkMode.value
               ? ColorManager.black
               : ColorManager.white,
-          widthFactor: 0.25,
           verticalPadding: 0,
           isBold: false,
           onPressed: () {

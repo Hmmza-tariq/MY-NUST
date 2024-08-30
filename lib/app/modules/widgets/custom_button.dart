@@ -8,7 +8,8 @@ class CustomButton extends StatelessWidget {
     this.onPressed,
     required this.color,
     required this.textColor,
-    required this.widthFactor,
+    this.widthFactor,
+    this.fontSize,
     this.margin,
     this.isBold,
     this.verticalPadding,
@@ -17,9 +18,10 @@ class CustomButton extends StatelessWidget {
   final void Function()? onPressed;
   final Color color;
   final Color textColor;
-  final double widthFactor;
+  final double? widthFactor;
   final double? margin;
   final double? verticalPadding;
+  final double? fontSize;
   final bool? isBold;
   @override
   Widget build(BuildContext context) {
@@ -34,13 +36,15 @@ class CustomButton extends StatelessWidget {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide(color: color)),
-              fixedSize: Size.fromWidth(Get.width * widthFactor),
+              fixedSize: widthFactor != null
+                  ? Size.fromWidth(Get.width * widthFactor!)
+                  : null,
               padding: EdgeInsets.symmetric(
                   horizontal: isBold == false ? 16 : 32,
                   vertical: verticalPadding ?? 16)),
           child: Text(title,
               style: TextStyle(
-                  fontSize: isBold == false ? 14 : 18,
+                  fontSize: fontSize ?? (isBold == false ? 14 : 18),
                   color: textColor,
                   fontWeight:
                       isBold == false ? FontWeight.normal : FontWeight.bold))),

@@ -106,7 +106,7 @@ class GpaCalculationController extends GetxController {
 
   void loadCourses(String semester) {
     var loadedCourses = databaseController.getCourses(semester);
-    courses.assignAll(loadedCourses.map((c) => c.obs));
+    courses = loadedCourses.map((c) => c.obs).toList().obs;
   }
 
   String getGrade(double gpa) {
