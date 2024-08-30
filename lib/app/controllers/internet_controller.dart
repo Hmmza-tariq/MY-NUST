@@ -15,10 +15,10 @@ class InternetController extends GetxController {
     Connectivity().onConnectivityChanged.listen((var result) {
       if (result[0] == ConnectivityResult.none) {
         isOnline(false);
-        debugPrint('No internet available');
+        // debugPrint('No internet available');
       } else {
         isOnline(true);
-        debugPrint('Internet available');
+        // debugPrint('Internet available');
       }
     });
   }
