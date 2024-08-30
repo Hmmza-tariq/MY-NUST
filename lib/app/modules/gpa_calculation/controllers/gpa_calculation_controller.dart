@@ -19,6 +19,7 @@ class GpaCalculationController extends GetxController {
   var isCGPA = true.obs;
   var semesters = <Rx<Semester>>[].obs;
   var courses = <Rx<Course>>[].obs;
+  var selectedSemester = "Semester 1".obs;
   var semesterNames = [
     "Semester 1",
     "Semester 2",
@@ -28,7 +29,10 @@ class GpaCalculationController extends GetxController {
     "Semester 6",
     "Semester 7",
     "Semester 8",
-    "Summer"
+    "Summer 1",
+    "Summer 2",
+    "Summer 3",
+    "Summer 4",
   ];
   var grades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
 
@@ -36,7 +40,7 @@ class GpaCalculationController extends GetxController {
   void onInit() {
     super.onInit();
     loadSemesters();
-    loadCourses();
+    loadCourses(selectedSemester.value);
   }
 
   @override
@@ -54,12 +58,13 @@ class GpaCalculationController extends GetxController {
     saveSemesters();
   }
 
-  void addCourse() {
+  void addCourse(String semesterId) {
     courses.add(Course(
-      name: "Course ${courses.length + 1}",
-      credit: 1,
-      gpa: 4,
-    ).obs);
+            name: "Course ${courses.length + 1}",
+            credit: 1,
+            gpa: 4,
+            semesterId: semesterId)
+        .obs);
     saveCourses();
   }
 
@@ -95,11 +100,12 @@ class GpaCalculationController extends GetxController {
   }
 
   void saveCourses() {
-    databaseController.saveCourses(courses.map((c) => c.value).toList());
+    databaseController.saveCourses(
+        courses.map((c) => c.value).toList(), selectedSemester.value);
   }
 
-  void loadCourses() {
-    var loadedCourses = databaseController.getCourses();
+  void loadCourses(String semester) {
+    var loadedCourses = databaseController.getCourses(semester);
     courses.assignAll(loadedCourses.map((c) => c.obs));
   }
 
@@ -318,6 +324,26 @@ class GpaCalculationController extends GetxController {
                                   gradient: ColorManager.gradientColor),
                               alignment: Alignment.center,
                               child: Text("My NUST",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: !themeController.isDarkMode.value
+                                        ? ColorManager.black
+                                        : ColorManager.white,
+                                  )),
+                            ),
+                          ),
+                          Positioned(
+                            top: Get.height * 0.018,
+                            left: 16,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 8),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  gradient: ColorManager.gradientColor),
+                              alignment: Alignment.center,
+                              child: Text(selectedSemester.value,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,

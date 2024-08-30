@@ -94,20 +94,20 @@ class DatabaseController extends GetxController {
     return semesters;
   }
 
-  Future<void> saveCourses(List<Course> courses) async {
+  Future<void> saveCourses(List<Course> courses, String semester) async {
     Map<String, dynamic> data = {
-      'courses': courses.map((course) => course.toMap()).toList(),
+      'courses - $semester': courses.map((course) => course.toMap()).toList(),
     };
     sharedPref.setString('courses', jsonEncode(data));
   }
 
-  List<Course> getCourses() {
+  List<Course> getCourses(String semester) {
     List<Course> courses = [];
     try {
       Map<String, dynamic> data =
-          jsonDecode(sharedPref.getString('courses') ?? '{}');
+          jsonDecode(sharedPref.getString('courses  - $semester') ?? '{}');
       if (data.isNotEmpty) {
-        courses = data['courses']
+        courses = data['courses  - $semester']
             .map<Course>((course) => Course.fromMap(course))
             .toList();
       }
