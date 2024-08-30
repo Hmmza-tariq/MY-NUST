@@ -199,42 +199,64 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
   }
 
   Widget _buildSGPASection(BuildContext context) {
-    return SizedBox(
-      height: Get.height * 0.8,
-      child: (controller.courses.isEmpty)
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Add Course to Calculate\nSGPA",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: controller.themeController.theme.appBarTheme
-                          .titleTextStyle?.color,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8.0),
+          width: Get.width * 0.9,
+          decoration: BoxDecoration(
+            color: controller.themeController.theme.cardTheme.color,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(
+                    controller.semesterNames.length,
+                    (index) => SelectSemester(
+                        semester: controller.semesterNames[index]))),
+          ),
+        ),
+        SizedBox(
+          height: Get.height * 0.6,
+          child: (controller.courses.isEmpty)
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Add Course to Calculate\nSGPA",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: controller.themeController.theme.appBarTheme
+                              .titleTextStyle?.color,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      CustomButton(
+                        title: "Add Course",
+                        color: ColorManager.primary,
+                        textColor: ColorManager.white,
+                        widthFactor: 0.4,
+                        isBold: false,
+                        onPressed: () => controller
+                            .addCourse(controller.selectedSemester.value),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  CustomButton(
-                    title: "Add Course",
-                    color: ColorManager.primary,
-                    textColor: ColorManager.white,
-                    widthFactor: 0.4,
-                    isBold: false,
-                    onPressed: controller.addCourse,
-                  ),
-                ],
-              ),
-            )
-          : ListView.builder(
-              itemCount: controller.courses.length,
-              controller: controller.scrollController,
-              itemBuilder: (context, index) {
-                return _buildCourseItem(index);
-              },
-            ),
+                )
+              : ListView.builder(
+                  itemCount: controller.courses.length,
+                  controller: controller.scrollController,
+                  itemBuilder: (context, index) {
+                    return _buildCourseItem(index);
+                  },
+                ),
+        ),
+      ],
     );
   }
 
@@ -514,7 +536,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
             ),
-            onChanged: (value) {
+            onSubmitted: (value) {
               controller.courses[index].update((course) {
                 course?.name = value;
               });
@@ -716,7 +738,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
             isBold: false,
             onPressed: controller.isCGPA.value
                 ? controller.addSemester
-                : controller.addCourse,
+                : () => controller.addCourse(controller.selectedSemester.value),
           ),
           const Spacer(),
           CustomButton(
@@ -732,5 +754,33 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
         ],
       ),
     );
+  }
+}
+
+class SelectSemester extends StatelessWidget {
+  const SelectSemester({super.key, required this.semester});
+
+  final String semester;
+  @override
+  Widget build(BuildContext context) {
+    final GpaCalculationController controller =
+        Get.find<GpaCalculationController>();
+    return Obx(() => CustomButton(
+          title: semester,
+          color: controller.selectedSemester.value == semester
+              ? ColorManager.primary
+              : controller.themeController.theme.cardTheme.color!,
+          textColor: !(controller.selectedSemester.value == semester) &&
+                  !controller.themeController.isDarkMode.value
+              ? ColorManager.black
+              : ColorManager.white,
+          widthFactor: 0.25,
+          verticalPadding: 0,
+          isBold: false,
+          onPressed: () {
+            controller.selectedSemester.value = semester;
+            controller.loadCourses(semester);
+          },
+        ));
   }
 }
