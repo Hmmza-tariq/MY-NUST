@@ -34,7 +34,7 @@ class GpaCalculationController extends GetxController {
     "Summer 3",
     "Summer 4",
   ];
-  var grades = ["A", "B+", "B", "C+", "C", "D+", "D", "F"];
+  List<String> grades = ["F", "D", "D+", "C", "C+", "B", "B+", "A"];
 
   @override
   void onInit() {
@@ -110,14 +110,38 @@ class GpaCalculationController extends GetxController {
   }
 
   String getGrade(double gpa) {
-    if (gpa >= 3.7) return 'A';
-    if (gpa >= 3.3) return 'B+';
+    if (gpa >= 4.0) return 'A';
+    if (gpa >= 3.5) return 'B+';
     if (gpa >= 3.0) return 'B';
-    if (gpa >= 2.7) return 'C+';
-    if (gpa >= 2.3) return 'C';
-    if (gpa >= 2.0) return 'D+';
-    if (gpa >= 1.7) return 'D';
-    return 'F';
+    if (gpa >= 2.5) return 'C+';
+    if (gpa >= 2.0) return 'C';
+    if (gpa >= 1.5) return 'D+';
+    if (gpa >= 1.0) return 'D';
+    if (gpa >= 0.0) return 'F';
+    return 'I';
+  }
+
+  double getGradePoint(String grade) {
+    switch (grade) {
+      case 'A':
+        return 4.0;
+      case 'B+':
+        return 3.5;
+      case 'B':
+        return 3.0;
+      case 'C+':
+        return 2.5;
+      case 'C':
+        return 2.0;
+      case 'D+':
+        return 1.5;
+      case 'D':
+        return 1.0;
+      case 'F':
+        return 0.0;
+      default:
+        return 0.0;
+    }
   }
 
   void showResult(bool isCGPA, double result) async {
@@ -139,9 +163,15 @@ class GpaCalculationController extends GetxController {
     if (isCGPA) {
       for (int i = 0; i < semesters.length; i++) {
         var semester = semesters[i];
+        double achievedGPA = semester.value.gpa * semester.value.credit;
+        double totalCredits =
+            semester.value.credit * 4.0; // Maximum GPA of 4.0 per credit
+        double emptySpace = totalCredits - achievedGPA;
+
+        // Achieved GPA section
         sections.add(PieChartSectionData(
           color: colors[i % colors.length],
-          value: semester.value.gpa * semester.value.credit,
+          value: achievedGPA,
           title:
               "${semester.value.name}\n${semester.value.gpa.toStringAsFixed(2)}",
           radius: Get.width * 0.14,
@@ -154,39 +184,36 @@ class GpaCalculationController extends GetxController {
           ),
           titlePositionPercentageOffset: 0.5,
         ));
-        details.add(
-          ListTile(
-            leading: Icon(Icons.school, color: colors[i % colors.length]),
-            title: Text(
-              semester.value.name,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: themeController.theme.appBarTheme.titleTextStyle?.color,
-              ),
+
+        // Empty space section
+        if (emptySpace > 0) {
+          sections.add(PieChartSectionData(
+            color: ColorManager.primary.withOpacity(.2),
+            value: emptySpace,
+            title: '', // No title for empty space
+            radius: Get.width * 0.14,
+            titleStyle: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: themeController.isDarkMode.value
+                  ? ColorManager.lightGrey1
+                  : ColorManager.black,
             ),
-            subtitle: Text('GPA: ${semester.value.gpa.toStringAsFixed(2)}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color:
-                      themeController.theme.appBarTheme.titleTextStyle?.color,
-                )),
-            trailing: Text(
-              '${semester.value.credit} Credits',
-              style: TextStyle(
-                fontSize: 14,
-                color: themeController.theme.appBarTheme.titleTextStyle?.color,
-              ),
-            ),
-          ),
-        );
+            titlePositionPercentageOffset: 0.5,
+          ));
+        }
       }
     } else {
       for (int i = 0; i < courses.length; i++) {
         var course = courses[i];
+        double achievedGPA = course.value.gpa * course.value.credit;
+        double totalCredits = course.value.credit * 4.0;
+        double emptySpace = totalCredits - achievedGPA;
+
+        // Achieved GPA section
         sections.add(PieChartSectionData(
           color: colors[i % colors.length],
-          value: course.value.gpa * course.value.credit,
+          value: achievedGPA,
           title: "${course.value.name}\n${getGrade(course.value.gpa)}",
           radius: Get.width * 0.14,
           titleStyle: TextStyle(
@@ -198,32 +225,24 @@ class GpaCalculationController extends GetxController {
           ),
           titlePositionPercentageOffset: .5,
         ));
-        details.add(
-          ListTile(
-            leading: Icon(Icons.book, color: colors[i % colors.length]),
-            title: Text(
-              course.value.name,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: themeController.theme.appBarTheme.titleTextStyle?.color,
-              ),
+
+        // Empty space section
+        if (emptySpace > 0) {
+          sections.add(PieChartSectionData(
+            color: ColorManager.primary.withOpacity(.2),
+            value: emptySpace,
+            title: '',
+            radius: Get.width * 0.14,
+            titleStyle: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: themeController.isDarkMode.value
+                  ? ColorManager.lightGrey1
+                  : ColorManager.black,
             ),
-            subtitle: Text('Grade: ${getGrade(course.value.gpa)}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color:
-                      themeController.theme.appBarTheme.titleTextStyle?.color,
-                )),
-            trailing: Text(
-              '${course.value.credit} Credits',
-              style: TextStyle(
-                fontSize: 14,
-                color: themeController.theme.appBarTheme.titleTextStyle?.color,
-              ),
-            ),
-          ),
-        );
+            titlePositionPercentageOffset: .5,
+          ));
+        }
       }
     }
 
@@ -254,7 +273,6 @@ class GpaCalculationController extends GetxController {
                     Container(
                       width: 100,
                       height: 4,
-                      // margin: const EdgeInsets.only(top: 8),
                       decoration: BoxDecoration(
                         color: themeController.isDarkMode.value
                             ? ColorManager.lightGrey1
@@ -333,26 +351,27 @@ class GpaCalculationController extends GetxController {
                                   )),
                             ),
                           ),
-                          Positioned(
-                            top: Get.height * 0.018,
-                            left: 16,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  gradient: ColorManager.gradientColor),
-                              alignment: Alignment.center,
-                              child: Text(selectedSemester.value,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: !themeController.isDarkMode.value
-                                        ? ColorManager.black
-                                        : ColorManager.white,
-                                  )),
-                            ),
-                          )
+                          if (!isCGPA)
+                            Positioned(
+                              top: Get.height * 0.018,
+                              left: 16,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    gradient: ColorManager.gradientColor),
+                                alignment: Alignment.center,
+                                child: Text(selectedSemester.value,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: !themeController.isDarkMode.value
+                                          ? ColorManager.black
+                                          : ColorManager.white,
+                                    )),
+                              ),
+                            )
                         ],
                       ),
                     ),
