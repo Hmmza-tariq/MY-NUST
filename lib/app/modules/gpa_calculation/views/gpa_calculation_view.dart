@@ -144,7 +144,6 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                           shape: const CircleBorder(),
                           backgroundColor:
                               ColorManager.primary.withOpacity(0.4),
-                          // fixedSize: const Size(32, 32)
                         ),
                         icon: Icon(
                           Icons.arrow_downward_rounded,
@@ -518,6 +517,8 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
   }
 
   Widget _buildCourseNameField(int index) {
+    TextEditingController courseNameController =
+        TextEditingController(text: controller.courses[index].value.name);
     return Row(
       children: [
         Expanded(
@@ -526,8 +527,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
               color: controller
                   .themeController.theme.appBarTheme.titleTextStyle?.color,
             ),
-            controller: TextEditingController(
-                text: controller.courses[index].value.name),
+            controller: courseNameController,
             decoration: InputDecoration(
               labelText: 'Course Name',
               labelStyle: TextStyle(
@@ -538,10 +538,8 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
             ),
-            onSubmitted: (value) {
-              controller.courses[index].update((course) {
-                course?.name = value;
-              });
+            onChanged: (value) {
+              controller.courses[index].value.name = value;
               controller.saveCourses();
             },
           ),
@@ -640,9 +638,8 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
   }
 
   Widget _buildGradeSlider(int index) {
-    List<String> grades = ["F", "D", "D+", "C", "C+", "B", "B+", "A"];
     double gpa = controller.courses[index].value.gpa;
-    int gradeIndex = (gpa * 2).clamp(0, grades.length - 1).round();
+    String grade = controller.getGrade(gpa);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -656,7 +653,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
             ),
             children: [
               TextSpan(
-                text: grades[gradeIndex],
+                text: grade,
                 style: const TextStyle(
                   color: ColorManager.primary,
                   fontWeight: FontWeight.bold,
@@ -675,7 +672,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
               onTap: () {
                 if (gpa > 0.0) {
                   controller.courses[index].update((course) {
-                    course?.gpa = (gpa - 0.5).clamp(0.0, 4.0);
+                    course?.gpa = (gpa - (gpa == 1 ? 1 : 0.5)).clamp(0.0, 4.0);
                   });
                   controller.saveCourses();
                 }
@@ -686,11 +683,11 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                 value: gpa,
                 min: 0.0,
                 max: 4.0,
-                divisions: grades.length - 1,
-                label: grades[gradeIndex],
+                divisions: 8,
+                label: grade,
                 onChanged: (value) {
                   controller.courses[index].update((course) {
-                    course?.gpa = value;
+                    course?.gpa = value == 0.5 ? 0.0 : value;
                   });
                   controller.saveCourses();
                 },
@@ -703,7 +700,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
               onTap: () {
                 if (gpa < 4.0) {
                   controller.courses[index].update((course) {
-                    course?.gpa = (gpa + 0.5).clamp(0.0, 4.0);
+                    course?.gpa = (gpa + (gpa == 0 ? 1 : 0.5)).clamp(0.0, 4.0);
                   });
                   controller.saveCourses();
                 }
