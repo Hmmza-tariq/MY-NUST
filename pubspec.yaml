@@ -44,6 +44,7 @@ dependencies:
   flutter_downloader: ^1.11.8
   webview_cookie_manager: ^2.0.6
   background_downloader: ^8.5.3
+  shimmer: ^3.0.0
    
 
 dev_dependencies: 

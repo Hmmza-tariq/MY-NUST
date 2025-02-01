@@ -11,152 +11,145 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Obx(() => Scaffold(
-            backgroundColor:
-                controller.themeController.theme.scaffoldBackgroundColor,
-            body: SafeArea(
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: ColorManager.gradientColor,
-                    ),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              icon: const Icon(
-                                Icons.arrow_back_ios_new_rounded,
-                                color: ColorManager.primary,
-                              ),
-                              onPressed: () {
-                                Get.back();
-                              },
+    return Obx(() => Scaffold(
+          backgroundColor:
+              controller.themeController.theme.scaffoldBackgroundColor,
+          body: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  gradient: ColorManager.gradientColor,
+                ),
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: ColorManager.primary,
                             ),
-                            Container(
-                              padding: const EdgeInsets.all(8.0),
-                              width: Get.width * 0.7,
-                              decoration: BoxDecoration(
-                                color: controller
-                                    .themeController.theme.cardTheme.color,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  CustomButton(
-                                    title: "CGPA",
-                                    color: controller.isCGPA.value
-                                        ? ColorManager.primary
-                                        : controller.themeController.theme
-                                            .cardTheme.color!,
-                                    textColor: !controller.isCGPA.value &&
-                                            !controller.themeController
-                                                .isDarkMode.value
-                                        ? ColorManager.black
-                                        : ColorManager.white,
-                                    widthFactor: 0.3,
-                                    verticalPadding: 0,
-                                    onPressed: () {
-                                      controller.isCGPA.value = true;
-                                    },
-                                  ),
-                                  CustomButton(
-                                    title: "SGPA",
-                                    color: controller.isCGPA.value
-                                        ? controller.themeController.theme
-                                            .cardTheme.color!
-                                        : ColorManager.primary,
-                                    textColor: controller.isCGPA.value &&
-                                            !controller.themeController
-                                                .isDarkMode.value
-                                        ? ColorManager.black
-                                        : ColorManager.white,
-                                    widthFactor: 0.3,
-                                    verticalPadding: 0,
-                                    onPressed: () {
-                                      controller.isCGPA.value = false;
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const IconButton(icon: SizedBox(), onPressed: null),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: controller.isCGPA.value
-                                ? _buildCGPASection(context)
-                                : _buildSGPASection(context),
+                            onPressed: () {
+                              Get.back();
+                            },
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if ((controller.isCGPA.value &&
-                          controller.semesters.isNotEmpty) ||
-                      (!controller.isCGPA.value &&
-                          controller.courses.isNotEmpty))
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: _buildBottomButtons(),
-                    ),
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: ConfettiWidget(
-                      confettiController: controller.confettiController,
-                      blastDirectionality: BlastDirectionality.explosive,
-                      minBlastForce: 10,
-                      maxBlastForce: 20,
-                      numberOfParticles: 20,
-                      colors: const [
-                        ColorManager.primary,
-                        ColorManager.secondary,
-                      ],
-                      createParticlePath: drawHexagons,
-                    ),
-                  ),
-                  if ((controller.isCGPA.value &&
-                          controller.semesters.length > 2) ||
-                      (!controller.isCGPA.value &&
-                          controller.courses.length > 2))
-                    Positioned(
-                      bottom: 80,
-                      right: 0,
-                      left: 0,
-                      child: IconButton(
-                        onPressed: () {
-                          controller.scrollController.animateTo(
-                            controller
-                                .scrollController.position.maxScrollExtent,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                        style: IconButton.styleFrom(
-                          shape: const CircleBorder(),
-                          backgroundColor:
-                              ColorManager.primary.withOpacity(0.4),
-                        ),
-                        icon: Icon(
-                          Icons.arrow_downward_rounded,
-                          color: ColorManager.white.withOpacity(0.6),
-                          size: 24,
+                          Container(
+                            padding: const EdgeInsets.all(8.0),
+                            width: Get.width * 0.7,
+                            decoration: BoxDecoration(
+                              color: controller
+                                  .themeController.theme.cardTheme.color,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                CustomButton(
+                                  title: "CGPA",
+                                  color: controller.isCGPA.value
+                                      ? ColorManager.primary
+                                      : controller.themeController.theme
+                                          .cardTheme.color!,
+                                  textColor: !controller.isCGPA.value &&
+                                          !controller
+                                              .themeController.isDarkMode.value
+                                      ? ColorManager.black
+                                      : ColorManager.white,
+                                  widthFactor: 0.3,
+                                  verticalPadding: 0,
+                                  onPressed: () {
+                                    controller.isCGPA.value = true;
+                                  },
+                                ),
+                                CustomButton(
+                                  title: "SGPA",
+                                  color: controller.isCGPA.value
+                                      ? controller.themeController.theme
+                                          .cardTheme.color!
+                                      : ColorManager.primary,
+                                  textColor: controller.isCGPA.value &&
+                                          !controller
+                                              .themeController.isDarkMode.value
+                                      ? ColorManager.black
+                                      : ColorManager.white,
+                                  widthFactor: 0.3,
+                                  verticalPadding: 0,
+                                  onPressed: () {
+                                    controller.isCGPA.value = false;
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          const IconButton(icon: SizedBox(), onPressed: null),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: controller.isCGPA.value
+                              ? _buildCGPASection(context)
+                              : _buildSGPASection(context),
                         ),
                       ),
-                    ),
-                ],
+                    ],
+                  ),
+                ),
               ),
-            ),
-          )),
-    );
+              if ((controller.isCGPA.value &&
+                      controller.semesters.isNotEmpty) ||
+                  (!controller.isCGPA.value && controller.courses.isNotEmpty))
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: _buildBottomButtons(),
+                ),
+              Align(
+                alignment: Alignment.topCenter,
+                child: ConfettiWidget(
+                  confettiController: controller.confettiController,
+                  blastDirectionality: BlastDirectionality.explosive,
+                  minBlastForce: 10,
+                  maxBlastForce: 20,
+                  numberOfParticles: 20,
+                  colors: const [
+                    ColorManager.primary,
+                    ColorManager.secondary,
+                  ],
+                  createParticlePath: drawHexagons,
+                ),
+              ),
+              if ((controller.isCGPA.value &&
+                      controller.semesters.length > 2) ||
+                  (!controller.isCGPA.value && controller.courses.length > 2))
+                Positioned(
+                  bottom: 80,
+                  right: 0,
+                  left: 0,
+                  child: IconButton(
+                    onPressed: () {
+                      controller.scrollController.animateTo(
+                        controller.scrollController.position.maxScrollExtent,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    style: IconButton.styleFrom(
+                      shape: const CircleBorder(),
+                      backgroundColor: ColorManager.primary.withOpacity(0.4),
+                    ),
+                    icon: Icon(
+                      Icons.arrow_downward_rounded,
+                      color: ColorManager.white.withOpacity(0.6),
+                      size: 24,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ));
   }
 
   Widget _buildCGPASection(BuildContext context) {
@@ -713,44 +706,47 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
   }
 
   Widget _buildBottomButtons() {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        gradient: ColorManager.gradientColor,
-        boxShadow: [
-          BoxShadow(
-            color: controller.themeController.isDarkMode.value
-                ? ColorManager.transparent
-                : ColorManager.shadow,
-            blurRadius: 10,
-            offset: const Offset(0, -3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          CustomButton(
-            title: controller.isCGPA.value ? "Add Semester" : "Add Course",
-            color: ColorManager.primary,
-            textColor: ColorManager.white,
-            widthFactor: 0.4,
-            isBold: false,
-            onPressed: controller.isCGPA.value
-                ? controller.addSemester
-                : () => controller.addCourse(controller.selectedSemester.value),
-          ),
-          const Spacer(),
-          CustomButton(
-            title: "Calculate",
-            color: ColorManager.primary,
-            textColor: ColorManager.white,
-            widthFactor: 0.4,
-            isBold: false,
-            onPressed: controller.isCGPA.value
-                ? controller.calculateCGPA
-                : controller.calculateSGPA,
-          ),
-        ],
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          gradient: ColorManager.gradientColor,
+          boxShadow: [
+            BoxShadow(
+              color: controller.themeController.isDarkMode.value
+                  ? ColorManager.transparent
+                  : ColorManager.shadow,
+              blurRadius: 10,
+              offset: const Offset(0, -3),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            CustomButton(
+              title: controller.isCGPA.value ? "Add Semester" : "Add Course",
+              color: ColorManager.primary,
+              textColor: ColorManager.white,
+              widthFactor: 0.4,
+              isBold: false,
+              onPressed: controller.isCGPA.value
+                  ? controller.addSemester
+                  : () =>
+                      controller.addCourse(controller.selectedSemester.value),
+            ),
+            const Spacer(),
+            CustomButton(
+              title: "Calculate",
+              color: ColorManager.primary,
+              textColor: ColorManager.white,
+              widthFactor: 0.4,
+              isBold: false,
+              onPressed: controller.isCGPA.value
+                  ? controller.calculateCGPA
+                  : controller.calculateSGPA,
+            ),
+          ],
+        ),
       ),
     );
   }
