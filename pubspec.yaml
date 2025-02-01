@@ -41,7 +41,10 @@ dependencies:
   path_provider: ^2.1.4
   device_info_plus: ^11.2.2
   flutter_downloader: ^1.11.8
-  webview_cookie_manager: ^2.0.6
+  webview_cookie_manager:
+    git:
+      url: https://github.com/rekire/webview_cookie_manager.git
+      ref: main
   background_downloader: ^8.5.3
   shimmer: ^3.0.0
   screenshot: ^3.0.0
