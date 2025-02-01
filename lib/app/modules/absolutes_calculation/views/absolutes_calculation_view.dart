@@ -15,15 +15,16 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
     return Scaffold(
       backgroundColor: controller.themeController.theme.scaffoldBackgroundColor,
       body: Container(
-        decoration: BoxDecoration(
-          gradient: ColorManager.gradientColor,
-        ),
-        height: Get.height,
-        child: SafeArea(
-          child: Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              Obx(() => Padding(
+          decoration: BoxDecoration(
+            gradient: ColorManager.gradientColor,
+          ),
+          height: Get.height,
+          child: SafeArea(
+            child: Obx(
+              () => Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,22 +33,60 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
                         const SizedBox(height: 16),
                         _buildChooseTypeButtons(),
                         const SizedBox(height: 16),
-                        Expanded(
+                        Flexible(
                           child: SingleChildScrollView(
                             controller: controller.scrollController,
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 const SizedBox(height: 8),
                                 _buildWeightSection(),
                                 const SizedBox(height: 16),
-                                ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: controller.assessments.length,
-                                  itemBuilder: (context, index) {
-                                    return _buildAssessmentCard(index);
-                                  },
-                                ),
+                                if (controller.assessments.isEmpty)
+                                  SizedBox(
+                                    height: Get.height * 0.5,
+                                    width: Get.width,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "Add an assessment to get\nstarted",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: controller
+                                                .themeController
+                                                .theme
+                                                .appBarTheme
+                                                .titleTextStyle
+                                                ?.color,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        CustomButton(
+                                          title: "Add Assessment",
+                                          color: ColorManager.primary,
+                                          textColor: ColorManager.white,
+                                          widthFactor: 0.4,
+                                          isBold: false,
+                                          onPressed: controller.addAssessment,
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                else
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemCount: controller.assessments.length,
+                                    itemBuilder: (context, index) {
+                                      return _buildAssessmentCard(index);
+                                    },
+                                  ),
                                 const SizedBox(height: 100),
                               ],
                             ),
@@ -55,60 +94,58 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
                         ),
                       ],
                     ),
-                  )),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: _buildBottomButtons(),
-              ),
-              Align(
-                alignment: Alignment.topCenter,
-                child: ConfettiWidget(
-                  confettiController: controller.confettiController,
-                  blastDirectionality: BlastDirectionality.explosive,
-                  minBlastForce: 10,
-                  maxBlastForce: 20,
-                  numberOfParticles: 20,
-                  colors: const [
-                    ColorManager.primary,
-                    ColorManager.secondary,
-                  ],
-                  createParticlePath: drawHexagons,
-                ),
-              ),
-              Obx(() {
-                if ((controller.assessments.length > 2 &&
-                    controller.scrollController.hasClients)) {
-                  return Positioned(
-                    bottom: 80,
-                    right: 0,
-                    left: 0,
-                    child: IconButton(
-                      onPressed: () {
-                        controller.scrollController.animateTo(
-                          controller.scrollController.position.maxScrollExtent,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      style: IconButton.styleFrom(
-                        shape: const CircleBorder(),
-                        backgroundColor: ColorManager.primary.withOpacity(0.4),
-                      ),
-                      icon: Icon(
-                        Icons.arrow_downward_rounded,
-                        color: ColorManager.white.withOpacity(0.6),
-                        size: 24,
-                      ),
+                  ),
+                  if (controller.assessments.isNotEmpty)
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: _buildBottomButtons(),
                     ),
-                  );
-                } else {
-                  return const SizedBox();
-                }
-              }),
-            ],
-          ),
-        ),
-      ),
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: ConfettiWidget(
+                      confettiController: controller.confettiController,
+                      blastDirectionality: BlastDirectionality.explosive,
+                      minBlastForce: 10,
+                      maxBlastForce: 20,
+                      numberOfParticles: 20,
+                      colors: const [
+                        ColorManager.primary,
+                        ColorManager.secondary,
+                      ],
+                      createParticlePath: drawHexagons,
+                    ),
+                  ),
+                  if ((controller.assessments.length > 2 &&
+                      controller.scrollController.hasClients))
+                    Positioned(
+                      bottom: 80,
+                      right: 0,
+                      left: 0,
+                      child: IconButton(
+                        onPressed: () {
+                          controller.scrollController.animateTo(
+                            controller
+                                .scrollController.position.maxScrollExtent,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        style: IconButton.styleFrom(
+                          shape: const CircleBorder(),
+                          backgroundColor:
+                              ColorManager.primary.withValues(alpha: .4),
+                        ),
+                        icon: Icon(
+                          Icons.arrow_downward_rounded,
+                          color: ColorManager.white.withValues(alpha: 0.6),
+                          size: 24,
+                        ),
+                      ),
+                    )
+                ],
+              ),
+            ),
+          )),
     );
   }
 
@@ -208,6 +245,7 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
       return Row(
         children: [
           InputWidget(
+            widthFactor: .44,
             doubleValue: controller.lectureWeight,
             title: "Lecture Weight (%)",
             onChanged: () {
@@ -216,6 +254,7 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
           ),
           const SizedBox(width: 16),
           InputWidget(
+            widthFactor: .44,
             doubleValue: controller.labWeight,
             title: "Lab Weight (%)",
             onChanged: () {
@@ -225,16 +264,7 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
         ],
       );
     } else {
-      return SizedBox(
-        width: Get.width,
-        child: InputWidget(
-          doubleValue: 100.0.obs,
-          title: controller.selectedType.value == "lab"
-              ? "Lab Weight (%)"
-              : "Lecture Weight (%)",
-          isEditable: false,
-        ),
-      );
+      return const SizedBox();
     }
   }
 
@@ -261,6 +291,7 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
           Row(
             children: [
               InputWidget(
+                  widthFactor: .7,
                   stringValue: name,
                   title: "Assessment Name",
                   isBorder: false,
@@ -280,6 +311,7 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
           Row(
             children: [
               InputWidget(
+                widthFactor: .2,
                 doubleValue: weight,
                 title: "Weight",
                 onChanged: () {
@@ -290,6 +322,7 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
               ),
               const SizedBox(width: 8),
               InputWidget(
+                widthFactor: .3,
                 doubleValue: totalMarks,
                 title: "Total Marks",
                 onChanged: () {
@@ -300,6 +333,7 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
               ),
               const SizedBox(width: 8),
               InputWidget(
+                widthFactor: .3,
                 doubleValue: obtainedMarks,
                 title: "Obtained Marks",
                 onChanged: () {

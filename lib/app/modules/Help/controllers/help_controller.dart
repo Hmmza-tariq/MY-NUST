@@ -44,9 +44,10 @@ class HelpController extends GetxController {
       Get.snackbar(
         "Success",
         "Your message has been sent successfully",
-        backgroundColor: themeController.theme.primaryColor.withOpacity(0.4),
+        backgroundColor:
+            themeController.theme.primaryColor.withValues(alpha: 0.4),
         colorText: themeController.theme.appBarTheme.titleTextStyle!.color!
-            .withOpacity(0.8),
+            .withValues(alpha: 0.8),
       );
       mailController.clear();
       messageController.clear();

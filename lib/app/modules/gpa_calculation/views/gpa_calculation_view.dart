@@ -138,11 +138,12 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                     },
                     style: IconButton.styleFrom(
                       shape: const CircleBorder(),
-                      backgroundColor: ColorManager.primary.withOpacity(0.4),
+                      backgroundColor:
+                          ColorManager.primary.withValues(alpha: 0.4),
                     ),
                     icon: Icon(
                       Icons.arrow_downward_rounded,
-                      color: ColorManager.white.withOpacity(0.6),
+                      color: ColorManager.white.withValues(alpha: 0.6),
                       size: 24,
                     ),
                   ),
