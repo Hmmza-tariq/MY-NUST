@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:confetti/confetti.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -7,15 +9,17 @@ import 'package:nust/app/data/course.dart';
 import 'package:nust/app/data/semester.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:nust/app/resources/color_manager.dart';
-import 'package:share_files_and_screenshot_widgets/share_files_and_screenshot_widgets.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 class GpaCalculationController extends GetxController {
   ThemeController themeController = Get.find();
   DatabaseController databaseController = Get.find();
   ConfettiController confettiController = ConfettiController();
   ScrollController scrollController = ScrollController();
-  GlobalKey previewContainer = GlobalKey();
-
+  ScreenshotController screenshotController = ScreenshotController();
   var isCGPA = true.obs;
   var semesters = <Rx<Semester>>[].obs;
   var courses = <Rx<Course>>[].obs;
@@ -298,8 +302,8 @@ class GpaCalculationController extends GetxController {
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  RepaintBoundary(
-                    key: previewContainer,
+                  Screenshot(
+                    controller: screenshotController,
                     child: Container(
                       color: themeController.theme.scaffoldBackgroundColor,
                       height: Get.height * 0.36,
@@ -407,10 +411,16 @@ class GpaCalculationController extends GetxController {
   }
 
   Future<bool> captureScreenShot(String type) async {
-    await ShareFilesAndScreenshotWidgets().shareScreenshot(
-        previewContainer, 1000, "Logo", "result.png", "image/png",
-        text:
-            "Hey! Check this out. I calculated my expected $type using 'My NUST' app.");
+    await screenshotController
+        .capture(delay: const Duration(milliseconds: 10))
+        .then((Uint8List? image) async {
+      final directory = await getApplicationDocumentsDirectory();
+      final imagePath = await File('${directory.path}/image.png').create();
+      await imagePath.writeAsBytes(image!);
+      await Share.shareXFiles([XFile(imagePath.path)],
+          text:
+              "Hey! Check this out. I calculated my expected $type using 'My NUST' app.");
+    });
     return true;
   }
 }

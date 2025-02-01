@@ -1,9 +1,15 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:nust/app/controllers/database_controller.dart';
 import 'package:nust/app/resources/color_manager.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../data/assessment.dart';
 
 class AbsolutesCalculationController extends GetxController {
@@ -22,7 +28,7 @@ class AbsolutesCalculationController extends GetxController {
 
   ConfettiController confettiController =
       ConfettiController(duration: const Duration(seconds: 3));
-
+  ScreenshotController screenshotController = ScreenshotController();
   @override
   void onInit() {
     super.onInit();
@@ -118,116 +124,160 @@ class AbsolutesCalculationController extends GetxController {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.close,
-                        color: themeController.isDarkMode.value
-                            ? ColorManager.lightGrey1
-                            : ColorManager.black,
-                      ),
-                      onPressed: Get.back,
-                    ),
-                    Container(
-                      width: 100,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: themeController.isDarkMode.value
-                            ? ColorManager.lightGrey1
-                            : ColorManager.black,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    const IconButton(icon: SizedBox(), onPressed: null),
-                  ],
-                ),
-                Text(
-                  "Absolutes Score${selectedType.value == "both" ? "" : " in ${selectedType.value.capitalizeFirst}"}",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                IconButton(
+                  icon: Icon(
+                    Icons.close,
                     color: themeController.isDarkMode.value
                         ? ColorManager.lightGrey1
                         : ColorManager.black,
                   ),
+                  onPressed: Get.back,
                 ),
-                const SizedBox(height: 8),
-                Text.rich(
-                  TextSpan(
-                    text: absolutes.value.toStringAsFixed(2),
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: color,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: " out of 100",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: themeController.isDarkMode.value
-                              ? ColorManager.lightGrey1
-                              : ColorManager.black,
-                        ),
-                      ),
-                    ],
+                Container(
+                  width: 100,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: themeController.isDarkMode.value
+                        ? ColorManager.lightGrey1
+                        : ColorManager.black,
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                if (selectedType.value == "both")
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 8),
-                      Text.rich(
-                        TextSpan(
-                          text: "Absolutes Score in Lab: ",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: themeController.isDarkMode.value
-                                ? ColorManager.lightGrey1
-                                : ColorManager.black,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: labScore.toStringAsFixed(2),
-                              style: TextStyle(
-                                color: color,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text.rich(
-                        TextSpan(
-                          text: "Absolutes Score in Lecture: ",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: themeController.isDarkMode.value
-                                ? ColorManager.lightGrey1
-                                : ColorManager.black,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: lectureScore.toStringAsFixed(2),
-                              style: TextStyle(
-                                color: color,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                IconButton(
+                  icon: Icon(
+                    Icons.share,
+                    color: themeController.isDarkMode.value
+                        ? ColorManager.lightGrey1
+                        : ColorManager.black,
                   ),
+                  onPressed: () async {
+                    await captureScreenShot(selectedType.value == "both"
+                        ? " "
+                        : " ${selectedType.value.capitalizeFirst} ");
+                  },
+                ),
               ],
+            ),
+            Screenshot(
+              controller: screenshotController,
+              child: Container(
+                color: themeController.theme.scaffoldBackgroundColor,
+                width: Get.width,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Absolutes Score${selectedType.value == "both" ? "" : " in ${selectedType.value.capitalizeFirst}"}",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: themeController.isDarkMode.value
+                                ? ColorManager.lightGrey1
+                                : ColorManager.black,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text.rich(
+                          TextSpan(
+                            text: absolutes.value.toStringAsFixed(2),
+                            style: TextStyle(
+                              fontSize: 24,
+                              color: color,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: " out of 100",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: themeController.isDarkMode.value
+                                      ? ColorManager.lightGrey1
+                                      : ColorManager.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (selectedType.value == "both")
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 8),
+                              Text.rich(
+                                TextSpan(
+                                  text: "Absolutes Score in Lab: ",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: themeController.isDarkMode.value
+                                        ? ColorManager.lightGrey1
+                                        : ColorManager.black,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: labScore.toStringAsFixed(2),
+                                      style: TextStyle(
+                                        color: color,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text.rich(
+                                TextSpan(
+                                  text: "Absolutes Score in Lecture: ",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: themeController.isDarkMode.value
+                                        ? ColorManager.lightGrey1
+                                        : ColorManager.black,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: lectureScore.toStringAsFixed(2),
+                                      style: TextStyle(
+                                        color: color,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                    Positioned(
+                      top: 24,
+                      right: 2,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            gradient: ColorManager.gradientColor),
+                        alignment: Alignment.center,
+                        child: Text("My NUST",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: !themeController.isDarkMode.value
+                                  ? ColorManager.black
+                                  : ColorManager.white,
+                            )),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -289,5 +339,21 @@ class AbsolutesCalculationController extends GetxController {
         type: aData["type"] ?? "lecture",
       ));
     }
+  }
+
+  Future<bool> captureScreenShot(String type) async {
+    await screenshotController
+        .capture(delay: const Duration(milliseconds: 10))
+        .then((Uint8List? image) async {
+      final directory = await getApplicationDocumentsDirectory();
+      final imagePath = await File('${directory.path}/image.png').create();
+      await imagePath.writeAsBytes(image!);
+      await Share.shareXFiles(
+        [XFile(imagePath.path)],
+        text:
+            "Hey! Check this out. I have calculated my${type}Absolute score using My Nust App. It's amazing! You should try it too.",
+      );
+    });
+    return true;
   }
 }

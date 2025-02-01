@@ -22,33 +22,33 @@ dependencies:
   webview_flutter: ^4.8.0
   flutter_email_sender: ^6.0.3
   html: ^0.15.4 
-  firebase_core: ^2.24.2 
-  firebase_messaging: ^14.7.10
+  firebase_core: ^3.10.1 
+  firebase_messaging: ^15.2.1
   url_launcher: ^6.3.0  
   connectivity_plus: ^6.0.5
-  app_version_update: 4.0.0
+  app_version_update: ^6.0.0
   custom_refresh_indicator: ^4.0.1
   cached_network_image: ^3.4.1
   local_auth: ^2.3.0
-  encrypt_shared_preferences: ^0.7.5
-  share_plus: ^10.0.1 
-  confetti: ^0.7.0
-  share_files_and_screenshot_widgets: ^1.0.6
+  encrypt_shared_preferences: ^0.8.7
+  share_plus: ^10.1.4 
+  confetti: ^0.8.0 
   flutter_dotenv: ^5.1.0
-  fl_chart: ^0.68.0
+  fl_chart: ^0.70.2
   permission_handler: ^11.3.1
-  flutter_local_notifications: ^17.2.2
+  flutter_local_notifications: ^18.0.1
   flutter_file_downloader: ^2.0.0
   path_provider: ^2.1.4
-  device_info_plus: ^10.1.2
+  device_info_plus: ^11.2.2
   flutter_downloader: ^1.11.8
   webview_cookie_manager: ^2.0.6
   background_downloader: ^8.5.3
   shimmer: ^3.0.0
+  screenshot: ^3.0.0
    
 
 dev_dependencies: 
-  flutter_lints: 4.0.0
+  flutter_lints: ^5.0.0
   flutter_test: 
     sdk: flutter
 

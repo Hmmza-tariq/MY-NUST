@@ -16,8 +16,9 @@ class AppUpdateController extends GetxController {
     super.onInit();
     try {
       AppVersionUpdate.checkForUpdates(
-              appleId: appleId, playStoreId: playStoreId)
-          .then((data) {
+        playStoreId: playStoreId,
+        // appleId: appleId,
+      ).then((data) {
         if (data.canUpdate!) {
           isUpdateAvailable(true);
           debugPrint('Update Available: ${data.storeVersion}');
