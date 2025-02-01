@@ -14,6 +14,7 @@ class InputWidget extends StatelessWidget {
     this.onChanged,
     this.isEditable = true,
     this.isBorder = true,
+    this.widthFactor = 1,
   });
 
   final RxDouble? doubleValue;
@@ -23,10 +24,12 @@ class InputWidget extends StatelessWidget {
   final void Function()? onChanged;
   final bool isEditable;
   final bool isBorder;
+  final double widthFactor;
   @override
   Widget build(BuildContext context) {
     final themeController = Get.find<ThemeController>();
-    return Obx(() => Expanded(
+    return Obx(() => SizedBox(
+          width: Get.width * widthFactor,
           child: TextFormField(
             initialValue: value ??
                 (doubleValue != null

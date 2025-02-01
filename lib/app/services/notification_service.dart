@@ -33,7 +33,7 @@ class NotificationsService {
       fcmToken = await _fcm.getToken();
 
       _fcm.subscribeToTopic('all');
-      debugPrint('token: $fcmToken');
+      // debugPrint('token: $fcmToken');
 
       firebaseInit(context);
       setupInteractMessage(context);
@@ -147,8 +147,8 @@ class NotificationsService {
 
     if (message.data['page'].toString().contains('gpa')) {
       Get.toNamed(Routes.GPA_CALCULATION);
-      // } else if (message.data['page'].toString().contains('meal')) {
-      //   Get.toNamed(Routes.MEAL);
+    } else if (message.data['page'].toString().contains('absolutes')) {
+      Get.toNamed(Routes.ABSOLUTES_CALCULATION);
     } else {
       Get.toNamed(Routes.HOME);
     }

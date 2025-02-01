@@ -25,13 +25,13 @@ class HomeCampusWidget extends StatelessWidget {
           style: ElevatedButton.styleFrom(
               elevation: 0,
               backgroundColor: ColorManager.transparent,
-              shadowColor: ColorManager.primary.withOpacity(.1),
+              shadowColor: ColorManager.primary.withValues(alpha: .1),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
                 side: BorderSide(
                     color: controller.themeController.isDarkMode.value
                         ? ColorManager.white
-                        : ColorManager.darkPrimary.withOpacity(.4),
+                        : ColorManager.darkPrimary.withValues(alpha: .4),
                     width: 2),
               ),
               // fixedSize: Size.fromWidth(Get.width * .46),
@@ -123,7 +123,8 @@ class HomeCampusButton extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: ColorManager.gradientColor,
               border: Border.all(
-                  color: ColorManager.darkPrimary.withOpacity(.2), width: 2),
+                  color: ColorManager.darkPrimary.withValues(alpha: .2),
+                  width: 2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: controller.isLoading.value
@@ -308,8 +309,8 @@ class BuildStoryContainer extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         ColorManager.transparent,
-                        ColorManager.background2.withOpacity(.5),
-                        ColorManager.background1.withOpacity(.5),
+                        ColorManager.background2.withValues(alpha: .5),
+                        ColorManager.background1.withValues(alpha: .5),
                       ],
                     ),
                     borderRadius: const BorderRadius.only(
@@ -508,8 +509,8 @@ class BuildStoryDetails extends StatelessWidget {
           end: Alignment.bottomCenter,
           colors: [
             ColorManager.transparent,
-            ColorManager.background2.withOpacity(.5),
-            ColorManager.background1.withOpacity(.5),
+            ColorManager.background2.withValues(alpha: .5),
+            ColorManager.background1.withValues(alpha: .5),
           ],
         ),
         borderRadius: const BorderRadius.only(
@@ -589,8 +590,8 @@ class HomeWebButton extends StatelessWidget {
               color: themeController.theme.cardTheme.color,
               border: Border.all(
                   color: themeController.isDarkMode.value
-                      ? ColorManager.lightGrey1.withOpacity(.2)
-                      : ColorManager.darkPrimary.withOpacity(.4),
+                      ? ColorManager.lightGrey1.withValues(alpha: .2)
+                      : ColorManager.darkPrimary.withValues(alpha: .4),
                   width: 2),
               borderRadius: BorderRadius.circular(10),
             ),
@@ -633,8 +634,8 @@ class HomeLargeButton extends StatelessWidget {
               color: themeController.theme.cardTheme.color,
               border: Border.all(
                   color: themeController.isDarkMode.value
-                      ? ColorManager.lightGrey1.withOpacity(.2)
-                      : ColorManager.darkPrimary.withOpacity(.4),
+                      ? ColorManager.lightGrey1.withValues(alpha: .2)
+                      : ColorManager.darkPrimary.withValues(alpha: .4),
                   width: 2),
               borderRadius: BorderRadius.circular(12),
             ),
@@ -694,8 +695,8 @@ class HomeSmallButton extends StatelessWidget {
               color: themeController.theme.cardTheme.color,
               border: Border.all(
                   color: themeController.isDarkMode.value
-                      ? ColorManager.lightGrey1.withOpacity(.2)
-                      : ColorManager.darkPrimary.withOpacity(.4),
+                      ? ColorManager.lightGrey1.withValues(alpha: .2)
+                      : ColorManager.darkPrimary.withValues(alpha: .4),
                   width: 2),
               borderRadius: BorderRadius.circular(10),
             ),

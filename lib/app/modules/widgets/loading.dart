@@ -21,7 +21,7 @@ var colors = [
 
 Widget showFullPageLoading(RxInt percentage) {
   return Container(
-    color: ColorManager.black.withOpacity(0.5),
+    color: ColorManager.black.withValues(alpha: 0.5),
     width: Get.width,
     height: Get.height,
     child: Stack(
@@ -33,11 +33,11 @@ Widget showFullPageLoading(RxInt percentage) {
               child: Container(
                   width: Get.width * 0.8,
                   decoration: BoxDecoration(
-                    color: ColorManager.white.withOpacity(0.5),
+                    color: ColorManager.white.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [
                       BoxShadow(
-                        color: ColorManager.black.withOpacity(0.2),
+                        color: ColorManager.black.withValues(alpha: 0.2),
                         blurRadius: 10,
                         spreadRadius: 5,
                       )
@@ -93,7 +93,7 @@ void errorSnackbar(String message) {
     message,
     duration: const Duration(seconds: 1),
     snackPosition: SnackPosition.TOP,
-    backgroundColor: ColorManager.error.withOpacity(0.8),
+    backgroundColor: ColorManager.error.withValues(alpha: 0.8),
     colorText: ColorManager.white,
   );
 }
@@ -104,7 +104,7 @@ void disclaimerSnackbar(String message) {
     message,
     duration: const Duration(seconds: 2),
     snackPosition: SnackPosition.TOP,
-    backgroundColor: ColorManager.primary.withOpacity(0.8),
+    backgroundColor: ColorManager.primary.withValues(alpha: 0.8),
     colorText: ColorManager.white,
   );
 }

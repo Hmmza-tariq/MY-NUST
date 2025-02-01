@@ -109,7 +109,7 @@ class WebController extends GetxController {
       // Get.snackbar(
       //   "Downloading",
       //   "${url.split('/').last} is being downloaded",
-      //   backgroundColor: ColorManager.primary.withOpacity(0.4),
+      //   backgroundColor: ColorManager.primary.withValues(alpha: 0.4),
       //   colorText: ColorManager.secondary,
       // );
       if (Platform.isAndroid) {

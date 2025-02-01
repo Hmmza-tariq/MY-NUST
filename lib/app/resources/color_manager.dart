@@ -73,6 +73,7 @@ class ColorManager {
   static final gradientColor = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: List.generate(5, (index) => primary.withOpacity(0.1 * (index + 1))),
+    colors: List.generate(
+        5, (index) => primary.withValues(alpha: 0.1 * (index + 1))),
   );
 }

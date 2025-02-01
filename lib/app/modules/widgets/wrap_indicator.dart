@@ -242,7 +242,7 @@ class Star {
     );
     final t = speedScale / maxSpeedScale;
     final opacity = _minOpacity + (_maxOpacity - _minOpacity) * t;
-    color = initialColor.withOpacity(opacity);
+    color = initialColor.withValues(alpha: opacity);
   }
 
   draw(Canvas canvas, Rect rect) {

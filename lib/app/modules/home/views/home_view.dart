@@ -26,15 +26,15 @@ class HomeView extends GetView<HomeController> {
                       center: Alignment.center,
                       radius: .6,
                       colors: [
-                          ColorManager.darkPrimary.withOpacity(.4),
-                          ColorManager.darkGrey.withOpacity(.4),
+                          ColorManager.darkPrimary.withValues(alpha: .4),
+                          ColorManager.darkGrey.withValues(alpha: .4),
                         ])
                   : LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        ColorManager.secondary.withOpacity(.2),
-                        ColorManager.primary.withOpacity(.2),
+                        ColorManager.secondary.withValues(alpha: .2),
+                        ColorManager.primary.withValues(alpha: .2),
                       ],
                     ),
             ),

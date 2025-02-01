@@ -55,7 +55,8 @@ class WebView extends GetView<WebController> {
                     onPressed: () {
                       controller.reload();
                     },
-                    backgroundColor: ColorManager.primary.withOpacity(0.5),
+                    backgroundColor:
+                        ColorManager.primary.withValues(alpha: 0.5),
                     elevation: 0,
                     highlightElevation: 0,
                     child: SvgPicture.asset(

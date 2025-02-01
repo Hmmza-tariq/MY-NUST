@@ -189,7 +189,7 @@ class GpaCalculationController extends GetxController {
         // Empty space section
         if (emptySpace > 0) {
           sections.add(PieChartSectionData(
-            color: ColorManager.primary.withOpacity(.2),
+            color: ColorManager.primary.withValues(alpha: .2),
             value: emptySpace,
             title: '', // No title for empty space
             radius: Get.width * 0.14,
@@ -230,7 +230,7 @@ class GpaCalculationController extends GetxController {
         // Empty space section
         if (emptySpace > 0) {
           sections.add(PieChartSectionData(
-            color: ColorManager.primary.withOpacity(.2),
+            color: ColorManager.primary.withValues(alpha: .2),
             value: emptySpace,
             title: '',
             radius: Get.width * 0.14,
