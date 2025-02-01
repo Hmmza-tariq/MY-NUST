@@ -13,6 +13,7 @@ class CustomButton extends StatelessWidget {
     this.margin,
     this.isBold,
     this.verticalPadding,
+    this.horizontalPadding,
   });
   final String title;
   final void Function()? onPressed;
@@ -21,6 +22,7 @@ class CustomButton extends StatelessWidget {
   final double? widthFactor;
   final double? margin;
   final double? verticalPadding;
+  final double? horizontalPadding;
   final double? fontSize;
   final bool? isBold;
   @override
@@ -40,7 +42,7 @@ class CustomButton extends StatelessWidget {
                   ? Size.fromWidth(Get.width * widthFactor!)
                   : null,
               padding: EdgeInsets.symmetric(
-                  horizontal: isBold == false ? 16 : 32,
+                  horizontal: horizontalPadding ?? (isBold == false ? 16 : 32),
                   vertical: verticalPadding ?? 16)),
           child: Text(title,
               style: TextStyle(

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:nust/app/controllers/campus_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
 import '../../../controllers/internet_controller.dart';
+import '../../../services/notification_service.dart';
 
 class HomeController extends GetxController {
   final CarouselSliderController pageController = CarouselSliderController();
@@ -24,6 +25,7 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     _initialize();
+    NotificationsService().init(Get.context!);
   }
 
   void _initialize() {

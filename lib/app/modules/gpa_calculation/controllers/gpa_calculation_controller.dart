@@ -45,6 +45,7 @@ class GpaCalculationController extends GetxController {
 
   @override
   void onClose() {
+    confettiController.dispose();
     scrollController.dispose();
     super.onClose();
   }
