@@ -62,7 +62,8 @@ class AboutView extends GetView<AboutController> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(16.0),
-                  margin: const EdgeInsets.all(32.0),
+                  margin: const EdgeInsets.only(
+                      left: 32, right: 32, top: 0, bottom: 32),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -255,7 +256,7 @@ class AboutView extends GetView<AboutController> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Request source code:',
+                                'Source code:',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -265,15 +266,18 @@ class AboutView extends GetView<AboutController> {
                                       : ColorManager.black,
                                 ),
                               ),
-                              Text(
-                                '(not going to approve it though)',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w300,
-                                  color: controller
-                                          .themeController.isDarkMode.value
-                                      ? ColorManager.white
-                                      : ColorManager.black,
+                              SizedBox(
+                                width: Get.width * 0.7,
+                                child: Text(
+                                  'This project is now open source. Enjoy exploring and contributing.',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w300,
+                                    color: controller
+                                            .themeController.isDarkMode.value
+                                        ? ColorManager.white
+                                        : ColorManager.black,
+                                  ),
                                 ),
                               ),
                             ],

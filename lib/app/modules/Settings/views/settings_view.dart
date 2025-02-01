@@ -58,7 +58,8 @@ class SettingsView extends GetView<SettingsController> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   padding: const EdgeInsets.all(16.0),
-                  margin: const EdgeInsets.all(32.0),
+                  margin: const EdgeInsets.only(
+                      left: 32, right: 32, top: 0, bottom: 32),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [

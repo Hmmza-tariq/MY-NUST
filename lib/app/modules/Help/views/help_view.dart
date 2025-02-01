@@ -60,7 +60,8 @@ class HelpView extends GetView<HelpController> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     padding: const EdgeInsets.all(16.0),
-                    margin: const EdgeInsets.all(32.0),
+                    margin: const EdgeInsets.only(
+                        left: 32, right: 32, top: 0, bottom: 32),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -79,6 +80,13 @@ class HelpView extends GetView<HelpController> {
                             style: TextStyle(
                               color: controller.themeController.theme
                                   .appBarTheme.titleTextStyle!.color,
+                              fontSize: 14,
+                            )),
+                        Text(
+                            "(this is not an official NUST app, I am just a student like you)",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.grey[600],
                               fontSize: 14,
                             )),
                         const SizedBox(height: 16),

@@ -2,11 +2,11 @@ import 'package:get/get.dart';
 
 import '../controllers/aggregate_calculation_controller.dart';
 
-class AggregateCalculationBinding extends Bindings {
+class AbsolutesCalculationBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AggregateCalculationController>(
-      () => AggregateCalculationController(),
+    Get.lazyPut<AbsolutesCalculationController>(
+      () => AbsolutesCalculationController(),
     );
   }
 }

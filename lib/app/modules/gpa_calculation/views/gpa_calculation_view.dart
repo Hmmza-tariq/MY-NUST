@@ -43,7 +43,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                               decoration: BoxDecoration(
                                 color: controller
                                     .themeController.theme.cardTheme.color,
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(16),
                               ),
                               child: Row(
                                 mainAxisAlignment:

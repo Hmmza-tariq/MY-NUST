@@ -72,8 +72,8 @@ class AppPages {
     ),
     GetPage(
         name: _Paths.AGGREGATE_CALCULATION,
-        page: () => const AggregateCalculationView(),
-        binding: AggregateCalculationBinding(),
+        page: () => const AbsolutesCalculationView(),
+        binding: AbsolutesCalculationBinding(),
         transition: Transition.fadeIn,
         transitionDuration: const Duration(milliseconds: 300)),
     GetPage(

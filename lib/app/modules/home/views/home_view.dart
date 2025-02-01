@@ -218,7 +218,7 @@ class HomeView extends GetView<HomeController> {
                     ),
                     const SizedBox(height: 16),
                     const HomeLargeButton(
-                      title: 'Calculate Aggregate',
+                      title: 'Calculate Absolutes',
                       icon: AssetsManager.result,
                       page: Routes.AGGREGATE_CALCULATION,
                     ),

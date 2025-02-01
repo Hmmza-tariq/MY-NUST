@@ -118,4 +118,30 @@ class DatabaseController extends GetxController {
     }
     return courses;
   }
+
+  void saveAbsolutesAssessments(List<Map<String, Object>> list) {
+    sharedPref.setString('absolutesAssessments', jsonEncode(list));
+  }
+
+  List<dynamic> getAbsolutesAssessments() {
+    List<dynamic> data = [];
+    try {
+      data = jsonDecode(sharedPref.getString('absolutesAssessments') ?? '[]');
+    } catch (e) {
+      debugPrint('Error getting Absolutes assessments: $e');
+    }
+    return data;
+  }
+
+  void saveAbsolutesWeights(double value, double value2) {
+    sharedPref.setDouble('absolutesWeight1', value);
+    sharedPref.setDouble('absolutesWeight2', value2);
+  }
+
+  List<double> getAbsolutesWeights() {
+    return [
+      sharedPref.getDouble('absolutesWeight1') ?? 0.0,
+      sharedPref.getDouble('absolutesWeight2') ?? 0.0,
+    ];
+  }
 }

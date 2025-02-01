@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -10,16 +11,19 @@ import 'package:nust/app/controllers/database_controller.dart';
 import 'package:nust/app/controllers/internet_controller.dart';
 import 'package:nust/app/controllers/campus_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
-import 'package:nust/app/services/notification_service.dart';
 import 'app/modules/widgets/error_widget.dart';
 import 'app/routes/app_pages.dart';
 import 'firebase_options.dart';
 
+@pragma('vm:entry-point')
+Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await NotificationsService().initNotifications();
   await dotenv.load(fileName: ".env");
 
   DatabaseController databaseController = Get.put(DatabaseController());

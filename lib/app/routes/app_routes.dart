@@ -23,6 +23,6 @@ abstract class _Paths {
   static const HELP = '/help';
   static const GPA_CALCULATION = '/gpa-calculation';
   static const ABOUT = '/about';
-  static const AGGREGATE_CALCULATION = '/aggregate-calculation';
+  static const AGGREGATE_CALCULATION = '/absolutes-calculation';
   static const AUTHENTICATION = '/authentication';
 }
