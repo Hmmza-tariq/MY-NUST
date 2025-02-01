@@ -220,7 +220,7 @@ class HomeView extends GetView<HomeController> {
                     const HomeLargeButton(
                       title: 'Calculate Absolutes',
                       icon: AssetsManager.result,
-                      page: Routes.AGGREGATE_CALCULATION,
+                      page: Routes.ABSOLUTES_CALCULATION,
                     ),
                     const SizedBox(height: 16),
                     const Row(

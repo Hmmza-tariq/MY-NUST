@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 
-import '../controllers/aggregate_calculation_controller.dart';
+import '../controllers/absolutes_calculation_controller.dart';
 
 class AbsolutesCalculationBinding extends Bindings {
   @override

@@ -5,7 +5,7 @@ import 'package:nust/app/modules/widgets/confetti.dart';
 import 'package:nust/app/resources/color_manager.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/input_widget.dart';
-import '../controllers/aggregate_calculation_controller.dart';
+import '../controllers/absolutes_calculation_controller.dart';
 
 class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
   const AbsolutesCalculationView({super.key});

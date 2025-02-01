@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/resources/color_manager.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../resources/assets_manager.dart';
@@ -87,15 +88,34 @@ class AboutView extends GetView<AboutController> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      Text(
-                        "Hey, I'm Hamza. Have a nice day! :)",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: controller.themeController.isDarkMode.value
-                              ? ColorManager.white
-                              : ColorManager.black,
+                      Shimmer(
+                        gradient: LinearGradient(
+                          colors: [
+                            !controller.themeController.isDarkMode.value
+                                ? ColorManager.primaryDark
+                                : ColorManager.lightGrey,
+                            !controller.themeController.isDarkMode.value
+                                ? ColorManager.primary50
+                                : ColorManager.white,
+                            !controller.themeController.isDarkMode.value
+                                ? ColorManager.primaryDark
+                                : ColorManager.lightGrey,
+                            !controller.themeController.isDarkMode.value
+                                ? ColorManager.primary50
+                                : ColorManager.white,
+                          ],
                         ),
-                        textAlign: TextAlign.center,
+                        period: const Duration(milliseconds: 3000),
+                        child: Text(
+                          "Hey, I'm Hamza.",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: controller.themeController.isDarkMode.value
+                                ? ColorManager.white
+                                : ColorManager.black,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       const Divider(color: ColorManager.lightGrey),
                       Text(
