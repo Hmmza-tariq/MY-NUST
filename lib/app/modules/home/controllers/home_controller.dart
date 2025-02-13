@@ -1,7 +1,7 @@
 import 'package:carousel_slider_plus/carousel_slider_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
-import 'package:nust/app/controllers/campus_controller.dart';
+import 'package:nust/app/controllers/stories_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
 import '../../../controllers/internet_controller.dart';
 import '../../../services/notification_service.dart';
@@ -11,7 +11,7 @@ class HomeController extends GetxController {
   final activePage = 0.obs;
 
   final ThemeController themeController = Get.find();
-  final CampusController campusController = Get.find();
+  final StoriesController campusController = Get.find();
   final InternetController internetController = Get.find();
 
   final String lmsUrl = dotenv.env['LMS_URL'] ?? '';

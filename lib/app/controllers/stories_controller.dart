@@ -6,8 +6,9 @@ import 'package:get/get.dart';
 import 'package:html/parser.dart' as htmlParser;
 import 'package:html/dom.dart';
 import 'package:nust/app/controllers/database_controller.dart';
+import 'package:nust/app/data/story.dart';
 
-class CampusController extends GetxController {
+class StoriesController extends GetxController {
   final Dio _dio = Dio();
   final String baseUrl = dotenv.env['BASE_URL'] ?? '';
   List<String> campuses = [
@@ -31,8 +32,7 @@ class CampusController extends GetxController {
   ];
   var selectedCampus = 'SEECS'.obs;
   var logo = ''.obs;
-  Rx<List<Map<String, String?>>> topStories =
-      Rx<List<Map<String, String?>>>([]);
+  RxList<Story> topStories = <Story>[].obs;
 
   DatabaseController databaseController = Get.find();
 
@@ -49,28 +49,43 @@ class CampusController extends GetxController {
 
   Future<bool> fetchTopStories() async {
     try {
-      List<Map<String, String?>> data = [];
+      List<Story> data = [];
       final mainResponse = await _dio.get(baseUrl);
       if (mainResponse.statusCode == 200) {
         String htmlContent = mainResponse.data;
         parseTopStories(htmlContent).forEach((element) {
-          data.add(element);
+          data.add(Story.fromMap(element));
         });
       }
       final otherResponse = await _dio.get(getCampusUrl());
       if (otherResponse.statusCode == 200) {
         String htmlContent = otherResponse.data;
         parseTopStories(htmlContent).forEach((element) {
-          data.add(element);
+          data.add(Story.fromMap(element));
         });
         parseLogo(htmlContent);
       }
-      data.add({
-        'title': 'NUST News',
-        'category': 'NUST',
-        'imageUrl': 'assets/images/nust_logo.png',
-        'link': baseUrl,
-      });
+      var customStories =
+          await databaseController.getDataFromFirebase('custom_stories') ?? [];
+      for (var story in customStories) {
+        data.add(Story.fromMap(story));
+      }
+
+      if (selectedCampus.value == 'CEME') {
+        data.add(Story(
+          category: 'CEME Monthly Bills',
+          title: 'EMEnents can check their monthly bills here',
+          imageUrl:
+              'https://play-lh.googleusercontent.com/T7oRnv3TYW1RgSPLWL8uvowHlYxhcAI16dRP6i6FfIq3cd-Hn2iJnPLhiETQmKzvzw',
+          link: 'https://app.kuickpay.com/PaymentsSearchBill',
+        ));
+      }
+      data.add(Story(
+        title: 'NUST News',
+        category: 'NUST',
+        imageUrl: 'assets/images/nust_logo.png',
+        link: baseUrl,
+      ));
       topStories.value = data;
       return true;
     } catch (e) {

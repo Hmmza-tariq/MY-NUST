@@ -2,6 +2,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/modules/widgets/custom_button.dart';
+import 'package:nust/app/modules/widgets/custom_scrollbar.dart';
 import '../../../resources/color_manager.dart';
 import '../../widgets/confetti.dart';
 import '../controllers/gpa_calculation_controller.dart';
@@ -121,33 +122,6 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                   createParticlePath: drawHexagons,
                 ),
               ),
-              if ((controller.isCGPA.value &&
-                      controller.semesters.length > 2) ||
-                  (!controller.isCGPA.value && controller.courses.length > 2))
-                Positioned(
-                  bottom: 80,
-                  right: 0,
-                  left: 0,
-                  child: IconButton(
-                    onPressed: () {
-                      controller.scrollController.animateTo(
-                        controller.scrollController.position.maxScrollExtent,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut,
-                      );
-                    },
-                    style: IconButton.styleFrom(
-                      shape: const CircleBorder(),
-                      backgroundColor:
-                          ColorManager.primary.withValues(alpha: 0.4),
-                    ),
-                    icon: Icon(
-                      Icons.arrow_downward_rounded,
-                      color: ColorManager.white.withValues(alpha: 0.6),
-                      size: 24,
-                    ),
-                  ),
-                ),
             ],
           ),
         ));
@@ -183,12 +157,15 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                 ],
               ),
             )
-          : ListView.builder(
-              itemCount: controller.semesters.length,
+          : CustomScrollbar(
               controller: controller.scrollController,
-              itemBuilder: (context, index) {
-                return _buildSemesterItem(index);
-              },
+              child: ListView.builder(
+                itemCount: controller.semesters.length,
+                controller: controller.scrollController,
+                itemBuilder: (context, index) {
+                  return _buildSemesterItem(index);
+                },
+              ),
             ),
     );
   }
@@ -243,12 +220,15 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                     ],
                   ),
                 )
-              : ListView.builder(
-                  itemCount: controller.courses.length,
+              : CustomScrollbar(
                   controller: controller.scrollController,
-                  itemBuilder: (context, index) {
-                    return _buildCourseItem(index);
-                  },
+                  child: ListView.builder(
+                    itemCount: controller.courses.length,
+                    controller: controller.scrollController,
+                    itemBuilder: (context, index) {
+                      return _buildCourseItem(index);
+                    },
+                  ),
                 ),
         ),
       ],

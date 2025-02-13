@@ -1,7 +1,7 @@
 name: nust
 description: Nust unofficial Student app
 
-version: 2.0.5+27
+version: 2.0.6+28
 publish_to: none
 
 environment: 
@@ -48,6 +48,7 @@ dependencies:
   background_downloader: ^8.5.3
   shimmer: ^3.0.0
   screenshot: ^3.0.0
+  firebase_database: ^11.3.2
    
 
 dev_dependencies: 
