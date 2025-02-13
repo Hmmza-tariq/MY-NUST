@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:nust/app/modules/widgets/confetti.dart';
 import 'package:nust/app/resources/color_manager.dart';
 import '../../widgets/custom_button.dart';
+import '../../widgets/custom_scrollbar.dart';
 import '../../widgets/input_widget.dart';
 import '../controllers/absolutes_calculation_controller.dart';
 
@@ -25,73 +26,56 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
                 alignment: Alignment.bottomCenter,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 16,
                       children: [
                         _buildHeader(),
-                        const SizedBox(height: 16),
                         _buildChooseTypeButtons(),
-                        const SizedBox(height: 16),
-                        Flexible(
-                          child: SingleChildScrollView(
-                            controller: controller.scrollController,
+                        _buildWeightSection(),
+                        if (controller.assessments.isEmpty)
+                          SizedBox(
+                            height: Get.height * 0.5,
+                            width: Get.width,
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const SizedBox(height: 8),
-                                _buildWeightSection(),
-                                const SizedBox(height: 16),
-                                if (controller.assessments.isEmpty)
-                                  SizedBox(
-                                    height: Get.height * 0.5,
-                                    width: Get.width,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          "Add an assessment to get\nstarted",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: controller
-                                                .themeController
-                                                .theme
-                                                .appBarTheme
-                                                .titleTextStyle
-                                                ?.color,
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 16),
-                                        CustomButton(
-                                          title: "Add Assessment",
-                                          color: ColorManager.primary,
-                                          textColor: ColorManager.white,
-                                          widthFactor: 0.4,
-                                          isBold: false,
-                                          onPressed: controller.addAssessment,
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                else
-                                  ListView.builder(
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: controller.assessments.length,
-                                    itemBuilder: (context, index) {
-                                      return _buildAssessmentCard(index);
-                                    },
+                                Text(
+                                  "Add an assessment to get\nstarted",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: controller.themeController.theme
+                                        .appBarTheme.titleTextStyle?.color,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                const SizedBox(height: 100),
+                                ),
+                                const SizedBox(height: 16),
+                                CustomButton(
+                                  title: "Add Assessment",
+                                  color: ColorManager.primary,
+                                  textColor: ColorManager.white,
+                                  widthFactor: 0.4,
+                                  isBold: false,
+                                  onPressed: controller.addAssessment,
+                                ),
                               ],
                             ),
+                          )
+                        else
+                          Expanded(
+                            child: CustomScrollbar(
+                              controller: controller.scrollController,
+                              child: ListView.builder(
+                                itemCount: controller.assessments.length,
+                                controller: controller.scrollController,
+                                itemBuilder: (context, index) {
+                                  return _buildAssessmentCard(index);
+                                },
+                              ),
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -115,33 +99,6 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
                       createParticlePath: drawHexagons,
                     ),
                   ),
-                  if ((controller.assessments.length > 2 &&
-                      controller.scrollController.hasClients))
-                    Positioned(
-                      bottom: 80,
-                      right: 0,
-                      left: 0,
-                      child: IconButton(
-                        onPressed: () {
-                          controller.scrollController.animateTo(
-                            controller
-                                .scrollController.position.maxScrollExtent,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                        style: IconButton.styleFrom(
-                          shape: const CircleBorder(),
-                          backgroundColor:
-                              ColorManager.primary.withValues(alpha: .4),
-                        ),
-                        icon: Icon(
-                          Icons.arrow_downward_rounded,
-                          color: ColorManager.white.withValues(alpha: 0.6),
-                          size: 24,
-                        ),
-                      ),
-                    )
                 ],
               ),
             ),
@@ -150,31 +107,35 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
   }
 
   Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            color: ColorManager.primary,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: ColorManager.primary,
+            ),
+            onPressed: () => Get.back(),
           ),
-          onPressed: () => Get.back(),
-        ),
-        const Text(
-          "Absolutes Calculation",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: ColorManager.primary,
+          const Text(
+            "Absolutes Calculation",
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: ColorManager.primary,
+            ),
           ),
-        ),
-        const IconButton(icon: SizedBox(), onPressed: null),
-      ],
+          const IconButton(icon: SizedBox(), onPressed: null),
+        ],
+      ),
     );
   }
 
   Widget _buildChooseTypeButtons() {
     return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0),
       padding: const EdgeInsets.all(8.0),
       width: Get.width,
       decoration: BoxDecoration(
@@ -242,29 +203,32 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
 
   Widget _buildWeightSection() {
     if (controller.selectedType.value == "both") {
-      return Row(
-        children: [
-          InputWidget(
-            widthFactor: .44,
-            doubleValue: controller.lectureWeight,
-            title: "Lecture Weight (%)",
-            onChanged: () {
-              controller.saveWeights();
-            },
-          ),
-          const SizedBox(width: 16),
-          InputWidget(
-            widthFactor: .44,
-            doubleValue: controller.labWeight,
-            title: "Lab Weight (%)",
-            onChanged: () {
-              controller.saveWeights();
-            },
-          ),
-        ],
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Row(
+          children: [
+            InputWidget(
+              widthFactor: .44,
+              doubleValue: controller.lectureWeight,
+              title: "Lecture Weight (%)",
+              onChanged: () {
+                controller.saveWeights();
+              },
+            ),
+            const SizedBox(width: 16),
+            InputWidget(
+              widthFactor: .44,
+              doubleValue: controller.labWeight,
+              title: "Lab Weight (%)",
+              onChanged: () {
+                controller.saveWeights();
+              },
+            ),
+          ],
+        ),
       );
     } else {
-      return const SizedBox();
+      return const SizedBox.shrink();
     }
   }
 
@@ -285,7 +249,11 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
         borderRadius: BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.all(12.0),
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: EdgeInsets.only(
+          right: 16,
+          left: 16,
+          top: 8,
+          bottom: index == controller.assessments.length - 1 ? 60 : 8),
       child: Column(
         children: [
           Row(

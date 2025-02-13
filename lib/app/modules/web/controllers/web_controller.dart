@@ -16,6 +16,7 @@ class WebController extends GetxController {
   var isLoading = true.obs;
   var isError = false.obs;
   var canPop = false.obs;
+  var queryRan = false.obs;
   late WebViewController webViewController;
   var status = 0.obs;
   AuthenticationController authenticationController = Get.find();
@@ -166,6 +167,8 @@ class WebController extends GetxController {
 
     if (authenticationController.isAutofillEnabled.value) {
       autoFillLoginDetails(url);
+    } else if (url.contains("kuickpay")) {
+      kuickPayQuery();
     }
   }
 
@@ -191,9 +194,51 @@ class WebController extends GetxController {
     }
   }
 
+  void kuickPayQuery() {
+    if (queryRan.value) {
+      return;
+    }
+    webViewController.runJavaScript('''
+      var selectElement = document.getElementById("MainContent_cboInstitution");
+      for (var i = 0; i < selectElement.options.length; i++) {
+        if (selectElement.options[i].value === "04490") {
+            selectElement.selectedIndex = i; 
+        if ("createEvent" in document) {
+            var evt = document.createEvent("HTMLEvents");
+            evt.initEvent("change", false, true);
+            selectElement.dispatchEvent(evt);
+        } else {
+            selectElement.fireEvent("onchange");
+        }
+        break;
+        }
+    } 
+    var selectElement = document.getElementById("MainContent_cboSearchBy"); 
+    for (var i = 0; i < selectElement.options.length; i++) {
+        if (selectElement.options[i].value === "RegistrationNumber") {
+            selectElement.selectedIndex = i;
+
+            if ("createEvent" in document) {
+                var evt = document.createEvent("HTMLEvents");
+                evt.initEvent("change", false, true);
+                selectElement.dispatchEvent(evt);
+            } else {
+                selectElement.fireEvent("onchange");
+            }
+
+            break;
+        }
+    }
+      ''');
+    queryRan.value = true;
+    print('kuickpay query ran');
+  }
+
   bool shouldPreventNavigation(String url) {
     final Uri uri = Uri.parse(url);
-    if (uri.host == 'nust.edu.pk' || uri.host.endsWith('.nust.edu.pk')) {
+    if (uri.host == 'nust.edu.pk' ||
+        uri.host.endsWith('.nust.edu.pk') ||
+        uri.host == 'app.kuickpay.com') {
       return false;
     }
     return true;

@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:nust/app/data/entities/lines.dart';
+import 'package:nust/app/data/story.dart';
 import 'package:nust/app/modules/widgets/error_widget.dart';
 import 'package:nust/app/resources/assets_manager.dart';
 import 'package:nust/app/resources/color_manager.dart';
@@ -236,14 +237,12 @@ class BuildStoryContainer extends StatelessWidget {
     required this.activePage,
     required this.isLast,
   });
-  final Map<String, String?> story;
+  final Story story;
   final int index;
   final int activePage;
   final bool isLast;
   @override
   Widget build(BuildContext context) {
-    String imageUrl = story['imageUrl'] ?? '';
-
     return AnimatedContainer(
       duration: const Duration(milliseconds: 400),
       width: Get.width * 0.6,
@@ -368,7 +367,7 @@ class BuildStoryContainer extends StatelessWidget {
             )
           : Stack(
               children: [
-                if (imageUrl != '')
+                if (story.imageUrl != '')
                   Column(
                     children: [
                       ClipRRect(
@@ -377,7 +376,7 @@ class BuildStoryContainer extends StatelessWidget {
                           topRight: Radius.circular(12),
                         ),
                         child: CachedNetworkImage(
-                            imageUrl: story['imageUrl']!,
+                            imageUrl: story.imageUrl!,
                             width: Get.width,
                             height: 120,
                             fit: BoxFit.cover,
@@ -476,15 +475,15 @@ class BuildStoryDetails extends StatelessWidget {
     required this.index,
     required this.activePage,
   });
-  final Map<String, String?> story;
+  final Story story;
   final int index;
   final int activePage;
 
   @override
   Widget build(BuildContext context) {
-    String category = story['category'] ?? '';
-    String title = story['title'] ?? '';
-    String link = story['link'] ?? '';
+    String category = story.category ?? '';
+    String title = story.title ?? '';
+    String link = story.link ?? '';
 
     String campus = '';
     try {
@@ -498,7 +497,6 @@ class BuildStoryDetails extends StatelessWidget {
       campus = '';
     }
     category = category == '' ? 'Top $campus Stories' : category;
-
     return Container(
       padding: const EdgeInsets.all(8),
       width: Get.width * 0.58,
@@ -542,7 +540,7 @@ class BuildStoryDetails extends StatelessWidget {
                     ),
                     onTap: () {
                       Get.toNamed(Routes.WEB,
-                          parameters: {'url': story['link'].toString()});
+                          parameters: {'url': story.link.toString()});
                     },
                   ),
                 const SizedBox(width: 10),

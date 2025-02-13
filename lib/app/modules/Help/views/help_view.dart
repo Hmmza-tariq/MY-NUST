@@ -75,7 +75,7 @@ class HelpView extends GetView<HelpController> {
                             child: Image.asset(AssetsManager.helpBanner,
                                 height: Get.height * 0.33)),
                         Text(
-                            "Need help? Want to report a bug? Post an Ad? Request a feature? We're here to help!",
+                            "Need help? Want to report a bug? Post an event? Request a feature? We're here to help!",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: controller.themeController.theme

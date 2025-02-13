@@ -104,8 +104,7 @@ class HomeView extends GetView<HomeController> {
                       final isLoading = controller.isLoading.value;
                       final isError = controller.isError.value;
                       final activePage = controller.activePage.value;
-                      final topStories =
-                          controller.campusController.topStories.value;
+                      final topStories = controller.campusController.topStories;
 
                       return SizedBox(
                         height: 240,
@@ -157,8 +156,7 @@ class HomeView extends GetView<HomeController> {
                         count: (controller.isLoading.value ||
                                 controller.isError.value)
                             ? 3
-                            : controller
-                                .campusController.topStories.value.length,
+                            : controller.campusController.topStories.length,
                         onDotClicked: (index) {
                           controller.pageController.animateToPage(
                             index,

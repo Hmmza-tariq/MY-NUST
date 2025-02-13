@@ -9,7 +9,7 @@ import 'package:nust/app/controllers/app_update_controller.dart';
 import 'package:nust/app/controllers/authentication_controller.dart';
 import 'package:nust/app/controllers/database_controller.dart';
 import 'package:nust/app/controllers/internet_controller.dart';
-import 'package:nust/app/controllers/campus_controller.dart';
+import 'package:nust/app/controllers/stories_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
 import 'app/modules/widgets/error_widget.dart';
 import 'app/routes/app_pages.dart';
@@ -35,7 +35,7 @@ void main() async {
 
   Get.put(InternetController());
   Get.put(AppUpdateController());
-  Get.put(CampusController());
+  Get.put(StoriesController());
 
   bool authenticated = false;
   if (authenticationController.isBiometricEnabled.value == true) {
