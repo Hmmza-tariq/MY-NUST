@@ -12,7 +12,7 @@ import 'package:nust/app/resources/color_manager.dart';
 import 'package:nust/app/routes/app_pages.dart';
 import '../home/controllers/home_controller.dart';
 import 'custom_button.dart';
-import 'loading.dart';
+import 'custom_loading.dart';
 
 class HomeCampusWidget extends StatelessWidget {
   const HomeCampusWidget({

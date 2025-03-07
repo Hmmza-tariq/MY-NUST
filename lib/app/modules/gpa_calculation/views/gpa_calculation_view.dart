@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/modules/widgets/custom_button.dart';
 import 'package:nust/app/modules/widgets/custom_scrollbar.dart';
+import 'package:nust/app/routes/app_pages.dart';
 import '../../../resources/color_manager.dart';
 import '../../widgets/confetti.dart';
 import '../controllers/gpa_calculation_controller.dart';
@@ -34,7 +35,11 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                               color: ColorManager.primary,
                             ),
                             onPressed: () {
-                              Get.back();
+                              if (Get.previousRoute.isEmpty) {
+                                Get.offAllNamed(Routes.HOME);
+                              } else {
+                                Get.back();
+                              }
                             },
                           ),
                           Container(
