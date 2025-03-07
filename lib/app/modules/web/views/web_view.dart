@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/modules/widgets/error_widget.dart';
-import 'package:nust/app/modules/widgets/loading.dart';
+import 'package:nust/app/modules/widgets/custom_loading.dart';
 import 'package:nust/app/resources/assets_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../resources/color_manager.dart';
@@ -27,7 +27,8 @@ class WebView extends GetView<WebController> {
             });
           },
           child: Scaffold(
-            backgroundColor: ColorManager.background1,
+            backgroundColor:
+                controller.themeController.theme.scaffoldBackgroundColor,
             body: SafeArea(
               child: Stack(
                 alignment: Alignment.center,
@@ -38,6 +39,7 @@ class WebView extends GetView<WebController> {
                     child: !controller.isError.value
                         ? WebViewWidget(
                             controller: controller.webViewController,
+                            gestureRecognizers: const {},
                           )
                         : const ErrorScreen(
                             details: "No Internet Connection",
@@ -46,6 +48,11 @@ class WebView extends GetView<WebController> {
                   controller.isLoading.value
                       ? showFullPageLoading(controller.status)
                       : const SizedBox(),
+                  if (controller.initError.value)
+                    const ErrorScreen(
+                      details:
+                          "An error occurred while initializing the web view",
+                    ),
                 ],
               ),
             ),

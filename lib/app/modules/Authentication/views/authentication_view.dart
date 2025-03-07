@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nust/app/controllers/authentication_controller.dart' as auth;
 import 'package:nust/app/resources/color_manager.dart';
-import 'package:nust/app/routes/app_pages.dart';
 import '../../../resources/assets_manager.dart';
 import '../../widgets/custom_button.dart';
 
@@ -67,10 +65,9 @@ class AuthenticationView extends GetView<AuthenticationController> {
                         widthFactor: 1,
                         margin: 32,
                         onPressed: () async {
-                          auth.AuthenticationController controller = Get.find();
                           bool authenticated = await controller.authenticate();
                           if (authenticated) {
-                            Get.offAllNamed(Routes.HOME);
+                            Get.offAllNamed(controller.page.value);
                           } else {
                             Get.snackbar('Authentication Failed',
                                 'Please try again later',

@@ -49,6 +49,7 @@ dependencies:
   shimmer: ^3.0.0
   screenshot: ^3.0.0
   firebase_database: ^11.3.2
+  quick_actions: ^1.1.0
    
 
 dev_dependencies: 
@@ -77,5 +78,4 @@ flutter_native_splash:
   android_12:
     color: '#ffffff'
     icon_background_color: '#ffffff'
-    image: assets/images/splash_12.png 
     branding: assets/images/branding_12.png

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/modules/widgets/confetti.dart';
 import 'package:nust/app/resources/color_manager.dart';
+import '../../../routes/app_pages.dart';
 import '../../widgets/custom_button.dart';
 import '../../widgets/custom_scrollbar.dart';
 import '../../widgets/input_widget.dart';
@@ -117,7 +118,13 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
               Icons.arrow_back_ios_new_rounded,
               color: ColorManager.primary,
             ),
-            onPressed: () => Get.back(),
+            onPressed: () {
+              if (Get.previousRoute.isEmpty) {
+                Get.offAllNamed(Routes.HOME);
+              } else {
+                Get.back();
+              }
+            },
           ),
           const Text(
             "Absolutes Calculation",

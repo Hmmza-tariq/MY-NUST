@@ -6,11 +6,12 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/app_update_controller.dart';
-import 'package:nust/app/controllers/authentication_controller.dart';
+import 'package:nust/app/modules/Authentication/controllers/authentication_controller.dart';
 import 'package:nust/app/controllers/database_controller.dart';
 import 'package:nust/app/controllers/internet_controller.dart';
 import 'package:nust/app/controllers/stories_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
+import 'package:quick_actions/quick_actions.dart';
 import 'app/modules/widgets/error_widget.dart';
 import 'app/routes/app_pages.dart';
 import 'firebase_options.dart';
@@ -21,36 +22,77 @@ Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
 }
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await dotenv.load(fileName: ".env");
+  Future<String> isQuickActionClicked() async {
+    String selectedShortcutType = '';
+    try {
+      const QuickActions quickActions = QuickActions();
+      await quickActions.initialize((String shortcutType) {
+        if (shortcutType == 'gpa') {
+          selectedShortcutType = Routes.GPA_CALCULATION;
+        } else if (shortcutType == 'absolutes') {
+          selectedShortcutType = Routes.ABSOLUTES_CALCULATION;
+        }
+      });
 
-  DatabaseController databaseController = Get.put(DatabaseController());
-  await databaseController.initialize();
-
-  ThemeController themeController = Get.put(ThemeController());
-  AuthenticationController authenticationController =
-      Get.put(AuthenticationController());
-
-  Get.put(InternetController());
-  Get.put(AppUpdateController());
-  Get.put(StoriesController());
-
-  bool authenticated = false;
-  if (authenticationController.isBiometricEnabled.value == true) {
-    authenticated = await authenticationController.authenticate();
-  } else {
-    authenticated = true;
+      quickActions.setShortcutItems(<ShortcutItem>[
+        const ShortcutItem(
+          type: 'gpa',
+          localizedTitle: 'Calculate GPA',
+          localizedSubtitle: 'Calculate your GPA',
+          icon: 'gpa',
+        ),
+        const ShortcutItem(
+          type: 'absolutes',
+          localizedTitle: 'Calculate Absolutes',
+          localizedSubtitle: 'Calculate your Absolutes',
+          icon: 'absolutes',
+        ),
+      ]);
+    } catch (e) {
+      debugPrint('Error setting quick actions: $e');
+    }
+    return selectedShortcutType;
   }
 
-  await FlutterDownloader.initialize(debug: false, ignoreSsl: true);
+  Future<String> init() async {
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+    await dotenv.load(fileName: ".env");
+
+    await Get.put(DatabaseController(), permanent: true).initialize();
+    Get.put(InternetController(), permanent: true);
+    Get.put(AppUpdateController(), permanent: true);
+    Get.put(StoriesController(), permanent: true);
+
+    final authenticationController =
+        Get.put(AuthenticationController(), permanent: true);
+
+    bool isAuthenticated = false;
+    if (authenticationController.isBiometricEnabled.value == true) {
+      isAuthenticated = await authenticationController.authenticate();
+    } else {
+      isAuthenticated = true;
+    }
+    await FlutterDownloader.initialize(debug: false, ignoreSsl: true);
+    String page = AppPages.INITIAL;
+    String selectedShortcutType = await isQuickActionClicked();
+    if (selectedShortcutType.isNotEmpty) {
+      page = selectedShortcutType;
+    }
+    authenticationController.page.value = page;
+
+    return isAuthenticated ? page : AppPages.AUTHENTICATE;
+  }
+
+  WidgetsFlutterBinding.ensureInitialized();
+  FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
+  String page = await init();
 
   runApp(GetMaterialApp(
     title: "My Nust",
     debugShowCheckedModeBanner: false,
-    theme: themeController.theme,
-    initialRoute: authenticated ? AppPages.INITIAL : AppPages.AUTHENTICATE,
+    theme: Get.put(ThemeController(), permanent: true).theme,
+    initialRoute: page,
     getPages: AppPages.routes,
     scrollBehavior: const MaterialScrollBehavior().copyWith(
       dragDevices: {
