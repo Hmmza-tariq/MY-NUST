@@ -157,4 +157,12 @@ class DatabaseController extends GetxController {
       return null;
     }
   }
+
+  Future<void> setData(String key, String value) async {
+    await _sharedPref.setString(key, value);
+  }
+
+  Future<String> getData(String key) async {
+    return _sharedPref.getString(key) ?? '';
+  }
 }

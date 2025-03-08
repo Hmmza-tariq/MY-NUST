@@ -6,6 +6,7 @@ import 'package:nust/app/modules/widgets/custom_loading.dart';
 import 'package:nust/app/resources/assets_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../../resources/color_manager.dart';
+import '../../../routes/app_pages.dart';
 import '../controllers/web_controller.dart';
 
 class WebView extends GetView<WebController> {
@@ -22,7 +23,11 @@ class WebView extends GetView<WebController> {
                 controller.webViewController.goBack();
               } else {
                 controller.canPop.value = false;
-                Get.back();
+                if (Get.previousRoute.isEmpty) {
+                  Get.offAllNamed(Routes.HOME);
+                } else {
+                  Get.back();
+                }
               }
             });
           },
