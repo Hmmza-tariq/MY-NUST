@@ -22,19 +22,57 @@ Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
 }
 
 void main() async {
-  Future<String> isQuickActionClicked() async {
-    String selectedShortcutType = '';
+  Future<String> init() async {
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
+    await dotenv.load(fileName: ".env");
+
+    final dbController = Get.put(DatabaseController(), permanent: true);
+    await dbController.initialize();
+    Get.put(InternetController(), permanent: true);
+    Get.put(AppUpdateController(), permanent: true);
+    Get.put(StoriesController(), permanent: true);
+
+    final authenticationController =
+        Get.put(AuthenticationController(), permanent: true);
+
+    bool isAuthenticated = false;
+    if (authenticationController.isBiometricEnabled.value == true) {
+      isAuthenticated = await authenticationController.authenticate();
+    } else {
+      isAuthenticated = true;
+    }
+    await FlutterDownloader.initialize(debug: false, ignoreSsl: true);
+    String page = AppPages.INITIAL;
     try {
       const QuickActions quickActions = QuickActions();
       await quickActions.initialize((String shortcutType) {
         if (shortcutType == 'gpa') {
-          selectedShortcutType = Routes.GPA_CALCULATION;
+          page = Routes.GPA_CALCULATION;
         } else if (shortcutType == 'absolutes') {
-          selectedShortcutType = Routes.ABSOLUTES_CALCULATION;
+          page = Routes.ABSOLUTES_CALCULATION;
+        } else if (shortcutType == 'lms') {
+          page = Routes.WEB;
+          dbController.setData('url', dotenv.env['LMS_URL'] ?? '');
+        } else if (shortcutType == 'qalam') {
+          page = Routes.WEB;
+          dbController.setData('url', dotenv.env['QALAM_URL'] ?? '');
         }
       });
 
       quickActions.setShortcutItems(<ShortcutItem>[
+        const ShortcutItem(
+          type: 'lms',
+          localizedTitle: 'LMS',
+          localizedSubtitle: 'Open LMS',
+          icon: 'lms',
+        ),
+        const ShortcutItem(
+          type: 'qalam',
+          localizedTitle: 'Qalam',
+          localizedSubtitle: 'Open Qalam',
+          icon: 'qalam',
+        ),
         const ShortcutItem(
           type: 'gpa',
           localizedTitle: 'Calculate GPA',
@@ -51,34 +89,7 @@ void main() async {
     } catch (e) {
       debugPrint('Error setting quick actions: $e');
     }
-    return selectedShortcutType;
-  }
 
-  Future<String> init() async {
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
-    await dotenv.load(fileName: ".env");
-
-    await Get.put(DatabaseController(), permanent: true).initialize();
-    Get.put(InternetController(), permanent: true);
-    Get.put(AppUpdateController(), permanent: true);
-    Get.put(StoriesController(), permanent: true);
-
-    final authenticationController =
-        Get.put(AuthenticationController(), permanent: true);
-
-    bool isAuthenticated = false;
-    if (authenticationController.isBiometricEnabled.value == true) {
-      isAuthenticated = await authenticationController.authenticate();
-    } else {
-      isAuthenticated = true;
-    }
-    await FlutterDownloader.initialize(debug: false, ignoreSsl: true);
-    String page = AppPages.INITIAL;
-    String selectedShortcutType = await isQuickActionClicked();
-    if (selectedShortcutType.isNotEmpty) {
-      page = selectedShortcutType;
-    }
     authenticationController.page.value = page;
 
     return isAuthenticated ? page : AppPages.AUTHENTICATE;

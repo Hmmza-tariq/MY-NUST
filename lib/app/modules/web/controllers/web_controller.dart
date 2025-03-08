@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nust/app/controllers/database_controller.dart';
 import 'package:nust/app/modules/Authentication/controllers/authentication_controller.dart';
 import 'package:nust/app/controllers/internet_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
@@ -25,6 +26,7 @@ class WebController extends GetxController {
   final DownloadController downloadController = Get.put(DownloadController());
   final cookieManager = WebviewCookieManager();
   ThemeController themeController = Get.find();
+  DatabaseController databaseController = Get.find();
 
   @override
   void onInit() {
@@ -38,8 +40,20 @@ class WebController extends GetxController {
     downloadController.dispose();
   }
 
-  void initializeWebView() {
+  void initializeWebView() async {
     try {
+      if (url.isEmpty) {
+        await databaseController.getData('url').then((value) {
+          url = value;
+        });
+      }
+
+      if (url.isEmpty) {
+        initError.value = true;
+        errorMessage.value = "No URL provided";
+        isLoading.value = false;
+        return;
+      }
       final String userAgent = Platform.isAndroid
           ? 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36'
           : 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1';
@@ -48,7 +62,7 @@ class WebController extends GetxController {
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
         ..setBackgroundColor(ColorManager.background1)
         ..setUserAgent(userAgent)
-        ..enableZoom(true)
+        ..enableZoom(false)
         ..setNavigationDelegate(
           NavigationDelegate(
             onProgress: (int newProgress) {
@@ -105,7 +119,6 @@ class WebController extends GetxController {
             },
           ),
         );
-
       webViewController.loadRequest(Uri.parse(url));
 
       if (!internetController.isOnline.value) {
@@ -127,7 +140,6 @@ class WebController extends GetxController {
   }
 
   void applyRenderingFixes() {
-    // Apply CSS fixes to prevent rendering glitches
     webViewController.runJavaScript('''
       var selectElement = document.getElementById("MainContent_cboInstitution");
       for (var i = 0; i < selectElement.options.length; i++) {
