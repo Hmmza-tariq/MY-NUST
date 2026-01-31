@@ -2,56 +2,206 @@
 
 ![](assets/screenshots/banner.png)
 
-## Download Now: [My NUST on Playstore](https://play.google.com/store/apps/details?id=com.hexagone.mynust&pcampaignid=web_share)
+## Availability
 
-## About:
+- **Google Play Store**: [Download Now](https://play.google.com/store/apps/details?id=com.hexagone.mynust&pcampaignid=web_share) - **10,000+ Downloads**
+- **Apple App Store**: Submission pending — awaiting confirmation/approval from NUST
+
+## About
 
 'My NUST' is your ultimate companion for a seamless university experience. Designed exclusively for NUST students, this comprehensive app brings a range of features right to your fingertips, enhancing your academic journey and campus life like never before.
 
+This app is **open-source** and the complete codebase is public on GitHub to ensure transparency and community collaboration.
 
-Key Features:
+## Key Features
 
-1. Qalam Access: Stay informed about your academic progress with the NUST Qalam feature. Easily view your exam results and attendance records in real-time, allowing you to gauge your performance and make informed decisions.
+### Integrated Portal Access
+- **NUST Qalam Integration**: Access the official Qalam portal directly within the app via WebView. View exam results, attendance records, and academic progress in real-time.
+- **LMS Integration**: Access the NUST Learning Management System seamlessly. View course materials, lecture slides, assignments, and important announcements without leaving the app.
+- **Secure Autofill**: Encrypted credential storage with user consent for quick and secure login to Qalam and LMS. Your credentials are stored locally and never shared.
 
-2. LMS Access: Access course materials, lecture slides, and important announcements directly through the app's integrated NUST Learning Management System (LMS). Stay up-to-date with your studies effortlessly.
+### Smart Notice Board
+- **Campus-Specific Updates**: Get notices and news tailored to your specific school/sub-campus within NUST.
+- **NUST-Wide Announcements**: Stay updated with university-wide events, deadlines, and important news.
+- **Featured Banners**: Custom notice board banners highlight urgent and featured announcements so you never miss critical information.
+- **Real-time Sync**: Automatically fetches the latest notices from official NUST and campus websites.
 
-3. Autofill ID/Pass for LMS and Qalam: Enable autofill for a smoother login experience. No more hassles with login details. Update your app now and experience the convenience of seamless autofill for LMS and Qalam credentials.
+### Academic Calculators
+- **GPA Calculator**: Calculate both expected CGPA (Cumulative GPA) and SGPA (Semester GPA) accurately. Monitor your academic performance and plan ahead.
+- **Absolutes Calculator**: Calculate your absolutes to get a better estimate of your expected grades based on your current performance.
 
-4. Notice Board: Never miss a beat with the Notice Board feature. Get instant updates and announcements tailored to your specific sub-campus within NUST. Stay in the loop with campus events, deadlines, and important news.
+### Push Notifications
+- Receive in-app notifications for important updates, announcements, and deadlines.
+- Stay informed without constantly checking the app.
 
-5. GPA Calculator: Calculate your GPA accurately using the built-in GPA calculator. Stay on top of your grades and monitor your academic achievements effortlessly.
+## Getting Started
 
-6. Absolutes Calculate: Calculate your absolutes to get better idea about your expected grades.
+### Prerequisites
 
+Before you begin, ensure you have the following installed on your system:
 
-'My NUST' is more than just an app – it's your personalized university companion, dedicated to streamlining your academic journey and enhancing your campus life. Download 'My NUST' now and unlock a world of convenience, organization, and empowerment."
+- **Flutter SDK** (3.0 or higher) - [Install Flutter](https://docs.flutter.dev/get-started/install)
+- **Dart SDK** (comes with Flutter)
+- **Android Studio** or **Xcode** (for iOS development)
+- **Git** - [Install Git](https://git-scm.com/downloads)
+- **Firebase Account** - Required for backend services
 
-## Privacy Policy: 
+### Installation & Setup
 
-We take your privacy seriously. This app does not collect any personal data or information from its users. Any data you enter in the app, such as LMS / Qalam ID, Passwords, or your GPA, is stored locally on your device and not shared with any third parties.
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/Hmmza-tariq/My-NUST.git
+   cd My-NUST
+   ```
 
-By using this app, you agree to the following:
-- All data you enter in the app is stored locally on your device and is not shared with any external servers. 
-- We do not collect or store any personal information, including your name, email, or location.
+2. **Install Dependencies**
+   ```bash
+   flutter pub get
+   ```
+
+3. **Setup Environment Variables**
+   - Copy the `.env.example` file to `.env`:
+     ```bash
+     cp .env.example .env
+     ```
+   - The `.env` file contains NUST portal URLs:
+     - `LMS_URL` - NUST Learning Management System URL
+     - `QALAM_URL` - NUST Qalam portal URL
+
+4. **Firebase Configuration**
+   - Create a new Firebase project at [Firebase Console](https://console.firebase.google.com/)
+   - Add Android and iOS apps to your Firebase project
+   - Download and place the configuration files:
+     - `google-services.json` → `android/app/`
+     - `GoogleService-Info.plist` → `ios/Runner/`
+   - Run the FlutterFire CLI to configure Firebase:
+     ```bash
+     flutter pub global activate flutterfire_cli
+     flutterfire configure
+     ```
+
+5. **Check Flutter Setup**
+   ```bash
+   flutter doctor
+   ```
+   Resolve any issues reported by the doctor command.
+
+### Running the App
+
+#### On Android
+```bash
+flutter run
+```
+or use Android Studio/VS Code to run the app on an emulator or connected device.
+
+#### On iOS (macOS only)
+```bash
+cd ios
+pod install
+cd ..
+flutter run
+```
+
+#### Build Release APK (Android)
+```bash
+flutter build apk --release
+```
+
+#### Build iOS App (macOS only)
+```bash
+flutter build ios --release
+```
+
+## Project Structure
+
+```
+lib/
+├── app/
+│   ├── controllers/      # State management controllers
+│   ├── data/            # Data models and entities
+│   ├── modules/         # Feature modules (Home, Auth, GPA Calculator, etc.)
+│   ├── resources/       # App resources (colors, fonts, strings, themes)
+│   ├── routes/          # Navigation and routing
+│   └── services/        # Services (notifications, etc.)
+├── firebase_options.dart # Firebase configuration
+└── main.dart            # App entry point
+```
+
+## Technologies Used
+
+- **Flutter & Dart**: Cross-platform mobile development
+- **GetX**: State management and navigation
+- **Firebase**: Backend services (Firestore, Cloud Messaging, Analytics)
+- **WebView**: Embedded portal access for Qalam and LMS
+- **Encrypted Shared Preferences**: Secure local storage for credentials
+
+## Contributing
+
+Contributions are welcome! Feel free to:
+- Report bugs and issues
+- Suggest new features
+- Submit pull requests
+
+Please read our [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
+
+### How to Contribute
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+Please ensure your code follows the existing style and includes appropriate tests.
+
+## Privacy & Security
+
+We take your privacy seriously. This app does not collect any personal data or information from its users. 
+
+**Privacy Highlights:**
+- All credentials (LMS/Qalam ID and passwords) are **encrypted** and stored **locally** on your device
+- No personal information is shared with external servers or third parties
+- GPA calculations and academic data remain on your device
+- User consent is required before enabling autofill features
+
+**Security:**
+- End-to-end encryption for stored credentials
+- Biometric authentication support
+- Secure WebView implementation
+- Regular security updates
+
+For security concerns or to report vulnerabilities, please see our [Security Policy](SECURITY.md).
 
 For more details, please visit:
 - [Privacy Policy](https://sites.google.com/view/my-nust-privacy-policy/home)
 - [Terms and Conditions](https://sites.google.com/view/my-nust-terms-and-conditions/home)
 
+## License
 
-## Source Code:
+This project is open source under the terms specified in the [LICENSE](LICENSE) file.
 
-# Source Code
+## Contact & Support
 
-This project is now open source. Enjoy exploring and contributing [GITHUB](https://github.com/Hmmza-tariq/My-NUST).
+For questions, feedback, or support:
+- Open an issue on [GitHub](https://github.com/Hmmza-tariq/My-NUST/issues)
+- Check existing discussions and FAQs
 
+## Support the Project
 
+If you find this app helpful, please:
+- Give it a ⭐ on GitHub
+- Share it with fellow NUST students
+- Leave a positive review on the Play Store
+- Contribute to the codebase
 
-
-## Screenshots:
+## Screenshots
 
 |   |   |
 |--------------|--------------|
 | ![Screenshot 1](assets/screenshots/1.png) | ![Screenshot 2](assets/screenshots/4.png) |
 | ![Screenshot 3](assets/screenshots/2.png) | ![Screenshot 4](assets/screenshots/5.png) |
 | ![Screenshot 5](assets/screenshots/3.png) | ![Screenshot 6](assets/screenshots/6.png) |
+
+---
+
+Made by a Nustian for Nustians

@@ -61,7 +61,7 @@ class HomeCampusWidget extends StatelessWidget {
                   crossAxisCount: 3,
                   crossAxisSpacing: 8,
                   mainAxisSpacing: 8,
-                  childAspectRatio: Get.width * .005,
+                  childAspectRatio: 1.5,
                 ),
                 shrinkWrap: true,
                 // physics: const NeverScrollableScrollPhysics(),
@@ -438,7 +438,7 @@ class HomeSliderItem extends StatelessWidget {
               : Alignment.centerRight,
       child: Column(
         children: [
-          child,
+          Expanded(child: child),
           SizedBox(
               width: Get.width * 0.6,
               height: index != activePage ? 50 : 80,
@@ -522,15 +522,18 @@ class BuildStoryDetails extends StatelessWidget {
         children: [
           if (activePage == index)
             Row(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  category,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    category,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(width: 8),
                 if (link != '')
                   InkWell(
                     child: const Icon(

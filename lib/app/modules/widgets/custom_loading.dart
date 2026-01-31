@@ -86,25 +86,3 @@ Widget heightLoading(double height) {
 void closeLoading() {
   if (Get.isDialogOpen ?? false) Get.back();
 }
-
-void errorSnackbar(String message) {
-  Get.snackbar(
-    'Error',
-    message,
-    duration: const Duration(seconds: 1),
-    snackPosition: SnackPosition.TOP,
-    backgroundColor: ColorManager.error.withValues(alpha: 0.8),
-    colorText: ColorManager.white,
-  );
-}
-
-void disclaimerSnackbar(String message) {
-  Get.snackbar(
-    'Disclaimer',
-    message,
-    duration: const Duration(seconds: 2),
-    snackPosition: SnackPosition.TOP,
-    backgroundColor: ColorManager.primary.withValues(alpha: 0.8),
-    colorText: ColorManager.white,
-  );
-}

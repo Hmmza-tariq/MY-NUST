@@ -200,20 +200,19 @@ class SettingSwitchButton extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          color: controller.themeController.theme.appBarTheme
-                              .titleTextStyle!.color,
-                          fontSize: 16,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: TextStyle(
+                            color: controller.themeController.theme.appBarTheme
+                                .titleTextStyle!.color,
+                            fontSize: 16,
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        width: Get.width * 0.5,
-                        child: Text(
+                        Text(
                           subTitle,
                           style: TextStyle(
                             fontSize: 10,
@@ -221,13 +220,14 @@ class SettingSwitchButton extends StatelessWidget {
                                 .titleTextStyle!.color,
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   Switch(
                     value: isSwitched.value,
                     onChanged: onChanged,
-                    activeColor: ColorManager.primary,
+                    activeThumbColor: ColorManager.primary,
                     inactiveThumbColor: ColorManager.lightGrey2,
                     inactiveTrackColor: ColorManager.lightGrey1,
                   )
@@ -250,7 +250,9 @@ void addCredentials(SettingsController controller) {
       text: controller.authenticationController.lmsPassword.value);
   TextEditingController qalamPasswordController = TextEditingController(
       text: controller.authenticationController.qalamPassword.value);
-  var isReadInfo = false.obs;
+  RxBool isReadInfo = false.obs;
+  RxBool showLMSPass = false.obs;
+  RxBool showQalamPass = false.obs;
   Get.dialog(Dialog(
     backgroundColor: controller.themeController.theme.scaffoldBackgroundColor,
     child: Obx(() => SingleChildScrollView(
@@ -261,8 +263,7 @@ void addCredentials(SettingsController controller) {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(
-                    width: Get.width * 0.6,
+                  Expanded(
                     child: Text(
                         isReadInfo.value == true
                             ? 'Why do we need your credentials?'
@@ -273,6 +274,7 @@ void addCredentials(SettingsController controller) {
                             fontSize: 24,
                             fontWeight: FontWeight.bold)),
                   ),
+                  const SizedBox(width: 8),
                   IconButton(
                     icon: Icon(
                         isReadInfo.value == false
@@ -337,16 +339,29 @@ void addCredentials(SettingsController controller) {
                               color: controller.themeController.theme
                                   .appBarTheme.titleTextStyle!.color),
                           decoration: InputDecoration(
-                            labelText: 'LMS Password',
-                            labelStyle: TextStyle(
-                                color: controller.themeController.theme
-                                    .appBarTheme.titleTextStyle!.color),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(
+                              labelText: 'LMS Password',
+                              labelStyle: TextStyle(
                                   color: controller.themeController.theme
-                                      .appBarTheme.titleTextStyle!.color!),
-                            ),
-                          ),
+                                      .appBarTheme.titleTextStyle!.color),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: controller.themeController.theme
+                                        .appBarTheme.titleTextStyle!.color!),
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  showLMSPass.value
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: controller.themeController.theme
+                                      .appBarTheme.titleTextStyle!.color,
+                                ),
+                                onPressed: () {
+                                  showLMSPass.value = !showLMSPass.value;
+                                },
+                              )),
+                          keyboardType: TextInputType.visiblePassword,
+                          obscureText: !showLMSPass.value,
                         ),
                         TextField(
                           controller: qalamPasswordController,
@@ -363,7 +378,21 @@ void addCredentials(SettingsController controller) {
                                   color: controller.themeController.theme
                                       .appBarTheme.titleTextStyle!.color!),
                             ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                showQalamPass.value
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: controller.themeController.theme
+                                    .appBarTheme.titleTextStyle!.color,
+                              ),
+                              onPressed: () {
+                                showQalamPass.value = !showQalamPass.value;
+                              },
+                            ),
                           ),
+                          keyboardType: TextInputType.visiblePassword,
+                          obscureText: !showQalamPass.value,
                         ),
                       ],
                     ),

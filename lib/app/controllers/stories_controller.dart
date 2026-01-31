@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -7,6 +8,7 @@ import 'package:html/parser.dart' as htmlParser;
 import 'package:html/dom.dart';
 import 'package:nust/app/controllers/database_controller.dart';
 import 'package:nust/app/data/story.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StoriesController extends GetxController {
   final Dio _dio = Dio();
@@ -33,13 +35,18 @@ class StoriesController extends GetxController {
   var selectedCampus = 'SEECS'.obs;
   var logo = ''.obs;
   RxList<Story> topStories = <Story>[].obs;
+  var isLoadingFresh = false.obs; // Track if fetching fresh data
 
   DatabaseController databaseController = Get.find();
+
+  static const String _storiesCacheKey = 'cached_top_stories';
 
   @override
   void onInit() {
     super.onInit();
     selectedCampus.value = databaseController.getCampus();
+    // Load cached stories immediately on init
+    loadCachedStories();
   }
 
   void setCampus(String campus) {
@@ -47,8 +54,42 @@ class StoriesController extends GetxController {
     databaseController.setCampus(campus);
   }
 
+  // Load stories from local cache
+  Future<void> loadCachedStories() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedData = prefs.getString(_storiesCacheKey);
+
+      if (cachedData != null) {
+        final decodedData = jsonDecode(cachedData) as List;
+        topStories.value = decodedData
+            .map((story) => Story.fromMap(story as Map<String, dynamic>))
+            .toList();
+        debugPrint('Loaded ${topStories.length} stories from cache');
+      }
+    } catch (e) {
+      debugPrint('Error loading cached stories: $e');
+    }
+  }
+
+  // Save stories to local cache
+  Future<void> cacheStories(List<Story> stories) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final encodedData = jsonEncode(
+        stories.map((story) => story.toMap()).toList(),
+      );
+      await prefs.setString(_storiesCacheKey, encodedData);
+      debugPrint('Cached ${stories.length} stories locally');
+    } catch (e) {
+      debugPrint('Error caching stories: $e');
+    }
+  }
+
   Future<bool> fetchTopStories() async {
     try {
+      isLoadingFresh.value = true;
+
       List<Story> data = [];
       final mainResponse = await _dio.get(baseUrl);
       if (mainResponse.statusCode == 200) {
@@ -87,9 +128,15 @@ class StoriesController extends GetxController {
         link: baseUrl,
       ));
       topStories.value = data;
+
+      // Cache the new stories for next time
+      await cacheStories(data);
+
+      isLoadingFresh.value = false;
       return true;
     } catch (e) {
       debugPrint('Error fetching top stories: $e');
+      isLoadingFresh.value = false;
       return false;
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nust/app/modules/widgets/custom_snackbar.dart';
 import 'package:nust/app/resources/color_manager.dart';
 import '../../../resources/assets_manager.dart';
 import '../../widgets/custom_button.dart';
@@ -69,9 +70,9 @@ class AuthenticationView extends GetView<AuthenticationController> {
                           if (authenticated) {
                             Get.offAllNamed(controller.page.value);
                           } else {
-                            Get.snackbar('Authentication Failed',
-                                'Please try again later',
-                                snackPosition: SnackPosition.BOTTOM);
+                            AppSnackbar.error(
+                                title: 'Authentication Failed',
+                                message: 'Please try again later');
                           }
                         }),
                   ],

@@ -29,20 +29,48 @@ class HomeController extends GetxController {
   }
 
   void _initialize() {
+    // Don't show loading if we have cached data
+    if (campusController.topStories.isNotEmpty) {
+      isLoading.value = false;
+    }
     checkInternet();
   }
 
   void checkInternet() {
     if (internetController.isOnline.value) {
-      fetchStories();
+      // Fetch fresh data silently in background if we have internet
+      fetchStoriesInBackground();
     } else {
-      internetController.isOnline.listen((isOnline) {
-        if (isOnline) {
-          fetchStories();
-        } else {
-          internetController.noInternetDialog(fetchStories);
-        }
-      });
+      // If offline but have cached data, don't show dialog - just show cache
+      if (campusController.topStories.isEmpty) {
+        internetController.isOnline.listen((isOnline) {
+          if (isOnline) {
+            fetchStoriesInBackground();
+          } else {
+            internetController.noInternetDialog(fetchStories);
+          }
+        });
+      } else {
+        // Have cache, listen for internet and fetch when available
+        internetController.isOnline.listen((isOnline) {
+          if (isOnline) {
+            fetchStoriesInBackground();
+          }
+        });
+      }
+    }
+  }
+
+  // Silent background fetch - doesn't show loading spinner
+  Future<void> fetchStoriesInBackground() async {
+    try {
+      // Show loading only if no cached data exists
+      if (campusController.topStories.isEmpty) {
+        isLoading.value = true;
+      }
+      await campusController.fetchTopStories();
+    } finally {
+      isLoading.value = false;
     }
   }
 

@@ -53,10 +53,11 @@ class NotificationsService {
     var initializationSetting = InitializationSettings(
         android: androidInitializationSettings, iOS: iosInitializationSettings);
 
-    await _flutterLocalNotificationsPlugin.initialize(initializationSetting,
+    await _flutterLocalNotificationsPlugin.initialize(
+        settings: initializationSetting,
         onDidReceiveNotificationResponse: (payload) {
-      handleMessage(context, message);
-    });
+          handleMessage(context, message);
+        });
   }
 
   void firebaseInit(BuildContext context) {
@@ -123,10 +124,10 @@ class NotificationsService {
 
     Future.delayed(Duration.zero, () {
       _flutterLocalNotificationsPlugin.show(
-        0,
-        message.notification!.title.toString(),
-        message.notification!.body.toString(),
-        notificationDetails,
+        id: 0,
+        title: message.notification!.title.toString(),
+        body: message.notification!.body.toString(),
+        notificationDetails: notificationDetails,
         payload: 'my_data',
       );
     });

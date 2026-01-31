@@ -1,7 +1,7 @@
 name: nust
 description: Nust unofficial Student app
 
-version: 2.0.7+29
+version: 2.0.8+30
 publish_to: none
 
 environment: 
@@ -12,48 +12,47 @@ dependencies:
   get: 
   flutter: 
     sdk: flutter
-  google_fonts: ^6.2.1
+  google_fonts: ^8.0.0
   flutter_native_splash: ^2.4.1
-  smooth_page_indicator: ^1.2.0+3
+  smooth_page_indicator: ^2.0.1
   carousel_slider_plus: ^7.0.0
   dio: ^5.5.0+1
   flutter_svg: ^2.0.10+1
   lottie: ^3.1.2
   webview_flutter: ^4.8.0
-  flutter_email_sender: ^6.0.3
+  webview_flutter_android: ^3.16.0
+  flutter_email_sender: ^8.0.0
   html: ^0.15.4 
-  firebase_core: ^3.10.1 
-  firebase_messaging: ^15.2.1
+  firebase_core: ^4.2.0 
+  firebase_messaging: ^16.0.3
   url_launcher: ^6.3.0  
-  connectivity_plus: ^6.0.5
+  connectivity_plus: ^7.0.0
   app_version_update: ^6.0.0
   custom_refresh_indicator: ^4.0.1
   cached_network_image: ^3.4.1
-  local_auth: ^2.3.0
-  encrypt_shared_preferences: ^0.8.7
-  share_plus: ^10.1.4 
+  local_auth: ^3.0.0
+  encrypt_shared_preferences: ^0.9.10
+  share_plus: ^12.0.1 
   confetti: ^0.8.0 
-  flutter_dotenv: ^5.1.0
-  fl_chart: ^0.70.2
-  permission_handler: ^11.3.1
-  flutter_local_notifications: ^18.0.1
+  flutter_dotenv: ^6.0.0
+  fl_chart: ^1.1.1
+  permission_handler: ^12.0.1
+  flutter_local_notifications: ^20.0.0
   flutter_file_downloader: ^2.0.0
   path_provider: ^2.1.4
-  device_info_plus: ^11.2.2
+  device_info_plus: ^12.2.0
   flutter_downloader: ^1.11.8
-  webview_cookie_manager:
-    git:
-      url: https://github.com/rekire/webview_cookie_manager.git
-      ref: main
-  background_downloader: ^8.5.3
+  # webview_cookie_manager: ^2.0.6  # Temporarily disabled - incompatible with AGP 8.6+
+  background_downloader: ^9.5.2
   shimmer: ^3.0.0
   screenshot: ^3.0.0
-  firebase_database: ^11.3.2
+  firebase_database: ^12.0.3
   quick_actions: ^1.1.0
+  shared_preferences: ^2.5.4
    
 
 dev_dependencies: 
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   flutter_test: 
     sdk: flutter
 

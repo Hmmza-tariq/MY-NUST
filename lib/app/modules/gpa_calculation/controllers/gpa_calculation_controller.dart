@@ -8,6 +8,7 @@ import 'package:nust/app/controllers/database_controller.dart';
 import 'package:nust/app/data/course.dart';
 import 'package:nust/app/data/semester.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
+import 'package:nust/app/modules/widgets/custom_snackbar.dart';
 import 'package:nust/app/resources/color_manager.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
@@ -81,7 +82,7 @@ class GpaCalculationController extends GetxController {
       totalGPA += semester.value.gpa * semester.value.credit;
     }
     double cgpa = totalGPA / totalCredit;
-    showResult(true, cgpa);
+    showResult(true, cgpa, 0);
   }
 
   void calculateSGPA() {
@@ -92,7 +93,34 @@ class GpaCalculationController extends GetxController {
       totalGPA += course.value.gpa * course.value.credit;
     }
     double sgpa = totalGPA / totalCredit;
-    showResult(false, sgpa);
+    showResult(false, sgpa, totalCredit.toInt());
+  }
+
+  void addSGPAToCGPA(String semesterName, double sgpa, int totalCredit) {
+    // Check if semester already exists in CGPA
+    int existingIndex =
+        semesters.indexWhere((s) => s.value.name == semesterName);
+
+    if (existingIndex != -1) {
+      // Update existing semester
+      semesters[existingIndex].update((semester) {
+        semester?.gpa = double.parse(sgpa.toStringAsFixed(2));
+        semester?.credit = totalCredit;
+      });
+    } else {
+      // Add new semester
+      semesters.add(Semester(
+        name: semesterName,
+        credit: totalCredit,
+        gpa: double.parse(sgpa.toStringAsFixed(2)),
+      ).obs);
+    }
+
+    saveSemesters();
+
+    AppSnackbar.success(
+      message: 'SGPA added to CGPA calculator',
+    );
   }
 
   void saveSemesters() {
@@ -149,7 +177,7 @@ class GpaCalculationController extends GetxController {
     }
   }
 
-  void showResult(bool isCGPA, double result) async {
+  void showResult(bool isCGPA, double result, int totalCredit) async {
     confettiController.play();
 
     final List<Color> colors = [
@@ -400,6 +428,39 @@ class GpaCalculationController extends GetxController {
                       ),
                     ),
                   ),
+                  // Add to CGPA button for SGPA results
+                  if (!isCGPA && totalCredit > 0)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 8.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            addSGPAToCGPA(
+                                selectedSemester.value, result, totalCredit);
+                            Get.back();
+                          },
+                          icon: const Icon(Icons.add_circle_outline,
+                              color: ColorManager.white),
+                          label: const Text(
+                            'Add to CGPA Calculator',
+                            style: TextStyle(
+                              color: ColorManager.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ColorManager.primary,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ],
@@ -417,9 +478,10 @@ class GpaCalculationController extends GetxController {
       final directory = await getApplicationDocumentsDirectory();
       final imagePath = await File('${directory.path}/image.png').create();
       await imagePath.writeAsBytes(image!);
-      await Share.shareXFiles([XFile(imagePath.path)],
+      await SharePlus.instance.share(ShareParams(
+          files: [XFile(imagePath.path)],
           text:
-              "Hey! Check this out. I calculated my expected $type using 'My NUST' app.");
+              "Hey! Check this out. I calculated my expected $type using 'My NUST' app."));
     });
     return true;
   }

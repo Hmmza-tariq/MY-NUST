@@ -125,19 +125,30 @@ class HomeView extends GetView<HomeController> {
                             scrollPhysics: const BouncingScrollPhysics(),
                           ),
                           itemCount:
-                              (isError || isLoading) ? 3 : topStories.length,
+                              (isError || isLoading) && topStories.isEmpty
+                                  ? 3
+                                  : topStories.length,
                           itemBuilder: (context, index, realIndex) {
-                            if (!controller.internetController.isOnline.value) {
-                              return Center(
-                                child: BuildNoInternetContainer(
-                                    index: index, activePage: activePage),
-                              );
-                            } else if (isLoading || isError) {
-                              return Center(
-                                child: BuildLoadingContainer(
-                                    index: index, activePage: activePage),
-                              );
+                            // Show cached stories if offline, or show loading/error state
+                            if ((!controller
+                                        .internetController.isOnline.value &&
+                                    topStories.isEmpty) ||
+                                (isLoading || isError) && topStories.isEmpty) {
+                              // Only show no internet/loading if we have no cache
+                              if (!controller
+                                  .internetController.isOnline.value) {
+                                return Center(
+                                  child: BuildNoInternetContainer(
+                                      index: index, activePage: activePage),
+                                );
+                              } else {
+                                return Center(
+                                  child: BuildLoadingContainer(
+                                      index: index, activePage: activePage),
+                                );
+                              }
                             } else {
+                              // Show cached story (works offline too)
                               final story = topStories[index];
                               return BuildStoryContainer(
                                   isLast: index == topStories.length - 1,
@@ -151,12 +162,15 @@ class HomeView extends GetView<HomeController> {
                     }),
                     const SizedBox(height: 20),
                     Obx(() {
+                      final topStoryCount =
+                          controller.campusController.topStories.length;
+                      final shouldShowPlaceholder =
+                          (controller.isLoading.value ||
+                                  controller.isError.value) &&
+                              topStoryCount == 0;
                       return AnimatedSmoothIndicator(
                         activeIndex: controller.activePage.value,
-                        count: (controller.isLoading.value ||
-                                controller.isError.value)
-                            ? 3
-                            : controller.campusController.topStories.length,
+                        count: shouldShowPlaceholder ? 3 : topStoryCount,
                         onDotClicked: (index) {
                           controller.pageController.animateToPage(
                             index,

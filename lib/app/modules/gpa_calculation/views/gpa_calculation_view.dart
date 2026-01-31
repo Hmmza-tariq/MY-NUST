@@ -179,8 +179,9 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
     return Column(
       children: [
         Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
           padding: const EdgeInsets.all(8.0),
-          width: Get.width * 0.9,
+          // width: Get.width * 0.9,
           decoration: BoxDecoration(
             color: controller.themeController.theme.cardTheme.color,
             borderRadius: BorderRadius.circular(12),

@@ -28,4 +28,13 @@ class Story {
       'category': category,
     };
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'imageUrl': imageUrl,
+      'link': link,
+      'category': category,
+    };
+  }
 }

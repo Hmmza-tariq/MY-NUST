@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
+import 'package:nust/app/modules/widgets/custom_snackbar.dart';
 
 class HelpController extends GetxController {
   final ThemeController themeController = Get.find();
@@ -41,13 +42,8 @@ class HelpController extends GetxController {
     }
 
     if (state.value == "success") {
-      Get.snackbar(
-        "Success",
-        "Your message has been sent successfully",
-        backgroundColor:
-            themeController.theme.primaryColor.withValues(alpha: 0.4),
-        colorText: themeController.theme.appBarTheme.titleTextStyle!.color!
-            .withValues(alpha: 0.8),
+      AppSnackbar.success(
+        message: "Your message has been sent successfully",
       );
       mailController.clear();
       messageController.clear();

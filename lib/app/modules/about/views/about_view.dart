@@ -343,10 +343,11 @@ class AboutView extends GetView<AboutController> {
                     textColor: ColorManager.background2,
                     widthFactor: 1,
                     margin: 32,
-                    onPressed: () {
-                      Share.share(
-                        'Check out this cool NUST App available on ${Platform.isAndroid ? "PlayStore" : "App Store"}!🔥 \nDownload now: ${Platform.isAndroid ? controller.playStoreLink : controller.appStoreLink}',
-                      );
+                    onPressed: () async {
+                      await SharePlus.instance.share(ShareParams(
+                        text:
+                            'Check out this cool NUST App available on ${Platform.isAndroid ? "PlayStore" : "App Store"}!🔥 \nDownload now: ${Platform.isAndroid ? controller.playStoreLink : controller.appStoreLink}',
+                      ));
                     }),
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 16),
