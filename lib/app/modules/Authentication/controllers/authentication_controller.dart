@@ -59,8 +59,12 @@ class AuthenticationController extends GetxController {
       var auth = LocalAuthentication();
       bool authenticated = await auth.authenticate(
           localizedReason: 'Biometric authentication is enabled',
-          options: const AuthenticationOptions(
-              useErrorDialogs: false, stickyAuth: false, biometricOnly: false));
+          // options: const AuthenticationOptions(
+          // useErrorDialogs: false,
+          // stickyAuth: false,
+          biometricOnly: false
+          // )
+          );
       if (authenticated) {
         return true;
       } else {

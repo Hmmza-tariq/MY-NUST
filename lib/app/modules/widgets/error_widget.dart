@@ -30,21 +30,36 @@ class ErrorScreen extends StatelessWidget {
       // margin: const EdgeInsets.all(10.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(
-            AssetsManager.error,
-            fit: BoxFit.fitHeight,
-            height: height ?? Get.height * 0.3,
-            width: width ?? Get.width,
+          Flexible(
+            child: Image.asset(
+              AssetsManager.error,
+              fit: BoxFit.fitHeight,
+              height: height ?? Get.height * 0.3,
+              width: width ?? Get.width,
+            ),
           ),
           if (details.isNotEmpty)
-            Text(
-              details,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: themeController.theme.appBarTheme.titleTextStyle!.color,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+              decoration: BoxDecoration(
+                color: themeController.theme.scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Text(
+                details,
+                textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color:
+                      themeController.theme.appBarTheme.titleTextStyle!.color,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
         ],

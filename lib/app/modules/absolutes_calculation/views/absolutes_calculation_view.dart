@@ -35,33 +35,42 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
                         _buildHeader(),
                         _buildChooseTypeButtons(),
                         _buildWeightSection(),
-                        if (controller.assessments.isEmpty)
+                        if (controller.assessments
+                            .where((assessment) =>
+                                controller.selectedType.value == "both" ||
+                                assessment.type ==
+                                    controller.selectedType.value)
+                            .isEmpty)
                           SizedBox(
                             height: Get.height * 0.5,
                             width: Get.width,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Add an assessment to get\nstarted",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: controller.themeController.theme
-                                        .appBarTheme.titleTextStyle?.color,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Add ${controller.selectedType.value != "both" ? "a ${controller.selectedType.value} " : "an "}assessment to get\nstarted",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: controller.themeController.theme
+                                          .appBarTheme.titleTextStyle?.color,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 16),
-                                CustomButton(
-                                  title: "Add Assessment",
-                                  color: ColorManager.primary,
-                                  textColor: ColorManager.white,
-                                  widthFactor: 0.4,
-                                  isBold: false,
-                                  onPressed: controller.addAssessment,
-                                ),
-                              ],
+                                  const SizedBox(height: 16),
+                                  CustomButton(
+                                    title: "Add Assessment",
+                                    color: ColorManager.primary,
+                                    textColor: ColorManager.white,
+                                    widthFactor: 0.4,
+                                    isBold: false,
+                                    onPressed: controller.addAssessment,
+                                  ),
+                                ],
+                              ),
                             ),
                           )
                         else
@@ -126,12 +135,15 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
               }
             },
           ),
-          const Text(
-            "Absolutes Calculation",
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: ColorManager.primary,
+          Flexible(
+            child: Text(
+              "Absolutes Calculation",
+              style: TextStyle(
+                fontSize: Get.width * 0.055,
+                fontWeight: FontWeight.bold,
+                color: ColorManager.primary,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           const IconButton(icon: SizedBox(), onPressed: null),
@@ -215,16 +227,16 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
         child: Row(
           children: [
             InputWidget(
-              widthFactor: .44,
+              widthFactor: .38,
               doubleValue: controller.lectureWeight,
               title: "Lecture Weight (%)",
               onChanged: () {
                 controller.saveWeights();
               },
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 8),
             InputWidget(
-              widthFactor: .44,
+              widthFactor: .38,
               doubleValue: controller.labWeight,
               title: "Lab Weight (%)",
               onChanged: () {
@@ -286,7 +298,7 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
           Row(
             children: [
               InputWidget(
-                widthFactor: .2,
+                widthFactor: .19,
                 doubleValue: weight,
                 title: "Weight",
                 onChanged: () {
@@ -295,9 +307,9 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
                 },
                 isBorder: false,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               InputWidget(
-                widthFactor: .3,
+                widthFactor: .29,
                 doubleValue: totalMarks,
                 title: "Total Marks",
                 onChanged: () {
@@ -306,9 +318,9 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
                 },
                 isBorder: false,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               InputWidget(
-                widthFactor: .3,
+                widthFactor: .29,
                 doubleValue: obtainedMarks,
                 title: "Obtained Marks",
                 onChanged: () {
@@ -323,7 +335,7 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: DropdownButtonFormField<String>(
-                value: assessment.type,
+                initialValue: assessment.type,
                 borderRadius: BorderRadius.circular(12),
                 style: TextStyle(
                   color: !controller.themeController.isDarkMode.value

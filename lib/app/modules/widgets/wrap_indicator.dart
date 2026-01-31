@@ -245,7 +245,7 @@ class Star {
     color = initialColor.withValues(alpha: opacity);
   }
 
-  draw(Canvas canvas, Rect rect) {
+  void draw(Canvas canvas, Rect rect) {
     if (position == null) {
       _init(rect);
     }

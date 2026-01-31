@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:nust/app/controllers/database_controller.dart';
+import 'package:nust/app/modules/widgets/custom_snackbar.dart';
 import 'package:nust/app/resources/color_manager.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
@@ -45,7 +46,10 @@ class AbsolutesCalculationController extends GetxController {
   }
 
   void addAssessment() {
-    assessments.add(Assessment());
+    // Set the type based on currently selected type
+    String assessmentType =
+        selectedType.value == "both" ? "lecture" : selectedType.value;
+    assessments.add(Assessment(type: assessmentType));
     saveAssessments();
   }
 
@@ -77,8 +81,8 @@ class AbsolutesCalculationController extends GetxController {
 
     if (selectedType.value == "both") {
       if (labWeight.value + lectureWeight.value != 100) {
-        Get.snackbar("Error", "Total Lecture + Lab weightage must be 100.",
-            backgroundColor: Colors.red, colorText: Colors.white);
+        AppSnackbar.error(
+            message: "Total Lecture + Lab weightage must be 100.");
         return;
       }
       var labAssessments = assessments.where((a) => a.type == "lab").toList();
@@ -301,8 +305,8 @@ class AbsolutesCalculationController extends GetxController {
     }
 
     if (totalWeight > 100) {
-      Get.snackbar("Error", "Total assessment weightage cannot exceed 100.",
-          backgroundColor: Colors.red, colorText: Colors.white);
+      AppSnackbar.error(
+          message: "Total assessment weightage cannot exceed 100.");
       return -1;
     }
 
@@ -348,11 +352,11 @@ class AbsolutesCalculationController extends GetxController {
       final directory = await getApplicationDocumentsDirectory();
       final imagePath = await File('${directory.path}/image.png').create();
       await imagePath.writeAsBytes(image!);
-      await Share.shareXFiles(
-        [XFile(imagePath.path)],
+      await SharePlus.instance.share(ShareParams(
+        files: [XFile(imagePath.path)],
         text:
             "Hey! Check this out. I have calculated my${type}Absolute score using My Nust App. It's amazing! You should try it too.",
-      );
+      ));
     });
     return true;
   }

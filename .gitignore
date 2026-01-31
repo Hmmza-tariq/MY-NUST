@@ -15,7 +15,17 @@ migrate_working_dir/
 *.ipr
 *.iws
 .idea/
+
+# Environment files
 *.env
+!.env.example
+
+# Android signing keys
+key.properties
+*.jks
+*.keystore
+
+# VS Code
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.

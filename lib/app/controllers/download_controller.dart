@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nust/app/modules/widgets/custom_snackbar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:background_downloader/background_downloader.dart' as bd;
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -209,27 +210,16 @@ class DownloadController extends GetxController {
 
   // Helper method to show downloading snackbar
   void _showDownloadingSnackbar() {
-    Get.snackbar(
-      'Downloading',
-      'File download started',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.blue[100],
-      colorText: Colors.blue[900],
-      margin: const EdgeInsets.all(8),
-      duration: const Duration(seconds: 2),
+    AppSnackbar.info(
+      title: 'Downloading',
+      message: 'File download started',
     );
   }
 
   // Helper method to show success snackbar
   void _showSuccessSnackbar() {
-    Get.snackbar(
-      'Success',
-      'Download completed successfully',
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: Colors.green[100],
-      colorText: Colors.green[900],
-      margin: const EdgeInsets.all(8),
-      duration: const Duration(seconds: 2),
+    AppSnackbar.success(
+      message: 'Download completed successfully',
     );
   }
 }

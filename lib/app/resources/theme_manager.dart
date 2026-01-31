@@ -18,7 +18,7 @@ ThemeData getLightTheme() {
           ColorManager.primaryValue, ColorManager.colorSwatch),
     ),
     dividerColor: Colors.transparent,
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: ColorManager.white,
       shadowColor: ColorManager.shadow,
       elevation: 4,
@@ -92,7 +92,8 @@ ThemeData getLightTheme() {
       focusedErrorBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: ColorManager.lightGrey1)),
     ),
-    dialogTheme: const DialogTheme(backgroundColor: ColorManager.background1),
+    dialogTheme:
+        const DialogThemeData(backgroundColor: ColorManager.background1),
     expansionTileTheme: const ExpansionTileThemeData(
       collapsedBackgroundColor: ColorManager.background1,
     ),
@@ -121,7 +122,7 @@ ThemeData getDarkTheme() {
       ),
     ),
     dividerColor: Colors.transparent,
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: ColorManager.darkCard,
       shadowColor: ColorManager.darkShadow,
       elevation: 4,
@@ -196,7 +197,7 @@ ThemeData getDarkTheme() {
           borderSide: BorderSide(color: ColorManager.darkGrey1)),
     ),
     dialogTheme:
-        const DialogTheme(backgroundColor: ColorManager.backgroundDark),
+        const DialogThemeData(backgroundColor: ColorManager.backgroundDark),
     expansionTileTheme: const ExpansionTileThemeData(
       collapsedBackgroundColor: ColorManager.backgroundDark,
     ),
