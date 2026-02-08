@@ -225,6 +225,7 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             InputWidget(
               widthFactor: .38,
