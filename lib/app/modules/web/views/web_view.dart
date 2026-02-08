@@ -191,14 +191,18 @@ class WebView extends GetView<WebController> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (controller.isLoading.value)
-                    SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                            ColorManager.white),
-                        value: controller.status.value / 100,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 2.0, vertical: 2.0),
+                      child: SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                              ColorManager.white),
+                          // value: controller.status.value / 100,
+                        ),
                       ),
                     )
                   else

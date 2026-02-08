@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <!-- Base configuration for all connections -->
-    <base-config cleartextTrafficPermitted="false">
+    <!-- Trust system and user-added certificates for all domains -->
+    <base-config cleartextTrafficPermitted="true">
         <trust-anchors>
-            <!-- Trust system certificate authorities -->
             <certificates src="system" />
-            <!-- Trust user-added certificate authorities -->
             <certificates src="user" />
         </trust-anchors>
     </base-config>
     
-    <!-- Special configuration for NUST domains -->
-    <domain-config cleartextTrafficPermitted="true">
+    <!-- Specific configuration for NUST domains -->
+    <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">nust.edu.pk</domain>
         <domain includeSubdomains="true">lms.nust.edu.pk</domain>
         <domain includeSubdomains="true">qalam.nust.edu.pk</domain>

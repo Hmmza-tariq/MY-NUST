@@ -371,6 +371,8 @@ class WebController extends GetxController {
         uri.path.endsWith('.jpeg') ||
         uri.path.endsWith('.png') ||
         uri.path.endsWith('.pptx')) {
+      // Extract cookies right before download (only when needed)
+      await _extractCookiesForDownloads();
       downloadController.download(url, 0);
       return true;
     }
@@ -433,15 +435,55 @@ class WebController extends GetxController {
 
     if (url.contains("lms")) {
       wvc.runJavaScript('''
+        // Set viewport
         var viewport = document.querySelector("meta[name=viewport]");
         if (viewport) {
-          viewport.setAttribute("content", "width=device-width, initial-scale=1.0, maximum-scale=1.0");
+          viewport.setAttribute("content", "width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes");
         } else {
           var meta = document.createElement('meta');
           meta.name = 'viewport';
-          meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0';
+          meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes';
           document.getElementsByTagName('head')[0].appendChild(meta);
         }
+        
+        // Add CSS to fit content to screen width
+        var style = document.createElement('style');
+        style.innerHTML = `
+          body {
+            width: 100% !important;
+            max-width: 100vw !important;
+            overflow-x: hidden !important;
+          }
+          
+          .container, .container-fluid, #page {
+            max-width: 100% !important;
+            width: 100% !important;
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+          }
+          
+          img {
+            max-width: 100% !important;
+            height: auto !important;
+          }
+          
+          table {
+            max-width: 100% !important;
+            overflow-x: auto !important;
+            display: block !important;
+          }
+          
+          iframe {
+            max-width: 100% !important;
+          }
+          
+          /* Fix for large header/logo */
+          .navbar, .navbar-brand img {
+            max-width: 100% !important;
+            height: auto !important;
+          }
+        `;
+        document.head.appendChild(style);
       ''');
     }
 
@@ -569,6 +611,46 @@ class WebController extends GetxController {
 
   void toggleAppBar() {
     isAppBarExpanded.value = !isAppBarExpanded.value;
+  }
+
+  Future<void> _extractCookiesForDownloads() async {
+    // Only called right before a file download - not on every page load
+    try {
+      final wvc = webViewController;
+      if (wvc == null) return;
+
+      // Wrap in browser-level try-catch to prevent uncaught SecurityErrors
+      final cookieString = await wvc
+          .runJavaScriptReturningResult(
+            '(function(){try{return document.cookie}catch(e){return ""}})()')
+          .timeout(const Duration(seconds: 2));
+
+      if (cookieString.toString().isNotEmpty &&
+          cookieString.toString() != '""' &&
+          cookieString.toString() != 'null') {
+        String cleanCookieString =
+            cookieString.toString().replaceAll('"', '').trim();
+
+        if (cleanCookieString.isNotEmpty) {
+          final List<Cookie> cookies = [];
+          final cookiePairs = cleanCookieString.split(';');
+
+          for (final pair in cookiePairs) {
+            final parts = pair.trim().split('=');
+            if (parts.length >= 2) {
+              final cookie = Cookie(parts[0], parts.sublist(1).join('='));
+              cookies.add(cookie);
+            }
+          }
+
+          if (cookies.isNotEmpty) {
+            downloadController.setCookies(cookies);
+          }
+        }
+      }
+    } catch (e) {
+      // Silently fail - downloads will work without cookies in most cases
+    }
   }
 
   void _showSslErrorDialog() {
