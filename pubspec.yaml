@@ -1,7 +1,7 @@
 name: nust
 description: Nust unofficial Student app
 
-version: 2.0.8+30
+version: 2.0.9+31
 publish_to: none
 
 environment: 
@@ -42,7 +42,6 @@ dependencies:
   path_provider: ^2.1.4
   device_info_plus: ^12.2.0
   flutter_downloader: ^1.11.8
-  # webview_cookie_manager: ^2.0.6  # Temporarily disabled - incompatible with AGP 8.6+
   background_downloader: ^9.5.2
   shimmer: ^3.0.0
   screenshot: ^3.0.0
