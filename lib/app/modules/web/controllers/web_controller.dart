@@ -138,8 +138,9 @@ class WebController extends GetxController {
                   // Wait longer to see if it's just a temporary state or real error
                   // Many pages initially load empty then populate
                   Future.delayed(const Duration(seconds: 2), () async {
-                    if (!emptyPageDetected.value)
+                    if (!emptyPageDetected.value) {
                       return; // Content loaded since then
+                    }
 
                     // Double-check content length after delay
                     try {
@@ -622,7 +623,7 @@ class WebController extends GetxController {
       // Wrap in browser-level try-catch to prevent uncaught SecurityErrors
       final cookieString = await wvc
           .runJavaScriptReturningResult(
-            '(function(){try{return document.cookie}catch(e){return ""}})()')
+              '(function(){try{return document.cookie}catch(e){return ""}})()')
           .timeout(const Duration(seconds: 2));
 
       if (cookieString.toString().isNotEmpty &&
