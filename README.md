@@ -9,7 +9,7 @@
 
 ## About
 
-'My NUST' is your ultimate companion for a seamless university experience. Designed exclusively for NUST students, this comprehensive app brings a range of features right to your fingertips, enhancing your academic journey and campus life like never before.
+My NUST is an independent, student-built utility for common academic tasks. It is not affiliated with, authorized by, or endorsed by the National University of Sciences & Technology. NUST names, marks, and portal content belong to their respective owner.
 
 This app is **open-source** and the complete codebase is public on GitHub to ensure transparency and community collaboration.
 
@@ -29,6 +29,9 @@ This app is **open-source** and the complete codebase is public on GitHub to ens
 ### Academic Calculators
 - **GPA Calculator**: Calculate both expected CGPA (Cumulative GPA) and SGPA (Semester GPA) accurately. Monitor your academic performance and plan ahead.
 - **Absolutes Calculator**: Calculate your absolutes to get a better estimate of your expected grades based on your current performance.
+
+### Interface
+- **Material 3 design system**: Seed-generated light/dark color schemes, tonal surfaces, consistent component shapes, accessible interaction states, and lightweight animations suitable for lower-end devices.
 
 ### Push Notifications
 - Receive in-app notifications for important updates, announcements, and deadlines.
@@ -50,8 +53,8 @@ Before you begin, ensure you have the following installed on your system:
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/Hmmza-tariq/My-NUST.git
-   cd My-NUST
+   git clone https://github.com/Hmmza-tariq/MY-NUST.git
+   cd my-nust-student-app
    ```
 
 2. **Install Dependencies**
@@ -146,7 +149,7 @@ We take your privacy seriously. This app does not collect any personal data or i
 - User consent is required before enabling autofill features
 
 **Security:**
-- End-to-end encryption for stored credentials
+- Encrypted local storage for saved credentials; portal traffic uses the portal's HTTPS connection
 - Biometric authentication support
 - Secure WebView implementation
 - Regular security updates
@@ -164,7 +167,7 @@ This project is open source under the terms specified in the [LICENSE](LICENSE) 
 ## Contact & Support
 
 For questions, feedback, or support:
-- Open an issue on [GitHub](https://github.com/Hmmza-tariq/My-NUST/issues)
+- Open an issue on [GitHub](https://github.com/Hmmza-tariq/MY-NUST/issues)
 - Check existing discussions and FAQs
 
 ## Support the Project

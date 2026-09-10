@@ -1,44 +1,50 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/material.dart';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/database_controller.dart';
-import 'package:nust/app/modules/Authentication/controllers/authentication_controller.dart';
+import 'package:nust/app/controllers/download_controller.dart';
 import 'package:nust/app/controllers/internet_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
+import 'package:nust/app/domain/portal/portal_load_state.dart';
+import 'package:nust/app/domain/portal/portal_url_classifier.dart';
+import 'package:nust/app/modules/Authentication/controllers/authentication_controller.dart';
 import 'package:nust/app/modules/widgets/custom_snackbar.dart';
-import 'package:nust/app/resources/color_manager.dart';
-// import 'package:webview_cookie_manager/webview_cookie_manager.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
-import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../../../controllers/download_controller.dart';
 
 class WebController extends GetxController {
   static const platform = MethodChannel('com.hexagone.mynust/webview');
 
-  String url = Get.parameters['url'] ?? '';
-  var isLoading = true.obs;
-  var isError = false.obs;
-  var initError = false.obs;
-  var errorMessage = "Failed to load webpage".obs;
-  var canPop = false.obs;
-  var queryRan = false.obs;
-  WebViewController? webViewController;
-  var isWebViewInitialized = false.obs;
-  var status = 0.obs;
-  var pageTitle = ''.obs;
-  var currentUrl = ''.obs;
-  var isAppBarExpanded = false.obs;
-  var sslErrorDetected = false.obs;
-  var emptyPageDetected = false.obs;
-  var sslDialogShown = false;
-  AuthenticationController authenticationController = Get.find();
-  InternetController internetController = Get.find();
+  final AuthenticationController authenticationController = Get.find();
+  final InternetController internetController = Get.find();
+  final ThemeController themeController = Get.find();
+  final DatabaseController databaseController = Get.find();
   final DownloadController downloadController = Get.put(DownloadController());
-  // final cookieManager = WebviewCookieManager();
-  ThemeController themeController = Get.find();
-  DatabaseController databaseController = Get.find();
+
+  String url = Get.parameters['url'] ?? '';
+  final phase = PortalPhase.initializing.obs;
+  final isLoading = true.obs;
+  final isError = false.obs;
+  final initError = false.obs;
+  final errorMessage = 'Unable to load this page.'.obs;
+  final canPop = false.obs;
+  final queryRan = false.obs;
+  final isWebViewInitialized = false.obs;
+  final status = 0.obs;
+  final pageTitle = 'Portal'.obs;
+  final currentUrl = ''.obs;
+  final isAppBarExpanded = true.obs;
+  WebViewController? webViewController;
+
+  StreamSubscription<bool>? _connectionSubscription;
+  Timer? _slowTimer;
+  Timer? _timeoutTimer;
+  String _activeUrl = '';
 
   @override
   void onInit() {
@@ -46,696 +52,361 @@ class WebController extends GetxController {
     initializeWebView();
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-    downloadController.dispose();
-  }
-
-  void initializeWebView() async {
+  Future<void> initializeWebView() async {
+    if (isWebViewInitialized.value && webViewController != null) {
+      await reload();
+      return;
+    }
+    _setPhase(PortalPhase.initializing);
     try {
-      // Clear SSL preferences on Android
-      if (Platform.isAndroid) {
-        try {
-          await platform.invokeMethod('clearSslPreferences');
-          debugPrint('Cleared SSL preferences');
-        } catch (e) {
-          debugPrint('Could not clear SSL preferences: $e');
-        }
-      }
-
-      if (url.isEmpty) {
-        await databaseController.getData('url').then((value) {
-          url = value;
-        });
-      }
-
-      if (url.isEmpty) {
-        initError.value = true;
-        errorMessage.value = "No URL provided";
-        isLoading.value = false;
+      if (url.isEmpty) url = await databaseController.getData('url');
+      final uri = Uri.tryParse(url);
+      if (uri == null || !PortalUrlClassifier.isAllowedPage(url)) {
+        _fail('The portal address is missing or invalid.');
         return;
       }
-      final String userAgent = Platform.isAndroid
-          ? 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36'
-          : 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1';
 
-      final wvc = WebViewController()
+      final controller = WebViewController()
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setBackgroundColor(ColorManager.background1)
-        ..setUserAgent(userAgent)
-        ..enableZoom(false)
-        // Add JavaScript channel for error handling
+        ..setBackgroundColor(themeController.theme.scaffoldBackgroundColor)
+        ..enableZoom(true)
         ..addJavaScriptChannel(
-          'ErrorHandler',
-          onMessageReceived: (JavaScriptMessage message) {
-            debugPrint('JS Error: ${message.message}');
-          },
+          'PortalBridge',
+          onMessageReceived: (message) => _handlePortalMessage(message.message),
         )
         ..setNavigationDelegate(
           NavigationDelegate(
-            onProgress: (int newProgress) {
-              status.value = newProgress;
-            },
-            onPageStarted: (String url) {
-              isLoading.value = true;
-              initError.value = false;
-              currentUrl.value = _formatUrl(url);
-              sslDialogShown = false; // Reset dialog flag for new page
-              debugPrint('Page started loading: $url');
-            },
-            onPageFinished: (String url) async {
-              debugPrint('Page finished loading: $url');
-              isLoading.value = false;
-              isError.value = false;
-              initError.value = false;
-              currentUrl.value = _formatUrl(url);
-
-              // Get page title safely
-              try {
-                final title = await webViewController?.getTitle();
-                pageTitle.value = title ?? 'NUST Portal';
-                debugPrint('Page title: $title');
-              } catch (e) {
-                debugPrint('Error getting page title: $e');
-                pageTitle.value = 'NUST Portal';
-              }
-
-              // Check if page actually has content
-              try {
-                final html =
-                    await webViewController?.runJavaScriptReturningResult(
-                        'document.body.innerHTML.length');
-                debugPrint('Page content length: $html characters');
-
-                final contentLength = int.tryParse(html.toString()) ?? 0;
-
-                if (contentLength == 0) {
-                  debugPrint(
-                      'WARNING: Page appears to be empty despite onPageFinished');
-                  emptyPageDetected.value = true;
-
-                  // Wait longer to see if it's just a temporary state or real error
-                  // Many pages initially load empty then populate
-                  Future.delayed(const Duration(seconds: 2), () async {
-                    if (!emptyPageDetected.value) {
-                      return; // Content loaded since then
-                    }
-
-                    // Double-check content length after delay
-                    try {
-                      final recheckHtml =
-                          await webViewController?.runJavaScriptReturningResult(
-                              'document.body.innerHTML.length');
-                      final recheckLength =
-                          int.tryParse(recheckHtml.toString()) ?? 0;
-
-                      if (recheckLength == 0) {
-                        debugPrint(
-                            'Page still empty after 2 seconds - showing error dialog');
-                        _showSslErrorDialog();
-                      } else {
-                        debugPrint(
-                            'Page loaded successfully after delay: $recheckLength characters');
-                        emptyPageDetected.value = false;
-                      }
-                    } catch (e) {
-                      debugPrint('Error rechecking page content: $e');
-                    }
-                  });
-                } else {
-                  emptyPageDetected.value = false;
-                  sslErrorDetected.value = false;
-                }
-              } catch (e) {
-                debugPrint('Could not check page content: $e');
-              }
-
-              // Inject error handling JavaScript
-              try {
-                await webViewController?.runJavaScript('''
-                  // Override console.error to send to Flutter
-                  (function() {
-                    var originalError = console.error;
-                    console.error = function() {
-                      try {
-                        ErrorHandler.postMessage(Array.from(arguments).join(' '));
-                      } catch(e) {}
-                      originalError.apply(console, arguments);
-                    };
-                    
-                    // Add global error handler to catch uncaught errors
-                    window.addEventListener('error', function(e) {
-                      try {
-                        ErrorHandler.postMessage('Global Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno);
-                      } catch(err) {}
-                      return false;
-                    });
-                  })();
-                ''');
-              } catch (e) {
-                debugPrint('Error injecting JavaScript: $e');
-              }
-
-              runJavaScriptOnPageLoad(url);
-
-              // Note: Cookie management temporarily disabled due to package compatibility
-              // If you need cookie support, consider using webview_flutter's built-in WebViewCookieManager
-
-              // Apply CSS fixes to prevent display issues
-              applyRenderingFixes();
-            },
-            onWebResourceError: (WebResourceError error) {
-              debugPrint(
-                  'WebView Error: ${error.errorCode} - ${error.description} - Type: ${error.errorType} - isMainFrame: ${error.isForMainFrame}');
-
-              // Handle SSL errors - only show error if it's for the main frame and critical
-              if (error.errorCode == -2 ||
-                  error.errorCode == -202 ||
-                  error.description.toLowerCase().contains('ssl') ||
-                  error.description.toLowerCase().contains('certificate')) {
-                debugPrint(
-                    'SSL/Certificate error detected - Error code: ${error.errorCode}');
-                sslErrorDetected.value = true;
-
-                // Only show error for main frame SSL errors, and even then, just log it
-                // Many university sites have SSL issues with sub-resources but work fine
-                if (error.isForMainFrame ?? false) {
-                  debugPrint(
-                      'SSL error on main frame - allowing page to continue loading');
-                  debugPrint(
-                      'If page appears empty, user will be offered to open in external browser');
-                }
-                // Don't prevent loading for SSL errors on sub-resources
-                return;
-              }
-
-              if (error.errorCode == -1 ||
-                  error.errorType == WebResourceErrorType.hostLookup) {
-                // Network related errors - only for main frame
-                if (error.isForMainFrame ?? true) {
-                  isError.value = true;
-                  isLoading.value = false;
-                }
-              } else if (error.errorType ==
-                      WebResourceErrorType.javaScriptExceptionOccurred ||
-                  error.errorType ==
-                      WebResourceErrorType.webContentProcessTerminated) {
-                // Rendering or JavaScript errors - only for main frame
-                if (error.isForMainFrame ?? true) {
-                  initError.value = true;
-                  errorMessage.value = "Rendering error: ${error.description}";
-                  isLoading.value = false;
-                }
-              }
-            },
-            onNavigationRequest: (NavigationRequest request) async {
-              String url = request.url;
-
-              if (await handleFileDownload(request)) {
-                return NavigationDecision.prevent;
-              }
-
-              if (shouldPreventNavigation(url)) {
-                debugPrint('Preventing navigation to $url');
-                AppSnackbar.error(
-                    message: 'Navigation to external sites is not allowed');
-                return NavigationDecision.prevent;
-              }
-
-              return NavigationDecision.navigate;
-            },
+            onProgress: (value) => status.value = value,
+            onPageStarted: _onPageStarted,
+            onPageFinished: _onPageFinished,
+            onWebResourceError: _onWebResourceError,
+            onNavigationRequest: _onNavigationRequest,
           ),
         );
-
-      // Set the controller after full configuration
-      webViewController = wvc;
+      webViewController = controller;
       isWebViewInitialized.value = true;
 
-      // Android-specific configuration for SSL and mixed content
       if (Platform.isAndroid) {
-        try {
-          final androidController = wvc.platform as AndroidWebViewController;
-          // Enable debugging to see detailed logs
-          AndroidWebViewController.enableDebugging(true);
-          // Allow mixed content (HTTP content in HTTPS pages)
-          await androidController.setMediaPlaybackRequiresUserGesture(false);
-
-          // Clear SSL preferences and cache to avoid cached failures
-          try {
-            await androidController.clearCache();
-            debugPrint('Cleared WebView cache');
-          } catch (e) {
-            debugPrint('Could not clear cache: $e');
-          }
-
-          debugPrint('Android WebView configured with debugging enabled');
-        } catch (e) {
-          debugPrint('Error configuring Android WebView: $e');
-        }
+        AndroidWebViewController.enableDebugging(kDebugMode);
+        final android = controller.platform as AndroidWebViewController;
+        await android.setMediaPlaybackRequiresUserGesture(false);
       }
 
+      _watchConnectivity();
       if (!internetController.isOnline.value) {
-        isError.value = true;
-        isLoading.value = false;
-        internetController.noInternetDialog(reload);
-      } else {
-        wvc.loadRequest(Uri.parse(url));
-        canPop.value = false;
-
-        // Add timeout to detect stuck loading - increased to 45 seconds for slower connections
-        Future.delayed(const Duration(seconds: 45), () {
-          if (isLoading.value) {
-            debugPrint('Loading timeout detected after 45 seconds');
-            initError.value = true;
-            errorMessage.value =
-                "The page is taking too long to load.\n\nThis might be due to:\n• Slow network connection\n• Server not responding\n• SSL/Certificate problems\n\nTip: Try using your mobile data instead of WiFi, or vice versa.\n\nTap 'Try Again' to retry.";
-            isLoading.value = false;
-          }
-        });
+        _setPhase(PortalPhase.offline);
+        return;
       }
-
-      checkInternet();
-    } catch (e) {
-      debugPrint('Error initializing webview: $e');
-      initError.value = true;
-      errorMessage.value = "Failed to initialize WebView: $e";
-      isLoading.value = false;
+      await controller.loadRequest(uri);
+    } catch (error, stackTrace) {
+      debugPrint('WebView initialization failed: $error\n$stackTrace');
+      _fail('The portal could not be started. Please try again.');
     }
   }
 
-  void applyRenderingFixes() {
-    final wvc = webViewController;
-    if (wvc == null) return;
-
-    wvc.runJavaScript('''
-      var selectElement = document.getElementById("MainContent_cboInstitution");
-      for (var i = 0; i < selectElement.options.length; i++) {
-        if (selectElement.options[i].value === "04490") {
-            selectElement.selectedIndex = i; 
-        if ("createEvent" in document) {
-            var evt = document.createEvent("HTMLEvents");
-            evt.initEvent("change", false, true);
-            selectElement.dispatchEvent(evt);
-        } else {
-            selectElement.fireEvent("onchange");
-        }
-        break;
-        }
-    } 
-    var selectElement = document.getElementById("MainContent_cboSearchBy"); 
-    for (var i = 0; i < selectElement.options.length; i++) {
-        if (selectElement.options[i].value === "RegistrationNumber") {
-            selectElement.selectedIndex = i;
-
-            if ("createEvent" in document) {
-                var evt = document.createEvent("HTMLEvents");
-                evt.initEvent("change", false, true);
-                selectElement.dispatchEvent(evt);
-            } else {
-                selectElement.fireEvent("onchange");
-            }
-
-            break;
-        }
-    }
-    ''');
+  void _onPageStarted(String value) {
+    canPop.value = false;
+    _activeUrl = value;
+    currentUrl.value = _formatUrl(value);
+    status.value = 0;
+    _setPhase(PortalPhase.loading);
+    _startLoadTimers();
   }
 
-  Future<bool> handleFileDownload(NavigationRequest request) async {
-    String url = request.url;
-    final Uri uri = Uri.parse(url);
-    if (uri.path.endsWith('.pdf') ||
-        uri.path.endsWith('.docx') ||
-        uri.path.endsWith('.ppt') ||
-        uri.path.endsWith('.jpg') ||
-        uri.path.endsWith('.jpeg') ||
-        uri.path.endsWith('.png') ||
-        uri.path.endsWith('.pptx')) {
-      // Extract cookies right before download (only when needed)
-      await _extractCookiesForDownloads();
-      downloadController.download(url, 0);
-      return true;
+  Future<void> _onPageFinished(String value) async {
+    _cancelLoadTimers();
+    _activeUrl = value;
+    currentUrl.value = _formatUrl(value);
+    status.value = 100;
+    _setPhase(PortalPhase.ready);
+    try {
+      final title = await webViewController?.getTitle();
+      pageTitle.value =
+          title?.trim().isNotEmpty == true ? title!.trim() : 'Portal';
+      await _installPortalBridge();
+      runJavaScriptOnPageLoad(value);
+    } catch (error) {
+      debugPrint('Post-load setup skipped: $error');
     }
-    return false;
   }
 
-  void checkInternet() {
-    internetController.isOnline.listen(
-      (isOnline) async {
-        if (isOnline) {
-          isError.value = false;
-          if (isError.value) {
-            await reload();
-          }
-        } else {
-          isError.value = true;
-          internetController.noInternetDialog(reload);
-        }
-      },
+  void _onWebResourceError(WebResourceError error) {
+    debugPrint('WebView error ${error.errorCode}: ${error.description}');
+    if (error.isForMainFrame == false) return;
+    _cancelLoadTimers();
+    if (!internetController.isOnline.value ||
+        error.errorType == WebResourceErrorType.hostLookup) {
+      _setPhase(PortalPhase.offline);
+      return;
+    }
+    _fail('The portal did not respond. Retry here or open it in your browser.');
+  }
+
+  Future<NavigationDecision> _onNavigationRequest(
+    NavigationRequest request,
+  ) async {
+    switch (PortalUrlClassifier.classify(request.url)) {
+      case PortalNavigationKind.page:
+        return NavigationDecision.navigate;
+      case PortalNavigationKind.download:
+        await _startDownload(request.url);
+        return NavigationDecision.prevent;
+      case PortalNavigationKind.external:
+        await openInBrowser(request.url);
+        return NavigationDecision.prevent;
+      case PortalNavigationKind.unsupported:
+        AppSnackbar.error(
+            message: 'This link type is not supported in the app.');
+        return NavigationDecision.prevent;
+    }
+  }
+
+  Future<void> _handlePortalMessage(String value) async {
+    if (value == 'print') {
+      await openInBrowser(_activeUrl.isEmpty ? url : _activeUrl);
+      AppSnackbar.info(
+        title: 'Opened in browser',
+        message:
+            'Use the browser print or download control to save the challan.',
+      );
+      return;
+    }
+    final kind = PortalUrlClassifier.classify(value);
+    if (kind == PortalNavigationKind.download) {
+      await _startDownload(value);
+    } else if (kind == PortalNavigationKind.page) {
+      await webViewController?.loadRequest(Uri.parse(value));
+    } else if (kind == PortalNavigationKind.external) {
+      await openInBrowser(value);
+    } else {
+      AppSnackbar.error(
+        message:
+            'This document cannot be saved directly. Opening the portal in your browser.',
+      );
+      await openInBrowser(_activeUrl.isEmpty ? url : _activeUrl);
+    }
+  }
+
+  Future<void> _startDownload(String downloadUrl) async {
+    if (downloadUrl.startsWith('blob:') || downloadUrl.startsWith('data:')) {
+      AppSnackbar.info(
+        title: 'Browser download required',
+        message:
+            'This document is generated by the portal. Opening it in your browser.',
+      );
+      await openInBrowser(_activeUrl.isEmpty ? url : _activeUrl);
+      return;
+    }
+    final cookieHeader = await _nativeCookies(downloadUrl);
+    await downloadController.download(
+      downloadUrl,
+      cookieHeader: cookieHeader,
+      referer: _activeUrl,
     );
   }
 
-  Future<void> reload() async {
-    final wvc = webViewController;
-    if (wvc == null) {
-      debugPrint('Cannot reload: WebViewController not initialized');
-      return;
-    }
-
-    if (internetController.isOnline.value) {
-      isLoading.value = true;
-      initError.value = false;
-      isError.value = false;
-
-      if (await wvc.currentUrl() == null) {
-        wvc.loadRequest(Uri.parse(url));
-      } else {
-        await wvc.reload();
-      }
-
-      // Add timeout for reload as well - increased to 45 seconds
-      Future.delayed(const Duration(seconds: 45), () {
-        if (isLoading.value) {
-          debugPrint('Reload timeout detected after 45 seconds');
-          initError.value = true;
-          errorMessage.value =
-              "The page is taking too long to load.\n\nThis might be due to:\n• Slow network connection\n• Server not responding\n• SSL/Certificate problems\n\nTip: Try using your mobile data instead of WiFi, or vice versa.\n\nTap 'Try Again' to retry.";
-          isLoading.value = false;
-        }
-      });
-    } else {
-      isError.value = true;
-      internetController.noInternetDialog(reload);
-    }
-  }
-
-  void runJavaScriptOnPageLoad(String url) {
-    final wvc = webViewController;
-    if (wvc == null) return;
-
-    if (url.contains("lms")) {
-      wvc.runJavaScript('''
-        // Set viewport
-        var viewport = document.querySelector("meta[name=viewport]");
-        if (viewport) {
-          viewport.setAttribute("content", "width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes");
-        } else {
-          var meta = document.createElement('meta');
-          meta.name = 'viewport';
-          meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes';
-          document.getElementsByTagName('head')[0].appendChild(meta);
-        }
-        
-        // Add CSS to fit content to screen width
-        var style = document.createElement('style');
-        style.innerHTML = `
-          body {
-            width: 100% !important;
-            max-width: 100vw !important;
-            overflow-x: hidden !important;
-          }
-          
-          .container, .container-fluid, #page {
-            max-width: 100% !important;
-            width: 100% !important;
-            padding-left: 10px !important;
-            padding-right: 10px !important;
-          }
-          
-          img {
-            max-width: 100% !important;
-            height: auto !important;
-          }
-          
-          table {
-            max-width: 100% !important;
-            overflow-x: auto !important;
-            display: block !important;
-          }
-          
-          iframe {
-            max-width: 100% !important;
-          }
-          
-          /* Fix for large header/logo */
-          .navbar, .navbar-brand img {
-            max-width: 100% !important;
-            height: auto !important;
-          }
-        `;
-        document.head.appendChild(style);
-      ''');
-    }
-
-    if (authenticationController.isAutofillEnabled.value) {
-      autoFillLoginDetails(url);
-    } else if (url.contains("kuickpay")) {
-      kuickPayQuery();
-    }
-  }
-
-  void autoFillLoginDetails(String url) {
-    final wvc = webViewController;
-    if (wvc == null) return;
-
-    if (url.contains("lms.nust.edu.pk")) {
-      wvc.runJavaScript('''
-        var username = document.getElementById('username');
-        var password = document.getElementById('password');
-        if (username && password) {
-          username.value = '${authenticationController.id}';
-          password.value = '${authenticationController.lmsPassword}';
-        }
-      ''');
-    } else if (url.contains("qalam.nust.edu.pk")) {
-      wvc.runJavaScript('''
-        var login = document.getElementById('login');
-        var password = document.getElementById('password');
-        if (login && password) {
-          login.value = '${authenticationController.id}';
-          password.value = '${authenticationController.qalamPassword}';
-        }
-      ''');
-    }
-  }
-
-  void kuickPayQuery() {
-    final wvc = webViewController;
-    if (wvc == null || queryRan.value) {
-      return;
-    }
-    wvc.runJavaScript('''
-      var selectElement = document.getElementById("MainContent_cboInstitution");
-      for (var i = 0; i < selectElement.options.length; i++) {
-        if (selectElement.options[i].value === "04490") {
-            selectElement.selectedIndex = i; 
-        if ("createEvent" in document) {
-            var evt = document.createEvent("HTMLEvents");
-            evt.initEvent("change", false, true);
-            selectElement.dispatchEvent(evt);
-        } else {
-            selectElement.fireEvent("onchange");
-        }
-        break;
-        }
-    } 
-    var selectElement = document.getElementById("MainContent_cboSearchBy"); 
-    for (var i = 0; i < selectElement.options.length; i++) {
-        if (selectElement.options[i].value === "RegistrationNumber") {
-            selectElement.selectedIndex = i;
-
-            if ("createEvent" in document) {
-                var evt = document.createEvent("HTMLEvents");
-                evt.initEvent("change", false, true);
-                selectElement.dispatchEvent(evt);
-            } else {
-                selectElement.fireEvent("onchange");
-            }
-
-            break;
-        }
-    }
-      ''');
-    queryRan.value = true;
-  }
-
-  bool shouldPreventNavigation(String url) {
-    final Uri uri = Uri.parse(url);
-    if (uri.host == 'nust.edu.pk' ||
-        uri.host.endsWith('.nust.edu.pk') ||
-        uri.host == 'app.kuickpay.com') {
-      return false;
-    }
-    return true;
-  }
-
-  void setCustomSettings(Map<String, dynamic> settings) {
-    final wvc = webViewController;
-    if (wvc == null) return;
-
-    for (var entry in settings.entries) {
-      try {
-        wvc.runJavaScript('window.navigator.${entry.key} = ${entry.value};');
-      } catch (e) {
-        debugPrint('Error setting ${entry.key}: $e');
-      }
-    }
-  }
-
-  String _formatUrl(String url) {
+  Future<String> _nativeCookies(String value) async {
     try {
-      final uri = Uri.parse(url);
-      if (uri.host.contains('lms.nust.edu.pk')) {
-        return 'LMS Portal';
-      } else if (uri.host.contains('qalam.nust.edu.pk')) {
-        return 'Qalam Portal';
-      } else if (uri.host.contains('kuickpay.com')) {
-        return 'Fee Portal';
-      } else if (uri.host.contains('nust.edu.pk')) {
-        return uri.host.replaceAll('.nust.edu.pk', '').toUpperCase();
+      return await platform
+              .invokeMethod<String>('getCookies', {'url': value}) ??
+          '';
+    } catch (error) {
+      debugPrint('Native cookies unavailable: $error');
+      return '';
+    }
+  }
+
+  Future<void> _installPortalBridge() async {
+    await webViewController?.runJavaScript(r'''
+      (function () {
+        if (window.__myNustBridgeInstalled) return;
+        window.__myNustBridgeInstalled = true;
+        window.open = function (target) {
+          if (target) PortalBridge.postMessage(new URL(target, location.href).href);
+          return null;
+        };
+        window.print = function () { PortalBridge.postMessage('print'); };
+        function keepFormsInPortal(root) {
+          var forms = (root || document).querySelectorAll('form[target="_blank"]');
+          forms.forEach(function (form) { form.target = '_self'; });
+        }
+        keepFormsInPortal(document);
+        new MutationObserver(function () { keepFormsInPortal(document); })
+          .observe(document.documentElement, { childList: true, subtree: true });
+        document.addEventListener('click', function (event) {
+          var anchor = event.target && event.target.closest
+            ? event.target.closest('a[href]') : null;
+          if (!anchor) return;
+          if (anchor.hasAttribute('download') || anchor.target === '_blank') {
+            event.preventDefault();
+            PortalBridge.postMessage(anchor.href);
+          }
+        }, true);
+      })();
+    ''');
+  }
+
+  void _watchConnectivity() {
+    _connectionSubscription?.cancel();
+    _connectionSubscription = internetController.isOnline.listen((online) {
+      if (!online) {
+        _setPhase(PortalPhase.offline);
+      } else if (phase.value == PortalPhase.offline) {
+        reload();
       }
-      return uri.host;
-    } catch (e) {
-      return url;
+    });
+  }
+
+  void _startLoadTimers() {
+    _cancelLoadTimers();
+    _slowTimer = Timer(const Duration(seconds: 12), () {
+      if (phase.value == PortalPhase.loading) _setPhase(PortalPhase.slow);
+    });
+    _timeoutTimer = Timer(const Duration(seconds: 45), () {
+      if (phase.value == PortalPhase.loading ||
+          phase.value == PortalPhase.slow) {
+        errorMessage.value =
+            'The portal is still loading. You can keep waiting, retry, or open it in your browser.';
+        _setPhase(PortalPhase.slow);
+      }
+    });
+  }
+
+  void _cancelLoadTimers() {
+    _slowTimer?.cancel();
+    _timeoutTimer?.cancel();
+  }
+
+  void _setPhase(PortalPhase value) {
+    phase.value = value;
+    isLoading.value = value.isBusy;
+    isError.value = value == PortalPhase.offline;
+    initError.value = value == PortalPhase.failed;
+  }
+
+  void _fail(String message) {
+    errorMessage.value = message;
+    _setPhase(PortalPhase.failed);
+  }
+
+  Future<void> reload() async {
+    if (!internetController.isOnline.value) {
+      _setPhase(PortalPhase.offline);
+      return;
+    }
+    final controller = webViewController;
+    if (controller == null) {
+      await initializeWebView();
+      return;
+    }
+    _setPhase(PortalPhase.loading);
+    final existingUrl = await controller.currentUrl();
+    if (existingUrl == null) {
+      await controller.loadRequest(Uri.parse(url));
+    } else {
+      await controller.reload();
+    }
+  }
+
+  Future<void> openInBrowser([String? value]) async {
+    final target = value ?? (_activeUrl.isEmpty ? url : _activeUrl);
+    final uri = Uri.tryParse(target);
+    if (uri == null ||
+        !await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      AppSnackbar.error(message: 'Could not open this link in your browser.');
+    }
+  }
+
+  Future<void> goBack() async {
+    final controller = webViewController;
+    if (controller != null && await controller.canGoBack()) {
+      await controller.goBack();
+    } else {
+      canPop.value = true;
+      await Future<void>.delayed(Duration.zero);
+      Get.back();
     }
   }
 
   Future<void> goForward() async {
-    final wvc = webViewController;
-    if (wvc == null) return;
-
-    if (await wvc.canGoForward()) {
-      await wvc.goForward();
+    final controller = webViewController;
+    if (controller != null && await controller.canGoForward()) {
+      await controller.goForward();
     }
   }
 
-  void toggleAppBar() {
-    isAppBarExpanded.value = !isAppBarExpanded.value;
+  void runJavaScriptOnPageLoad(String value) {
+    if (authenticationController.isAutofillEnabled.value) {
+      autoFillLoginDetails(value);
+    } else if (value.contains('kuickpay')) {
+      kuickPayQuery();
+    }
   }
 
-  Future<void> _extractCookiesForDownloads() async {
-    // Only called right before a file download - not on every page load
-    try {
-      final wvc = webViewController;
-      if (wvc == null) return;
-
-      // Wrap in browser-level try-catch to prevent uncaught SecurityErrors
-      final cookieString = await wvc
-          .runJavaScriptReturningResult(
-              '(function(){try{return document.cookie}catch(e){return ""}})()')
-          .timeout(const Duration(seconds: 2));
-
-      if (cookieString.toString().isNotEmpty &&
-          cookieString.toString() != '""' &&
-          cookieString.toString() != 'null') {
-        String cleanCookieString =
-            cookieString.toString().replaceAll('"', '').trim();
-
-        if (cleanCookieString.isNotEmpty) {
-          final List<Cookie> cookies = [];
-          final cookiePairs = cleanCookieString.split(';');
-
-          for (final pair in cookiePairs) {
-            final parts = pair.trim().split('=');
-            if (parts.length >= 2) {
-              final cookie = Cookie(parts[0], parts.sublist(1).join('='));
-              cookies.add(cookie);
-            }
-          }
-
-          if (cookies.isNotEmpty) {
-            downloadController.setCookies(cookies);
-          }
+  void autoFillLoginDetails(String value) {
+    String? userSelector;
+    String? passwordSelector;
+    String? password;
+    if (value.contains('lms.nust.edu.pk')) {
+      userSelector = 'username';
+      passwordSelector = 'password';
+      password = authenticationController.lmsPassword.value;
+    } else if (value.contains('qalam.nust.edu.pk')) {
+      userSelector = 'login';
+      passwordSelector = 'password';
+      password = authenticationController.qalamPassword.value;
+    }
+    if (userSelector == null || passwordSelector == null) return;
+    webViewController?.runJavaScript('''
+      (function () {
+        var user = document.getElementById(${jsonEncode(userSelector)});
+        var pass = document.getElementById(${jsonEncode(passwordSelector)});
+        if (user && pass) {
+          user.value = ${jsonEncode(authenticationController.id.value)};
+          pass.value = ${jsonEncode(password)};
+          user.dispatchEvent(new Event('input', { bubbles: true }));
+          pass.dispatchEvent(new Event('input', { bubbles: true }));
         }
-      }
-    } catch (e) {
-      // Silently fail - downloads will work without cookies in most cases
-    }
+      })();
+    ''');
   }
 
-  void _showSslErrorDialog() {
-    // Don't show multiple dialogs
-    if ((Get.isDialogOpen ?? false) || sslDialogShown) return;
+  void kuickPayQuery() {
+    if (queryRan.value) return;
+    webViewController?.runJavaScript(r'''
+      (function () {
+        var institution = document.getElementById('MainContent_cboInstitution');
+        var searchBy = document.getElementById('MainContent_cboSearchBy');
+        if (institution) {
+          institution.value = '04490';
+          institution.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        if (searchBy) {
+          searchBy.value = 'RegistrationNumber';
+          searchBy.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      })();
+    ''');
+    queryRan.value = true;
+  }
 
-    sslDialogShown = true;
+  bool shouldPreventNavigation(String value) =>
+      !PortalUrlClassifier.isAllowedPage(value);
 
-    Get.dialog(
-      AlertDialog(
-        title: const Text('Cannot Load Page',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'This page failed to load due to SSL certificate issues.',
-              style: TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w500, color: Colors.red),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'This is a known issue with this website. The site works fine in regular web browsers.',
-              style: TextStyle(fontSize: 13, color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'What would you like to do?',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Get.back();
-              sslDialogShown = false;
-              reload(); // Try again
-            },
-            child: const Text('Try Again'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Get.back();
-              sslDialogShown = false;
+  String _formatUrl(String value) {
+    final host = Uri.tryParse(value)?.host.toLowerCase() ?? '';
+    if (host.contains('lms.nust.edu.pk')) return 'LMS Portal';
+    if (host.contains('qalam.nust.edu.pk')) return 'Qalam Portal';
+    if (host.contains('kuickpay.com')) return 'Fee Portal';
+    return host.isEmpty ? 'Portal' : host;
+  }
 
-              try {
-                final uri = Uri.parse(url);
-                debugPrint('Attempting to launch URL: $url');
+  void toggleAppBar() => isAppBarExpanded.toggle();
 
-                // Try launching directly without canLaunchUrl check
-                final launched = await launchUrl(
-                  uri,
-                  mode: LaunchMode.externalApplication,
-                );
-
-                if (!launched) {
-                  debugPrint('Failed to launch URL');
-                  AppSnackbar.error(
-                    message:
-                        'Could not open browser. Please try manually: $url',
-                  );
-                }
-              } catch (e) {
-                debugPrint('Error launching URL: $e');
-                AppSnackbar.error(
-                  message: 'Error launching URL: $e',
-                );
-              }
-            },
-            child: const Text('Open in Browser'),
-          ),
-          TextButton(
-            onPressed: () {
-              Get.back();
-              sslDialogShown = false;
-              Get.back(); // Go back to previous screen
-            },
-            child: const Text('Go Back'),
-          ),
-        ],
-      ),
-      barrierDismissible: false,
-    );
+  @override
+  void onClose() {
+    _cancelLoadTimers();
+    _connectionSubscription?.cancel();
+    super.onClose();
   }
 }

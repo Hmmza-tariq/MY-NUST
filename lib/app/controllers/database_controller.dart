@@ -143,8 +143,8 @@ class DatabaseController extends GetxController {
 
   List<double> getAbsolutesWeights() {
     return [
-      _sharedPref.getDouble('absolutesWeight1') ?? 0.0,
-      _sharedPref.getDouble('absolutesWeight2') ?? 0.0,
+      _sharedPref.getDouble('absolutesWeight1') ?? 50.0,
+      _sharedPref.getDouble('absolutesWeight2') ?? 50.0,
     ];
   }
 

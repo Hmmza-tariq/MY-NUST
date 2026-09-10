@@ -1,414 +1,652 @@
-import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:nust/app/modules/widgets/confetti.dart';
-import 'package:nust/app/resources/color_manager.dart';
+
+import '../../../data/assessment.dart';
 import '../../../routes/app_pages.dart';
-import '../../widgets/custom_button.dart';
-import '../../widgets/custom_scrollbar.dart';
-import '../../widgets/input_widget.dart';
+import '../../widgets/app_dialog.dart';
+import '../../widgets/app_glass_surface.dart';
+import '../../widgets/app_page_shell.dart';
 import '../controllers/absolutes_calculation_controller.dart';
 
 class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
   const AbsolutesCalculationView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: controller.themeController.theme.scaffoldBackgroundColor,
-      body: Container(
-          decoration: BoxDecoration(
-            gradient: ColorManager.gradientColor,
-          ),
-          height: Get.height,
-          child: SafeArea(
-            child: Obx(
-              () => Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: 16,
-                      children: [
-                        _buildHeader(),
-                        _buildChooseTypeButtons(),
-                        _buildWeightSection(),
-                        if (controller.assessments
-                            .where((assessment) =>
-                                controller.selectedType.value == "both" ||
-                                assessment.type ==
-                                    controller.selectedType.value)
-                            .isEmpty)
+  Widget build(BuildContext context) => Obx(() {
+        final visible = controller.assessments.asMap().entries.where((entry) {
+          return controller.selectedType.value == 'both' ||
+              entry.value.type == controller.selectedType.value;
+        }).toList();
+
+        return Scaffold(
+          body: AppBackground(
+            child: SafeArea(
+              child: CustomScrollView(
+                physics: const ClampingScrollPhysics(),
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    automaticallyImplyLeading: false,
+                    toolbarHeight: 76,
+                    titleSpacing: 16,
+                    backgroundColor: Theme.of(context)
+                        .colorScheme
+                        .surface
+                        .withValues(alpha: .96),
+                    surfaceTintColor: Colors.transparent,
+                    title: _Header(
+                      onBack: () => Get.previousRoute.isEmpty
+                          ? Get.offAllNamed(Routes.HOME)
+                          : Get.back(),
+                    ),
+                  ),
+                  SliverFillRemaining(
+                    hasScrollBody: true,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const _GettingStartedCard(),
+                          const SizedBox(height: 12),
                           SizedBox(
-                            height: Get.height * 0.5,
-                            width: Get.width,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                            width: double.infinity,
+                            child: SegmentedButton<String>(
+                              showSelectedIcon: false,
+                              segments: const [
+                                ButtonSegment(
+                                  value: 'lecture',
+                                  label: Text('Lecture'),
+                                  icon: Icon(Icons.menu_book_outlined),
+                                ),
+                                ButtonSegment(
+                                  value: 'lab',
+                                  label: Text('Lab'),
+                                  icon: Icon(Icons.science_outlined),
+                                ),
+                                ButtonSegment(
+                                  value: 'both',
+                                  label: Text('Both'),
+                                  icon: Icon(Icons.dashboard_outlined),
+                                ),
+                              ],
+                              selected: {controller.selectedType.value},
+                              onSelectionChanged: (value) =>
+                                  controller.selectedType.value = value.first,
+                            ),
+                          ),
+                          if (controller.selectedType.value == 'both') ...[
+                            const SizedBox(height: 12),
+                            AppGlassSurface(
+                              padding: const EdgeInsets.all(16),
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Add ${controller.selectedType.value != "both" ? "a ${controller.selectedType.value} " : "an "}assessment to get\nstarted",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: controller.themeController.theme
-                                          .appBarTheme.titleTextStyle?.color,
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    'Course split',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(fontWeight: FontWeight.w800),
                                   ),
-                                  const SizedBox(height: 16),
-                                  CustomButton(
-                                    title: "Add Assessment",
-                                    color: ColorManager.primary,
-                                    textColor: ColorManager.white,
-                                    widthFactor: 0.4,
-                                    isBold: false,
-                                    onPressed: controller.addAssessment,
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Use this only when lecture and lab have separate weightage in your course outline.',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          color: appSecondaryText(context),
+                                        ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _NumberField(
+                                          key: const ValueKey('lecture-weight'),
+                                          label: 'Lecture %',
+                                          value: controller.lectureWeight.value,
+                                          onChanged: (value) {
+                                            controller.lectureWeight.value =
+                                                value;
+                                            controller.saveWeights();
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: _NumberField(
+                                          key: const ValueKey('lab-weight'),
+                                          label: 'Lab %',
+                                          value: controller.labWeight.value,
+                                          onChanged: (value) {
+                                            controller.labWeight.value = value;
+                                            controller.saveWeights();
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        controller.labWeight.value +
+                                                    controller
+                                                        .lectureWeight.value ==
+                                                100
+                                            ? Icons.check_circle_outline_rounded
+                                            : Icons.info_outline_rounded,
+                                        size: 18,
+                                        color: controller.labWeight.value +
+                                                    controller
+                                                        .lectureWeight.value ==
+                                                100
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .error,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Total: ${(controller.labWeight.value + controller.lectureWeight.value).toStringAsFixed(0)}%',
+                                        style: TextStyle(
+                                          color: appSecondaryText(context),
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
                             ),
-                          )
-                        else
+                          ],
+                          const SizedBox(height: 12),
                           Expanded(
-                            child: CustomScrollbar(
-                              controller: controller.scrollController,
-                              child: ListView.builder(
-                                itemCount: controller.assessments.length,
-                                controller: controller.scrollController,
-                                itemBuilder: (context, index) {
-                                  return _buildAssessmentCard(index);
-                                },
-                              ),
-                            ),
+                            child: visible.isEmpty
+                                ? _EmptyAbsolute(
+                                    onAdd: () => _showAddAssessmentSheet(
+                                        context, controller),
+                                    onExample: controller.loadExample,
+                                  )
+                                : ListView.separated(
+                                    physics: const ClampingScrollPhysics(),
+                                    padding: const EdgeInsets.only(bottom: 16),
+                                    itemCount: visible.length,
+                                    separatorBuilder: (_, __) =>
+                                        const SizedBox(height: 12),
+                                    itemBuilder: (context, position) {
+                                      final entry = visible[position];
+                                      return _AssessmentCard(
+                                        controller: controller,
+                                        assessment: entry.value,
+                                      );
+                                    },
+                                  ),
                           ),
-                      ],
-                    ),
-                  ),
-                  if (controller.assessments.isNotEmpty)
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: _buildBottomButtons(),
-                    ),
-                  Align(
-                    alignment: Alignment.topCenter,
-                    child: ConfettiWidget(
-                      confettiController: controller.confettiController,
-                      blastDirectionality: BlastDirectionality.explosive,
-                      minBlastForce: 10,
-                      maxBlastForce: 20,
-                      numberOfParticles: 20,
-                      colors: const [
-                        ColorManager.primary,
-                        ColorManager.secondary,
-                      ],
-                      createParticlePath: drawHexagons,
+                          if (visible.isNotEmpty)
+                            _ActionBar(
+                              onAdd: () =>
+                                  _showAddAssessmentSheet(context, controller),
+                              onCalculate: controller.calculateAbsolutes,
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          )),
-    );
-  }
+          ),
+        );
+      });
+}
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: ColorManager.primary,
-            ),
-            onPressed: () {
-              if (Get.previousRoute.isEmpty) {
-                Get.offAllNamed(Routes.HOME);
-              } else {
-                Get.back();
-              }
-            },
-          ),
-          Flexible(
-            child: Text(
-              "Absolutes Calculation",
-              style: TextStyle(
-                fontSize: Get.width * 0.055,
-                fontWeight: FontWeight.bold,
-                color: ColorManager.primary,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const IconButton(icon: SizedBox(), onPressed: null),
-        ],
-      ),
-    );
-  }
+class _Header extends StatelessWidget {
+  const _Header({required this.onBack});
+  final VoidCallback onBack;
 
-  Widget _buildChooseTypeButtons() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
-      padding: const EdgeInsets.all(8.0),
-      width: Get.width,
-      decoration: BoxDecoration(
-        color: controller.themeController.theme.cardTheme.color,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  @override
+  Widget build(BuildContext context) => Row(
         children: [
-          CustomButton(
-            title: "BOTH",
-            color: controller.selectedType.value == 'both'
-                ? ColorManager.primary
-                : controller.themeController.theme.cardTheme.color!,
-            textColor: controller.selectedType.value != 'both' &&
-                    !controller.themeController.isDarkMode.value
-                ? ColorManager.black
-                : ColorManager.white,
-            widthFactor: 0.28,
-            horizontalPadding: 0,
-            fontSize: 12,
-            verticalPadding: 0,
-            onPressed: () {
-              controller.selectedType.value = 'both';
-            },
+          IconButton.outlined(
+            tooltip: 'Back',
+            onPressed: onBack,
+            icon: const Icon(Icons.arrow_back_rounded),
           ),
-          CustomButton(
-            title: "LECTURE",
-            color: controller.selectedType.value == 'lecture'
-                ? ColorManager.primary
-                : controller.themeController.theme.cardTheme.color!,
-            textColor: controller.selectedType.value != 'lecture' &&
-                    !controller.themeController.isDarkMode.value
-                ? ColorManager.black
-                : ColorManager.white,
-            widthFactor: 0.28,
-            horizontalPadding: 0,
-            fontSize: 12,
-            verticalPadding: 0,
-            onPressed: () {
-              controller.selectedType.value = 'lecture';
-            },
-          ),
-          CustomButton(
-            title: "LAB",
-            color: controller.selectedType.value == 'lab'
-                ? ColorManager.primary
-                : controller.themeController.theme.cardTheme.color!,
-            textColor: controller.selectedType.value != 'lab' &&
-                    !controller.themeController.isDarkMode.value
-                ? ColorManager.black
-                : ColorManager.white,
-            widthFactor: 0.28,
-            horizontalPadding: 0,
-            fontSize: 12,
-            verticalPadding: 0,
-            onPressed: () {
-              controller.selectedType.value = 'lab';
-            },
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Absolute score',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(fontWeight: FontWeight.w800),
+                ),
+                Text(
+                  'Weighted marks, simplified',
+                  style: TextStyle(color: appSecondaryText(context)),
+                ),
+              ],
+            ),
           ),
         ],
-      ),
-    );
-  }
+      );
+}
 
-  Widget _buildWeightSection() {
-    if (controller.selectedType.value == "both") {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+class _GettingStartedCard extends StatelessWidget {
+  const _GettingStartedCard();
+
+  @override
+  Widget build(BuildContext context) => AppGlassSurface(
+        emphasized: true,
+        borderRadius: 12,
+        padding: const EdgeInsets.all(16),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InputWidget(
-              widthFactor: .38,
-              doubleValue: controller.lectureWeight,
-              title: "Lecture Weight (%)",
-              onChanged: () {
-                controller.saveWeights();
-              },
-            ),
-            const SizedBox(width: 8),
-            InputWidget(
-              widthFactor: .38,
-              doubleValue: controller.labWeight,
-              title: "Lab Weight (%)",
-              onChanged: () {
-                controller.saveWeights();
-              },
+            Icon(Icons.lightbulb_outline_rounded,
+                color: Theme.of(context).colorScheme.onPrimaryContainer),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Choose Lecture or Lab, add marks from your course outline, then view your weighted result.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      height: 1.4,
+                    ),
+              ),
             ),
           ],
         ),
       );
-    } else {
-      return const SizedBox.shrink();
-    }
-  }
+}
 
-  Widget _buildAssessmentCard(int index) {
-    final assessment = controller.assessments[index];
-    if (controller.selectedType.value != "both" &&
-        assessment.type != controller.selectedType.value) {
-      return const SizedBox();
-    }
-    RxString name = assessment.name.obs;
-    RxDouble weight = assessment.weight.obs;
-    RxDouble totalMarks = assessment.totalMarks.obs;
-    RxDouble obtainedMarks = assessment.obtainedMarks.obs;
+class _AssessmentCard extends StatelessWidget {
+  const _AssessmentCard({
+    required this.controller,
+    required this.assessment,
+  });
+  final AbsolutesCalculationController controller;
+  final Assessment assessment;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: controller.themeController.theme.cardTheme.color,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      padding: const EdgeInsets.all(12.0),
-      margin: EdgeInsets.only(
-          right: 16,
-          left: 16,
-          top: 8,
-          bottom: index == controller.assessments.length - 1 ? 60 : 8),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              InputWidget(
-                  widthFactor: .7,
-                  stringValue: name,
-                  title: "Assessment Name",
-                  isBorder: false,
-                  onChanged: () {
-                    assessment.name = name.value;
-                    controller.saveAssessments();
-                  }),
-              IconButton(
-                icon: const Icon(Icons.delete, color: ColorManager.error),
-                onPressed: () {
-                  controller.removeAssessment(index);
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              InputWidget(
-                widthFactor: .19,
-                doubleValue: weight,
-                title: "Weight",
-                onChanged: () {
-                  assessment.weight = weight.value;
-                  controller.saveAssessments();
-                },
-                isBorder: false,
-              ),
-              const SizedBox(width: 6),
-              InputWidget(
-                widthFactor: .29,
-                doubleValue: totalMarks,
-                title: "Total Marks",
-                onChanged: () {
-                  assessment.totalMarks = totalMarks.value;
-                  controller.saveAssessments();
-                },
-                isBorder: false,
-              ),
-              const SizedBox(width: 6),
-              InputWidget(
-                widthFactor: .29,
-                doubleValue: obtainedMarks,
-                title: "Obtained Marks",
-                onChanged: () {
-                  assessment.obtainedMarks = obtainedMarks.value;
-                  controller.saveAssessments();
-                },
-                isBorder: false,
-              ),
-            ],
-          ),
-          if (controller.selectedType.value == "both")
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: DropdownButtonFormField<String>(
-                initialValue: assessment.type,
-                borderRadius: BorderRadius.circular(12),
-                style: TextStyle(
-                  color: !controller.themeController.isDarkMode.value
-                      ? ColorManager.black
-                      : ColorManager.white,
-                ),
-                dropdownColor: controller.themeController.theme.cardTheme.color,
-                decoration: InputDecoration(
-                  labelText: "Assessment Type",
-                  border: null,
-                  enabledBorder: null,
-                  focusedBorder: null,
-                  labelStyle: TextStyle(
-                    color: !controller.themeController.isDarkMode.value
-                        ? ColorManager.primary
-                        : ColorManager.lightGrey3,
-                    fontWeight: FontWeight.bold,
+  @override
+  Widget build(BuildContext context) => AppGlassSurface(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    key: ObjectKey(assessment),
+                    initialValue: assessment.name,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: const InputDecoration(
+                      labelText: 'Assessment name',
+                      prefixIcon: Icon(Icons.assignment_outlined),
+                    ),
+                    onChanged: (value) {
+                      assessment.name = value;
+                      controller.saveAssessments();
+                    },
                   ),
                 ),
+                const SizedBox(width: 8),
+                IconButton(
+                  tooltip: 'Delete assessment',
+                  onPressed: () async {
+                    final confirmed = await showAppConfirmationDialog(
+                      context: context,
+                      title: 'Delete this assessment?',
+                      message:
+                          'This item will no longer count toward the absolute score.',
+                      confirmLabel: 'Delete',
+                      icon: Icons.delete_outline_rounded,
+                      destructive: true,
+                    );
+                    if (confirmed == true) {
+                      controller.assessments.remove(assessment);
+                      controller.saveAssessments();
+                    }
+                  },
+                  icon: Icon(
+                    Icons.delete_outline_rounded,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _NumberField(
+              label: 'Weight in final grade (%)',
+              value: assessment.weight,
+              icon: Icons.percent_rounded,
+              onChanged: (value) {
+                assessment.weight = value;
+                controller.saveAssessments();
+              },
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _NumberField(
+                    label: 'Total marks',
+                    value: assessment.totalMarks,
+                    onChanged: (value) {
+                      assessment.totalMarks = value;
+                      controller.saveAssessments();
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _NumberField(
+                    label: 'Your marks',
+                    value: assessment.obtainedMarks,
+                    onChanged: (value) {
+                      assessment.obtainedMarks = value;
+                      controller.saveAssessments();
+                    },
+                  ),
+                ),
+              ],
+            ),
+            if (controller.selectedType.value == 'both') ...[
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                initialValue: assessment.type,
+                decoration: const InputDecoration(
+                  labelText: 'Assessment type',
+                  prefixIcon: Icon(Icons.category_outlined),
+                ),
+                borderRadius: BorderRadius.circular(16),
                 items: const [
-                  DropdownMenuItem(value: "lab", child: Text("Lab")),
-                  DropdownMenuItem(value: "lecture", child: Text("Lecture")),
+                  DropdownMenuItem(
+                    value: 'lecture',
+                    child: Text('Lecture'),
+                  ),
+                  DropdownMenuItem(value: 'lab', child: Text('Lab')),
                 ],
-                onChanged: (val) {
-                  if (val != null) {
-                    assessment.type = val;
-                    controller.saveAssessments();
-                  }
+                onChanged: (value) {
+                  if (value == null) return;
+                  assessment.type = value;
+                  controller.saveAssessments();
                 },
               ),
-            ),
-        ],
-      ),
-    );
-  }
+            ],
+          ],
+        ),
+      );
+}
 
-  Widget _buildBottomButtons() {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        gradient: ColorManager.gradientColor,
-        boxShadow: [
-          BoxShadow(
-            color: controller.themeController.isDarkMode.value
-                ? ColorManager.transparent
-                : ColorManager.shadow,
-            blurRadius: 10,
-            offset: const Offset(0, -3),
-          ),
+class _NumberField extends StatelessWidget {
+  const _NumberField({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+    this.icon,
+    super.key,
+  });
+  final String label;
+  final double value;
+  final ValueChanged<double> onChanged;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) => TextFormField(
+        initialValue: value.toStringAsFixed(
+          value == value.roundToDouble() ? 0 : 1,
+        ),
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
         ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          CustomButton(
-            title: "Add Assessment",
-            color: ColorManager.primary,
-            textColor: ColorManager.white,
-            widthFactor: 0.4,
-            isBold: false,
-            onPressed: controller.addAssessment,
+        decoration: InputDecoration(
+          labelText: label,
+          prefixIcon: icon == null ? null : Icon(icon),
+        ),
+        onChanged: (raw) {
+          final parsed = double.tryParse(raw);
+          if (parsed != null) onChanged(parsed);
+        },
+      );
+}
+
+class _EmptyAbsolute extends StatelessWidget {
+  const _EmptyAbsolute({required this.onAdd, required this.onExample});
+  final VoidCallback onAdd;
+  final VoidCallback onExample;
+
+  @override
+  Widget build(BuildContext context) => Center(
+        child: AppGlassSurface(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Icon(
+                  Icons.fact_check_outlined,
+                  size: 32,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 18),
+              Text(
+                'Add your first assessment',
+                textAlign: TextAlign.center,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge
+                    ?.copyWith(fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Add the assessment weight from your course outline, its total marks, and the marks you earned.',
+                textAlign: TextAlign.center,
+                style:
+                    TextStyle(color: appSecondaryText(context), height: 1.45),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: onAdd,
+                  icon: const Icon(Icons.add_rounded),
+                  label: const Text('Add assessment'),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton.icon(
+                  onPressed: onExample,
+                  icon: const Icon(Icons.auto_awesome_outlined),
+                  label: const Text('Use example: Quiz 1 · 8/10 · 10%'),
+                ),
+              ),
+            ],
           ),
-          CustomButton(
-            title: "Calculate",
-            color: ColorManager.primary,
-            textColor: ColorManager.white,
-            widthFactor: 0.4,
-            isBold: false,
-            onPressed: controller.calculateAbsolutes,
-          ),
-        ],
+        ),
+      );
+}
+
+class _ActionBar extends StatelessWidget {
+  const _ActionBar({required this.onAdd, required this.onCalculate});
+  final VoidCallback onAdd;
+  final VoidCallback onCalculate;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(top: 4, bottom: 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: onAdd,
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('Add assessment'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: FilledButton(
+                onPressed: onCalculate,
+                child: const Text('View result'),
+              ),
+            ),
+          ],
+        ),
+      );
+}
+
+Future<void> _showAddAssessmentSheet(
+  BuildContext context,
+  AbsolutesCalculationController controller,
+) async {
+  final nameController = TextEditingController();
+  final weightController = TextEditingController(text: '10');
+  final totalController = TextEditingController(text: '10');
+  final obtainedController = TextEditingController(text: '8');
+  var type = controller.selectedType.value == 'both'
+      ? 'lecture'
+      : controller.selectedType.value;
+
+  await showAppSheet<void>(
+    context: context,
+    child: StatefulBuilder(
+      builder: (context, setSheetState) => SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Add assessment',
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Use the values from your course outline or fill the example.',
+              style: TextStyle(color: appSecondaryText(context)),
+            ),
+            const SizedBox(height: 18),
+            TextField(
+              controller: nameController,
+              textCapitalization: TextCapitalization.words,
+              decoration: const InputDecoration(
+                labelText: 'Assessment name',
+                prefixIcon: Icon(Icons.assignment_outlined),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: weightController,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              decoration: const InputDecoration(
+                labelText: 'Weight in final grade (%)',
+                prefixIcon: Icon(Icons.percent_rounded),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: totalController,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(labelText: 'Total marks'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: obtainedController,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(labelText: 'Your marks'),
+                  ),
+                ),
+              ],
+            ),
+            if (controller.selectedType.value == 'both') ...[
+              const SizedBox(height: 12),
+              SegmentedButton<String>(
+                showSelectedIcon: false,
+                segments: const [
+                  ButtonSegment(value: 'lecture', label: Text('Lecture')),
+                  ButtonSegment(value: 'lab', label: Text('Lab')),
+                ],
+                selected: {type},
+                onSelectionChanged: (value) =>
+                    setSheetState(() => type = value.first),
+              ),
+            ],
+            const SizedBox(height: 6),
+            TextButton.icon(
+              onPressed: () {
+                nameController.text = 'Quiz 1';
+                weightController.text = '10';
+                totalController.text = '10';
+                obtainedController.text = '8';
+              },
+              icon: const Icon(Icons.auto_awesome_outlined),
+              label: const Text('Fill example: Quiz 1 · 8/10 · 10%'),
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () {
+                  final weight = double.tryParse(weightController.text);
+                  final total = double.tryParse(totalController.text);
+                  final obtained = double.tryParse(obtainedController.text);
+                  if (weight == null || total == null || obtained == null) {
+                    return;
+                  }
+                  controller.addAssessmentEntry(
+                    name: nameController.text.trim().isEmpty
+                        ? 'Assessment ${controller.assessments.length + 1}'
+                        : nameController.text.trim(),
+                    weight: weight,
+                    totalMarks: total,
+                    obtainedMarks: obtained,
+                    type: type,
+                  );
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('Add assessment'),
+              ),
+            ),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
+
+  nameController.dispose();
+  weightController.dispose();
+  totalController.dispose();
+  obtainedController.dispose();
 }

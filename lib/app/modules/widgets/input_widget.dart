@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../controllers/theme_controller.dart';
-import '../../resources/color_manager.dart';
-
 class InputWidget extends StatelessWidget {
   const InputWidget({
     super.key,
@@ -21,15 +18,15 @@ class InputWidget extends StatelessWidget {
   final RxString? stringValue;
   final String title;
   final String? value;
-  final void Function()? onChanged;
+  final VoidCallback? onChanged;
   final bool isEditable;
   final bool isBorder;
   final double widthFactor;
+
   @override
-  Widget build(BuildContext context) {
-    final themeController = Get.find<ThemeController>();
-    return Obx(() => SizedBox(
-          width: Get.width * widthFactor,
+  Widget build(BuildContext context) => Obx(
+        () => SizedBox(
+          width: MediaQuery.sizeOf(context).width * widthFactor,
           child: TextFormField(
             initialValue: value ??
                 (doubleValue != null
@@ -38,62 +35,23 @@ class InputWidget extends StatelessWidget {
             enabled: isEditable,
             decoration: InputDecoration(
               labelText: title,
-              border: !isBorder
-                  ? null
-                  : OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: !themeController.isDarkMode.value
-                            ? ColorManager.primary
-                            : ColorManager.lightGrey,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-              enabledBorder: !isBorder
-                  ? null
-                  : OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: !themeController.isDarkMode.value
-                            ? ColorManager.primary
-                            : ColorManager.lightGrey,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-              focusedBorder: !isBorder
-                  ? null
-                  : OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: themeController.isDarkMode.value
-                            ? ColorManager.primary
-                            : ColorManager.lightGrey,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-              labelStyle: TextStyle(
-                color: !themeController.isDarkMode.value
-                    ? ColorManager.primary
-                    : ColorManager.lightGrey3,
-                fontWeight: FontWeight.bold,
-              ),
+              border: isBorder ? null : InputBorder.none,
+              enabledBorder: isBorder ? null : InputBorder.none,
+              focusedBorder: isBorder ? null : InputBorder.none,
             ),
-            style: TextStyle(
-              color: !themeController.isDarkMode.value
-                  ? ColorManager.black
-                  : ColorManager.white,
-            ),
-            keyboardType:
-                doubleValue != null ? TextInputType.number : TextInputType.text,
-            onChanged: (val) {
+            keyboardType: doubleValue != null
+                ? const TextInputType.numberWithOptions(decimal: true)
+                : TextInputType.text,
+            onChanged: (raw) {
               if (doubleValue != null) {
-                double? weight = double.tryParse(val);
-                if (weight != null) {
-                  doubleValue!.value = weight;
-                }
+                final parsed = double.tryParse(raw);
+                if (parsed != null) doubleValue!.value = parsed;
               } else if (stringValue != null) {
-                stringValue!.value = val;
+                stringValue!.value = raw;
               }
-              if (onChanged != null) onChanged!();
+              onChanged?.call();
             },
           ),
-        ));
-  }
+        ),
+      );
 }

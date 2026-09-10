@@ -34,20 +34,24 @@ class CustomButton extends StatelessWidget {
           style: ElevatedButton.styleFrom(
               elevation: 0,
               backgroundColor: color,
-              shadowColor: color,
+              foregroundColor: textColor,
+              disabledBackgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainerHighest,
+              disabledForegroundColor:
+                  Theme.of(context).colorScheme.onSurfaceVariant,
+              minimumSize: const Size(48, 50),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: color)),
+                borderRadius: BorderRadius.circular(16),
+              ),
               fixedSize: widthFactor != null
                   ? Size.fromWidth(Get.width * widthFactor!)
                   : null,
               padding: EdgeInsets.symmetric(
                   horizontal: horizontalPadding ?? (isBold == false ? 16 : 32),
-                  vertical: verticalPadding ?? 16)),
+                  vertical: verticalPadding ?? 14)),
           child: Text(title,
               style: TextStyle(
                   fontSize: fontSize ?? (isBold == false ? 14 : 18),
-                  color: textColor,
                   fontWeight:
                       isBold == false ? FontWeight.normal : FontWeight.bold))),
     );

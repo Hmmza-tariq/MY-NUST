@@ -14,15 +14,15 @@ class ColorManager {
     900: Color.fromRGBO(0, 98, 255, 1),
   };
 
-  static const primaryValue = 0xFF0062FF;
-  static const Color primary = Color(0xFF0062FF);
-  static const Color background1 = Color(0xFFF2F2F2);
+  static const primaryValue = 0xFF0369A1;
+  static const Color primary = Color(0xFF0369A1);
+  static const Color background1 = Color(0xFFF8FAFC);
   static const Color background2 = Color(0xFFFFFFFF);
   static const Color secondary = Color(0xFFAAAACF);
 
   static const Color lightPrimary = Color(0xFF4D8CFF);
   static const Color lightestPrimary = Color(0xFFB2C8FF);
-  static const Color darkPrimary = Color(0xFF0051CC);
+  static const Color darkPrimary = Color(0xFF38BDF8);
   static const Color primary50 = Color(0xFFE0ECFF);
   static const Color primary500 = Color(0xFF0062FF);
 
@@ -62,10 +62,10 @@ class ColorManager {
     offset: Offset(0, 30),
   );
 
-  static const Color backgroundDark = Color(0xFF1E1E1E);
-  static const Color primaryDark = Color(0xFF0051AA);
-  static const Color darkGrey1 = Color(0xFF2A2A2A);
-  static const Color darkCard = Color(0xFF333333);
+  static const Color backgroundDark = Color(0xFF07111F);
+  static const Color primaryDark = Color(0xFF38BDF8);
+  static const Color darkGrey1 = Color(0xFF172033);
+  static const Color darkCard = Color(0xFF111C2E);
   static const Color darkShadow = Color.fromARGB(100, 60, 60, 60);
   static const Color darkGrey2 = Color(0xFF3D3D3D);
   static const Color errorDark = Color(0xFFCF6679);
