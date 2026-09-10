@@ -1,47 +1,46 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
+
+import 'package:background_downloader/background_downloader.dart' as bd;
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/modules/widgets/custom_snackbar.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:background_downloader/background_downloader.dart' as bd;
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:permission_handler/permission_handler.dart' as ph;
 
+enum DownloadStartResult { accepted, permissionDenied, failed }
+
 class DownloadController extends GetxController {
-  final _progressList = <double>[].obs;
-  final Map<String, int> _taskIndexMap = {};
-  List<Cookie> _cookies = [];
-  final bool _isAndroid = Platform.isAndroid;
+  final progress = <String, double>{}.obs;
   final ReceivePort _port = ReceivePort();
+  StreamSubscription<dynamic>? _iosUpdates;
+  final bool _isAndroid = Platform.isAndroid;
 
   @override
   void onInit() {
     super.onInit();
-    if (_isAndroid) {
-      _initAndroid();
-    } else {
-      _initIOS();
-    }
+    _isAndroid ? _initAndroid() : _initIOS();
   }
 
   void _initAndroid() {
+    IsolateNameServer.removePortNameMapping('downloader_send_port');
     IsolateNameServer.registerPortWithName(
-        _port.sendPort, 'downloader_send_port');
+      _port.sendPort,
+      'downloader_send_port',
+    );
     _port.listen((dynamic data) {
-      String id = data[0];
-      int status = data[1];
-      int progress = data[2];
-
-      int index = _getTaskIndex(id);
-      if (index != -1) {
-        _progressList[index] = progress / 100.0;
-
-        if (status == DownloadTaskStatus.complete.index) {
-          _showSuccessSnackbar();
-        }
+      if (data is! List || data.length < 3) return;
+      final id = data[0] as String;
+      final status = data[1] as int;
+      progress[id] = (data[2] as int) / 100;
+      if (status == DownloadTaskStatus.complete.index) {
+        _showComplete();
+      } else if (status == DownloadTaskStatus.failed.index) {
+        _showFailure();
       }
     });
     FlutterDownloader.registerCallback(downloadCallback);
@@ -49,184 +48,147 @@ class DownloadController extends GetxController {
 
   void _initIOS() {
     bd.FileDownloader().trackTasks();
-
-    bd.FileDownloader().updates.listen((update) {
-      if (update is bd.TaskStatusUpdate) {
-        int index = _getTaskIndex(update.task.taskId);
-        if (index != -1 && update.status == bd.TaskStatus.complete) {
-          _progressList[index] = 1.0;
-        }
-      } else if (update is bd.TaskProgressUpdate) {
-        int index = _getTaskIndex(update.task.taskId);
-        if (index != -1) {
-          _progressList[index] = update.progress;
-        }
+    _iosUpdates = bd.FileDownloader().updates.listen((update) {
+      if (update is bd.TaskProgressUpdate) {
+        progress[update.task.taskId] = update.progress;
+      } else if (update is bd.TaskStatusUpdate) {
+        if (update.status == bd.TaskStatus.complete) _showComplete();
+        if (update.status == bd.TaskStatus.failed) _showFailure();
       }
     });
   }
 
-  @override
-  void onClose() {
-    if (_isAndroid) {
-      IsolateNameServer.removePortNameMapping('downloader_send_port');
-    } else {
-      bd.FileDownloader().destroy();
+  Future<DownloadStartResult> download(
+    String url, {
+    String cookieHeader = '',
+    String? referer,
+    String? suggestedFileName,
+  }) async {
+    try {
+      if (!await _requestPermission()) {
+        AppSnackbar.error(message: 'Download permission was not granted');
+        return DownloadStartResult.permissionDenied;
+      }
+      final uri = Uri.parse(url);
+      final fileName = _safeFileName(
+        suggestedFileName ??
+            (uri.pathSegments.isEmpty ? 'download' : uri.pathSegments.last),
+      );
+      final headers = <String, String>{
+        if (cookieHeader.isNotEmpty) 'Cookie': cookieHeader,
+        if (referer != null && referer.isNotEmpty) 'Referer': referer,
+      };
+      final accepted = _isAndroid
+          ? await _downloadAndroid(uri, fileName, headers)
+          : await _downloadIOS(uri, fileName, headers);
+      if (!accepted) {
+        _showFailure();
+        return DownloadStartResult.failed;
+      }
+      AppSnackbar.info(title: 'Downloading', message: fileName);
+      return DownloadStartResult.accepted;
+    } catch (error, stackTrace) {
+      debugPrint('Download could not start: $error\n$stackTrace');
+      _showFailure();
+      return DownloadStartResult.failed;
     }
-    super.onClose();
   }
 
-  void setCookies(List<Cookie> cookies) {
-    _cookies = cookies;
-  }
-
-  Future<void> download(String url, int index) async {
-    _showDownloadingSnackbar();
-    if (_isAndroid) {
-      await _downloadAndroid(url, index);
-    } else {
-      await _downloadIOS(url, index);
-    }
-  }
-
-  Future<void> _downloadAndroid(String url, int index) async {
-    if (!await _requestPermission()) return;
-
-    final fileName = url.split('/').last;
-    Directory? downloadsDirectory = await getExternalStorageDirectory();
-
-    final cookieHeader =
-        _cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
-    debugPrint('downloading: $fileName');
-
-    await FlutterDownloader.enqueue(
-      url: url,
-      headers: {'Cookie': cookieHeader},
-      savedDir: downloadsDirectory!.path,
+  Future<bool> _downloadAndroid(
+    Uri uri,
+    String fileName,
+    Map<String, String> headers,
+  ) async {
+    final directory = await getExternalStorageDirectory();
+    if (directory == null) return false;
+    final id = await FlutterDownloader.enqueue(
+      url: uri.toString(),
+      headers: headers,
+      savedDir: directory.path,
       fileName: fileName,
       showNotification: true,
       saveInPublicStorage: true,
-      openFileFromNotification: false,
-    ).then((id) {
-      if (id != null) {
-        _progressList.add(0.0);
-        _taskIndexMap[id] = index;
-      }
-    });
+      openFileFromNotification: true,
+    );
+    if (id == null) return false;
+    progress[id] = 0;
+    return true;
   }
 
-  Future<void> _downloadIOS(String url, int index) async {
-    if (!await _requestPermission()) return;
-
-    final fileName = url.split('/').last;
-    Directory? downloadsDirectory = await getApplicationDocumentsDirectory();
-
-    final cookieHeader =
-        _cookies.map((cookie) => '${cookie.name}=${cookie.value}').join('; ');
-    debugPrint('downloading: $fileName directory: ${downloadsDirectory.path}');
-
+  Future<bool> _downloadIOS(
+    Uri uri,
+    String fileName,
+    Map<String, String> headers,
+  ) async {
+    final directory = await getApplicationDocumentsDirectory();
     final task = bd.DownloadTask(
-      url: url,
-      headers: {'Cookie': cookieHeader},
+      url: uri.toString(),
+      headers: headers,
       filename: fileName,
-      directory: downloadsDirectory.path,
+      directory: directory.path,
       updates: bd.Updates.statusAndProgress,
-      metaData: 'data for index $index',
     );
-
-    _progressList.add(0.0);
-    _taskIndexMap[task.taskId] = index;
     bd.FileDownloader().configureNotification(
-        running: bd.TaskNotification('Downloading', 'file: $fileName'),
-        complete: bd.TaskNotification('Download complete', 'file: $fileName'),
-        error: bd.TaskNotification('Download failed', 'file: $fileName'),
-        paused: bd.TaskNotification('Download paused', 'file: $fileName'),
-        tapOpensFile: true,
-        progressBar: true);
-    await bd.FileDownloader().download(
-      task,
-      onProgress: (progress) {
-        int taskIndex = _getTaskIndex(task.taskId);
-        if (taskIndex != -1) {
-          _progressList[taskIndex] = progress;
-        }
-      },
-      onStatus: (status) {
-        if (status == bd.TaskStatus.complete) {
-          _showSuccessSnackbar();
-        }
-      },
+      running: bd.TaskNotification('Downloading', fileName),
+      complete: bd.TaskNotification('Download complete', fileName),
+      error: bd.TaskNotification('Download failed', fileName),
+      paused: bd.TaskNotification('Download paused', fileName),
+      tapOpensFile: true,
+      progressBar: true,
     );
+    final accepted = await bd.FileDownloader().enqueue(task);
+    if (accepted) progress[task.taskId] = 0;
+    return accepted;
   }
 
   Future<bool> _requestPermission() async {
-    if (_isAndroid) {
-      return await _requestAndroidPermission();
-    } else {
-      return await _requestIOSPermission();
-    }
-  }
-
-  Future<bool> _requestAndroidPermission() async {
-    final plugin = DeviceInfoPlugin();
-    late ph.PermissionStatus storageStatus;
-
-    final android = await plugin.androidInfo;
-    storageStatus = android.version.sdkInt < 33
-        ? await ph.Permission.storage.request()
-        : ph.PermissionStatus.granted;
-
-    if (await ph.Permission.notification.status == ph.PermissionStatus.denied) {
-      await ph.Permission.notification.request();
-    }
-    if (storageStatus == ph.PermissionStatus.granted) {
-      return true;
-    } else {
-      var result = await ph.Permission.storage.request();
-      return result == ph.PermissionStatus.granted;
-    }
-  }
-
-  Future<bool> _requestIOSPermission() async {
-    var notificationPermission = await bd.FileDownloader()
-        .permissions
-        .status(bd.PermissionType.notifications);
-    if (notificationPermission != bd.PermissionStatus.granted) {
-      notificationPermission = await bd.FileDownloader()
+    if (!_isAndroid) {
+      final status = await bd.FileDownloader()
           .permissions
-          .request(bd.PermissionType.notifications);
+          .status(bd.PermissionType.notifications);
+      if (status != bd.PermissionStatus.granted) {
+        await bd.FileDownloader()
+            .permissions
+            .request(bd.PermissionType.notifications);
+      }
+      return true;
     }
 
-    var storageStatus = await ph.Permission.storage.status;
-    if (storageStatus != ph.PermissionStatus.granted) {
-      storageStatus = await ph.Permission.storage.request();
+    final android = await DeviceInfoPlugin().androidInfo;
+    if (android.version.sdkInt >= 33) {
+      if (await ph.Permission.notification.isDenied) {
+        await ph.Permission.notification.request();
+      }
+      return true;
     }
-
-    return storageStatus.isGranted;
+    return (await ph.Permission.storage.request()).isGranted;
   }
 
-  int _getTaskIndex(String taskId) {
-    return _taskIndexMap[taskId] ?? -1;
+  String _safeFileName(String raw) {
+    final decoded = Uri.decodeComponent(raw).trim();
+    final safe = decoded.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
+    return safe.isEmpty ? 'download' : safe;
   }
 
-  // Helper method to show downloading snackbar
-  void _showDownloadingSnackbar() {
-    AppSnackbar.info(
-      title: 'Downloading',
-      message: 'File download started',
-    );
-  }
+  void _showComplete() =>
+      AppSnackbar.success(message: 'Download completed successfully');
 
-  // Helper method to show success snackbar
-  void _showSuccessSnackbar() {
-    AppSnackbar.success(
-      message: 'Download completed successfully',
-    );
+  void _showFailure() => AppSnackbar.error(
+        message: 'Download failed. Use “Open in browser” as a fallback.',
+      );
+
+  @override
+  void onClose() {
+    _iosUpdates?.cancel();
+    _port.close();
+    IsolateNameServer.removePortNameMapping('downloader_send_port');
+    if (!_isAndroid) bd.FileDownloader().destroy();
+    super.onClose();
   }
 }
 
 @pragma('vm:entry-point')
 void downloadCallback(String id, int status, int progress) {
-  final SendPort send =
-      IsolateNameServer.lookupPortByName('downloader_send_port')!;
-  send.send([id, status, progress]);
+  IsolateNameServer.lookupPortByName('downloader_send_port')
+      ?.send([id, status, progress]);
 }

@@ -2,8 +2,7 @@ import 'package:app_version_update/app_version_update.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
-import 'package:nust/app/modules/widgets/custom_button.dart';
-import 'package:nust/app/resources/color_manager.dart';
+import 'package:nust/app/modules/widgets/app_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AppUpdateController extends GetxController {
@@ -22,35 +21,24 @@ class AppUpdateController extends GetxController {
         if (data.canUpdate!) {
           isUpdateAvailable(true);
           debugPrint('Update Available: ${data.storeVersion}');
-          Get.defaultDialog(
-            title: 'Update Available',
-            titleStyle: const TextStyle(color: ColorManager.primary),
-            content: const Text(
-                'A new version of the app is available. Please update to the latest version.'),
-            backgroundColor: ColorManager.background1,
-            actions: [
-              CustomButton(
-                title: "Cancel",
-                color: ColorManager.background1,
-                textColor: ColorManager.primary,
-                widthFactor: 1,
-                onPressed: () {
-                  Get.back();
-                },
-              ),
-              CustomButton(
-                title: "Update",
-                color: ColorManager.primary,
-                textColor: ColorManager.white,
-                widthFactor: 1,
-                onPressed: () async {
-                  await launchUrl(Uri.parse(data.storeUrl!),
-                      mode: LaunchMode.externalApplication);
-                  Get.back();
-                },
-              ),
-            ],
-          );
+          final context = Get.context;
+          if (context == null) return;
+          if (!context.mounted) return;
+          showAppConfirmationDialog(
+            context: context,
+            title: 'Update available',
+            message:
+                'Install the latest version for portal compatibility and reliability improvements.',
+            confirmLabel: 'Update now',
+            icon: Icons.system_update_alt_rounded,
+          ).then((confirmed) async {
+            if (confirmed == true && data.storeUrl != null) {
+              await launchUrl(
+                Uri.parse(data.storeUrl!),
+                mode: LaunchMode.externalApplication,
+              );
+            }
+          });
         }
       });
     } catch (e) {

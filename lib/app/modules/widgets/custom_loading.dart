@@ -1,87 +1,68 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
-import 'package:nust/app/resources/assets_manager.dart';
-import 'package:nust/app/resources/color_manager.dart';
 
-var colors = [
-  ColorManager.black,
-  ColorManager.darkGrey,
-  ColorManager.lightGrey,
-  ColorManager.lightGrey1,
-  ColorManager.primary50,
-  ColorManager.lightestPrimary,
-  ColorManager.lightPrimary,
-  ColorManager.primary,
-  ColorManager.primary500,
-  ColorManager.darkPrimary,
-];
+import 'app_glass_surface.dart';
 
 Widget showFullPageLoading(RxInt percentage) {
-  return Container(
-    color: ColorManager.black.withValues(alpha: 0.5),
-    width: Get.width,
-    height: Get.height,
-    child: Stack(
-      alignment: Alignment.center,
-      children: [
-        if (Platform.isIOS)
-          Positioned(
-              top: Get.height * 0.05,
-              child: Container(
-                  width: Get.width * 0.8,
-                  decoration: BoxDecoration(
-                    color: ColorManager.white.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: ColorManager.black.withValues(alpha: 0.2),
-                        blurRadius: 10,
-                        spreadRadius: 5,
-                      )
-                    ],
-                  ),
-                  padding: const EdgeInsets.all(10),
-                  child: const Text(
-                    'The content of this page is not hosted on our servers. All rights belong to the NUST administration.',
-                    textAlign: TextAlign.center,
-                  ))),
-        Lottie.asset(
-          AssetsManager.loading,
-          width: Get.width * 0.5,
-          height: Get.width * 0.5,
+  return ColoredBox(
+    color: Colors.black.withValues(alpha: .38),
+    child: Center(
+      child: Padding(
+        padding: const EdgeInsets.all(28),
+        child: AppGlassSurface(
+          borderRadius: 22,
+          padding: const EdgeInsets.all(22),
+          child: Obx(() {
+            final value = percentage.value.clamp(0, 100);
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    const SizedBox.square(
+                      dimension: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2.5),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Text(
+                        value > 0 ? 'Loading… $value%' : 'Loading…',
+                        style: Get.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (value > 0) ...[
+                  const SizedBox(height: 16),
+                  LinearProgressIndicator(value: value / 100),
+                ],
+                const SizedBox(height: 12),
+                Text(
+                  'If this takes too long, return and try again.',
+                  style: Get.textTheme.bodySmall,
+                ),
+              ],
+            );
+          }),
         ),
-        Obx(() => Text(
-              "${percentage.value}%",
-              style: TextStyle(
-                color: colors[(percentage.value ~/ 10).clamp(0, 9)],
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            )),
-      ],
+      ),
     ),
   );
 }
 
-Widget showLoading() {
-  return Lottie.asset(
-    AssetsManager.loading,
-    width: Get.width * 0.5,
-    height: Get.width * 0.5,
-    frameRate: FrameRate.max,
-  );
-}
+Widget showLoading() => const Center(
+      child: SizedBox.square(
+        dimension: 28,
+        child: CircularProgressIndicator(strokeWidth: 2.5),
+      ),
+    );
 
-Widget heightLoading(double height) {
-  return Lottie.asset(
-    AssetsManager.loading,
-    height: height,
-    frameRate: FrameRate.max,
-  );
-}
+Widget heightLoading(double height) => SizedBox(
+      height: height,
+      child: showLoading(),
+    );
 
 void closeLoading() {
   if (Get.isDialogOpen ?? false) Get.back();

@@ -1,85 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nust/app/modules/widgets/custom_snackbar.dart';
-import 'package:nust/app/resources/color_manager.dart';
-import '../../../resources/assets_manager.dart';
-import '../../widgets/custom_button.dart';
 
+import '../../widgets/app_page_shell.dart';
+import '../../widgets/custom_snackbar.dart';
 import '../controllers/authentication_controller.dart';
 
 class AuthenticationView extends GetView<AuthenticationController> {
   const AuthenticationView({super.key});
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: ColorManager.gradientColor,
-          ),
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: SafeArea(
-              child: SizedBox(
-                height: Get.height,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardTheme.color,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.all(16.0),
-                      margin: const EdgeInsets.all(32.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text('User Authentication',
-                              style: TextStyle(
-                                  color: Theme.of(context)
-                                      .appBarTheme
-                                      .titleTextStyle!
-                                      .color,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold)),
-                          Center(
-                              child: Image.asset(AssetsManager.logo,
-                                  height: Get.height * 0.2)),
-                          const SizedBox(height: 10),
-                          Text(
-                            'Please authenticate to continue',
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .appBarTheme
-                                    .titleTextStyle!
-                                    .color,
-                                fontSize: 16),
-                          ),
-                        ],
-                      ),
+  Widget build(BuildContext context) => AppPageShell(
+        title: 'Confirm it’s you',
+        subtitle:
+            'Authentication protects access to locally saved portal credentials.',
+        scrollable: true,
+        child: Column(
+          children: [
+            AppSectionCard(
+              padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 34),
+              child: Column(
+                children: [
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: .14),
+                      shape: BoxShape.circle,
                     ),
-                    CustomButton(
-                        title: 'Authenticate',
-                        color: ColorManager.primary,
-                        textColor: ColorManager.background2,
-                        widthFactor: 1,
-                        margin: 32,
-                        onPressed: () async {
-                          bool authenticated = await controller.authenticate();
-                          if (authenticated) {
-                            Get.offAllNamed(controller.page.value);
-                          } else {
-                            AppSnackbar.error(
-                                title: 'Authentication Failed',
-                                message: 'Please try again later');
-                          }
-                        }),
-                  ],
-                ),
+                    child: Icon(Icons.fingerprint_rounded,
+                        size: 42, color: Theme.of(context).colorScheme.primary),
+                  ),
+                  const SizedBox(height: 20),
+                  Text('Biometric authentication',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 8),
+                  Text(
+                      'Use the biometric method configured on this device to continue.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: appSecondaryText(context), height: 1.4)),
+                ],
               ),
             ),
-          ),
-        ));
-  }
+            const SizedBox(height: 18),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: FilledButton.icon(
+                icon: const Icon(Icons.lock_open_rounded),
+                label: const Text('Authenticate'),
+                onPressed: () async {
+                  final authenticated = await controller.authenticate();
+                  if (authenticated) {
+                    Get.offAllNamed(controller.page.value);
+                  } else {
+                    AppSnackbar.error(
+                        title: 'Authentication failed',
+                        message: 'Please try again.');
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+      );
 }

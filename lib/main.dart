@@ -9,6 +9,7 @@ import 'package:nust/app/controllers/app_update_controller.dart';
 import 'package:nust/app/modules/Authentication/controllers/authentication_controller.dart';
 import 'package:nust/app/controllers/database_controller.dart';
 import 'package:nust/app/controllers/internet_controller.dart';
+import 'package:nust/app/controllers/review_prompt_controller.dart';
 import 'package:nust/app/controllers/stories_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:quick_actions/quick_actions.dart';
@@ -31,6 +32,7 @@ void main() async {
     await dbController.initialize();
     Get.put(InternetController(), permanent: true);
     Get.put(AppUpdateController(), permanent: true);
+    Get.put(ReviewPromptController(), permanent: true);
     Get.put(StoriesController(), permanent: true);
 
     final authenticationController =
@@ -98,28 +100,29 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
   String page = await init();
+  final themeController = Get.put(ThemeController(), permanent: true);
 
-  runApp(GetMaterialApp(
-    title: "My Nust",
-    debugShowCheckedModeBanner: false,
-    theme: Get.put(ThemeController(), permanent: true).theme,
-    initialRoute: page,
-    getPages: AppPages.routes,
-    scrollBehavior: const MaterialScrollBehavior().copyWith(
-      dragDevices: {
-        PointerDeviceKind.mouse,
-        PointerDeviceKind.touch,
-        PointerDeviceKind.stylus,
-        PointerDeviceKind.unknown
-      },
+  runApp(Obx(
+    () => GetMaterialApp(
+      title: "My Nust",
+      debugShowCheckedModeBanner: false,
+      theme: themeController.theme,
+      defaultTransition: Transition.cupertino,
+      transitionDuration: const Duration(milliseconds: 240),
+      initialRoute: page,
+      getPages: AppPages.routes,
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        scrollbars: false,
+        overscroll: false,
+        dragDevices: {
+          PointerDeviceKind.mouse,
+          PointerDeviceKind.touch,
+          PointerDeviceKind.stylus,
+          PointerDeviceKind.unknown
+        },
+      ),
+      builder: (BuildContext context, Widget? child) => child!,
     ),
-    builder: (BuildContext context, Widget? child) {
-      return MediaQuery(
-        data: MediaQuery.of(context)
-            .copyWith(textScaler: const TextScaler.linear(1.0)),
-        child: child!,
-      );
-    },
   ));
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return ErrorScreen(

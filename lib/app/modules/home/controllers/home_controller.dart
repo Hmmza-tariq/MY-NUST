@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/controllers/stories_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
+import 'package:nust/app/domain/portal/portal_endpoints.dart';
 import '../../../controllers/internet_controller.dart';
 import '../../../services/notification_service.dart';
 
@@ -14,8 +15,9 @@ class HomeController extends GetxController {
   final StoriesController campusController = Get.find();
   final InternetController internetController = Get.find();
 
-  final String lmsUrl = dotenv.env['LMS_URL'] ?? '';
-  final String qalamUrl = dotenv.env['QALAM_URL'] ?? '';
+  late final String lmsUrl = PortalEndpoints.lmsFrom(dotenv.env['LMS_URL']);
+  late final String qalamUrl =
+      PortalEndpoints.qalamFrom(dotenv.env['QALAM_URL']);
 
   final RxBool isLoading = true.obs;
   final RxBool isError = false.obs;
@@ -74,9 +76,10 @@ class HomeController extends GetxController {
     }
   }
 
-  void fetchStories() async {
+  Future<void> fetchStories() async {
     if (!internetController.isOnline.value) {
-      return internetController.noInternetDialog(fetchStories);
+      internetController.noInternetDialog(fetchStories);
+      return;
     }
 
     isLoading.value = true;

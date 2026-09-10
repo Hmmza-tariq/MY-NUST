@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nust/app/domain/portal/portal_load_state.dart';
+import 'package:nust/app/modules/widgets/app_glass_surface.dart';
+import 'package:nust/app/resources/color_manager.dart';
+import 'package:nust/app/resources/theme_manager.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import '../../../resources/color_manager.dart';
-import '../../../routes/app_pages.dart';
+
 import '../controllers/web_controller.dart';
-import 'package:nust/app/modules/widgets/custom_button.dart';
 
 class WebView extends GetView<WebController> {
   const WebView({super.key});
@@ -13,474 +15,269 @@ class WebView extends GetView<WebController> {
   Widget build(BuildContext context) {
     return Obx(() => PopScope(
           canPop: controller.canPop.value,
-          onPopInvokedWithResult: (pop, result) {
-            final wvc = controller.webViewController;
-            if (wvc == null) {
-              Get.back();
-              return;
-            }
-
-            wvc.canGoBack().then((value) {
-              if (value) {
-                controller.canPop.value = true;
-                wvc.goBack();
-              } else {
-                controller.canPop.value = false;
-                if (Get.previousRoute.isEmpty) {
-                  Get.offAllNamed(Routes.HOME);
-                } else {
-                  Get.back();
-                }
-              }
-            });
+          onPopInvokedWithResult: (didPop, result) {
+            if (!didPop) controller.goBack();
           },
           child: Scaffold(
-            backgroundColor:
-                controller.themeController.theme.scaffoldBackgroundColor,
-            body: Stack(
-              children: [
-                // Webview with dynamic padding
-                Obx(() => AnimatedPadding(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      padding: EdgeInsets.only(
-                        top: controller.isAppBarExpanded.value
-                            ? (MediaQuery.of(context).padding.top +
-                                kToolbarHeight +
-                                3)
-                            : MediaQuery.of(context).padding.top,
-                      ),
-                      child: RefreshIndicator(
-                        onRefresh: () async {
-                          await controller.reload();
-                        },
-                        color: ColorManager.primary,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            AnimatedOpacity(
-                              opacity: controller.isLoading.value ? 0.3 : 1.0,
-                              duration: const Duration(milliseconds: 300),
-                              child: SizedBox(
-                                width: Get.width,
-                                height: Get.height,
-                                child: !controller.isError.value &&
-                                        controller.isWebViewInitialized.value &&
-                                        controller.webViewController != null
-                                    ? WebViewWidget(
-                                        controller:
-                                            controller.webViewController!,
-                                        gestureRecognizers: const {},
-                                      )
-                                    : _buildErrorState(),
-                              ),
-                            ),
-                            if (controller.isLoading.value)
-                              Container(
-                                padding: const EdgeInsets.all(32),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 60,
-                                      height: 60,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 4,
-                                        valueColor:
-                                            const AlwaysStoppedAnimation<Color>(
-                                                ColorManager.primary),
-                                        value: controller.status.value > 0
-                                            ? controller.status.value / 100
-                                            : null,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 24),
-                                    Text(
-                                      controller.status.value > 0
-                                          ? 'Loading ${controller.status.value}%'
-                                          : 'Loading...',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: controller.themeController.theme
-                                            .appBarTheme.titleTextStyle!.color,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      controller.currentUrl.value.isNotEmpty
-                                          ? controller.currentUrl.value
-                                          : 'Please wait...',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: controller.themeController.theme
-                                            .appBarTheme.titleTextStyle!.color
-                                            ?.withValues(alpha: 0.6),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            if (controller.initError.value)
-                              _buildInitErrorState(),
-                          ],
-                        ),
-                      ),
-                    )),
-                // Collapsible AppBar
-                _buildCollapsibleAppBar(),
-              ],
-            ),
-          ),
-        ));
-  }
-
-  Widget _buildCollapsibleAppBar() {
-    return Obx(() => AnimatedPositioned(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          top: 0,
-          left: 0,
-          right: 0,
-          child: controller.isAppBarExpanded.value
-              ? _buildExpandedAppBar()
-              : _buildCollapsedAppBar(),
-        ));
-  }
-
-  Widget _buildCollapsedAppBar() {
-    return SafeArea(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          InkWell(
-            onTap: () {
-              controller.toggleAppBar();
-            },
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              bottomLeft: Radius.circular(12),
-              topRight: Radius.circular(0),
-              bottomRight: Radius.circular(0),
-            ),
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  bottomLeft: Radius.circular(12),
-                  topRight: Radius.circular(0),
-                  bottomRight: Radius.circular(0),
-                ),
-                color: controller
-                    .themeController.theme.appBarTheme.backgroundColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: controller.themeController.theme.appBarTheme
-                            .titleTextStyle?.color
-                            ?.withValues(alpha: 0.1) ??
-                        ColorManager.black.withValues(alpha: 0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
+            backgroundColor: Colors.white,
+            body: SafeArea(
+              child: Column(
                 children: [
-                  if (controller.isLoading.value)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 2.0, vertical: 2.0),
-                      child: SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                              ColorManager.white),
-                          // value: controller.status.value / 100,
-                        ),
-                      ),
-                    )
-                  else
-                    Icon(
-                      Icons.keyboard_arrow_left_rounded,
-                      color: controller.themeController.theme.appBarTheme
-                          .titleTextStyle!.color,
-                      size: 20,
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExpandedAppBar() {
-    Color iconColor =
-        controller.themeController.theme.appBarTheme.titleTextStyle!.color!;
-    Color bgColor =
-        controller.themeController.theme.appBarTheme.backgroundColor!;
-    return Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-        boxShadow: [
-          BoxShadow(
-            color: ColorManager.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              height: kToolbarHeight,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: iconColor,
-                    ),
-                    onPressed: () async {
-                      final wvc = controller.webViewController;
-                      if (wvc == null) {
-                        Get.back();
-                        return;
-                      }
-
-                      if (await wvc.canGoBack()) {
-                        wvc.goBack();
-                      } else {
-                        if (Get.previousRoute.isEmpty) {
-                          Get.offAllNamed(Routes.HOME);
-                        } else {
-                          Get.back();
-                        }
-                      }
-                    },
+                  Theme(
+                    data: getLightTheme(),
+                    child: _PortalToolbar(controller: controller),
                   ),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          controller.pageTitle.value.isEmpty
-                              ? 'Loading...'
-                              : controller.pageTitle.value,
-                          style: TextStyle(
-                            color: iconColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (controller.currentUrl.value.isNotEmpty)
-                          Text(
-                            controller.currentUrl.value,
-                            style: TextStyle(
-                              color: iconColor.withValues(alpha: 0.6),
-                              fontSize: 10,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                      ],
-                    ),
-                  ),
-                  if (!controller.isLoading.value && !controller.isError.value)
-                    IconButton(
-                      icon: Icon(
-                        Icons.refresh_rounded,
-                        color: iconColor,
-                      ),
-                      onPressed: () {
-                        controller.reload();
-                      },
-                    ),
-                  PopupMenuButton<String>(
-                    icon: Icon(
-                      Icons.more_vert_rounded,
-                      color: iconColor,
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                    color: bgColor,
-                    elevation: 4,
-                    onSelected: (value) {
-                      switch (value) {
-                        case 'forward':
-                          controller.goForward();
-                          break;
-                        case 'hide':
-                          controller.toggleAppBar();
-                          break;
-                        case 'home':
-                          Get.offAllNamed(Routes.HOME);
-                          break;
-                      }
-                    },
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'forward',
-                        child: Row(
+                    child: Obx(() {
+                      final phase = controller.phase.value;
+                      return Theme(
+                        data: getLightTheme(),
+                        child: Stack(
                           children: [
-                            Icon(Icons.arrow_forward_ios_rounded,
-                                color: iconColor, size: 18),
-                            SizedBox(width: 8),
-                            Text('Forward', style: TextStyle(color: iconColor)),
+                            if (phase.showsPage &&
+                                controller.webViewController != null)
+                              Positioned.fill(
+                                child: WebViewWidget(
+                                  controller: controller.webViewController!,
+                                ),
+                              ),
+                            if (phase == PortalPhase.initializing)
+                              const _StartingState(),
+                            if (phase == PortalPhase.offline ||
+                                phase == PortalPhase.failed)
+                              _ErrorState(
+                                offline: phase == PortalPhase.offline,
+                                message: controller.errorMessage.value,
+                                onRetry: controller.reload,
+                                onBrowser: controller.openInBrowser,
+                              ),
+                            if (phase == PortalPhase.slow)
+                              _SlowBanner(
+                                onRetry: controller.reload,
+                                onBrowser: controller.openInBrowser,
+                              ),
                           ],
                         ),
-                      ),
-                      PopupMenuItem(
-                        value: 'hide',
-                        child: Row(
-                          children: [
-                            Icon(Icons.keyboard_arrow_up_rounded,
-                                color: iconColor, size: 18),
-                            SizedBox(width: 8),
-                            Text('Hide', style: TextStyle(color: iconColor)),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'home',
-                        child: Row(
-                          children: [
-                            Icon(Icons.home_rounded,
-                                color: iconColor, size: 18),
-                            SizedBox(width: 8),
-                            Text('Home', style: TextStyle(color: iconColor)),
-                          ],
-                        ),
-                      ),
-                    ],
+                      );
+                    }),
                   ),
                 ],
               ),
             ),
-            SizedBox(
-              height: 3,
-              child: controller.isLoading.value
-                  ? LinearProgressIndicator(
-                      value: controller.status.value / 100,
-                      backgroundColor: ColorManager.lightGrey1,
-                      valueColor: const AlwaysStoppedAnimation<Color>(
-                          ColorManager.primary),
-                      minHeight: 3,
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          ],
+          ),
+        ));
+  }
+}
+
+class _PortalToolbar extends StatelessWidget {
+  const _PortalToolbar({required this.controller});
+
+  final WebController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      child: AppGlassSurface(
+        borderRadius: 16,
+        child: Obx(
+          () => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: 56,
+                child: Row(
+                  children: [
+                    IconButton(
+                      tooltip: 'Back',
+                      onPressed: controller.goBack,
+                      icon: const Icon(Icons.arrow_back_rounded),
+                    ),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            controller.pageTitle.value,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                          ),
+                          Text(
+                            controller.currentUrl.value.isEmpty
+                                ? 'Secure portal view'
+                                : controller.currentUrl.value,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Reload',
+                      onPressed: controller.reload,
+                      icon: const Icon(Icons.refresh_rounded),
+                    ),
+                    PopupMenuButton<String>(
+                      tooltip: 'More options',
+                      onSelected: (value) {
+                        if (value == 'forward') controller.goForward();
+                        if (value == 'browser') controller.openInBrowser();
+                      },
+                      itemBuilder: (context) => const [
+                        PopupMenuItem(
+                          value: 'forward',
+                          child: ListTile(
+                            leading: Icon(Icons.arrow_forward_rounded),
+                            title: Text('Forward'),
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'browser',
+                          child: ListTile(
+                            leading: Icon(Icons.open_in_browser_rounded),
+                            title: Text('Open in browser'),
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              if (controller.phase.value.isBusy)
+                const LinearProgressIndicator(
+                  minHeight: 2,
+                  color: ColorManager.primary,
+                  backgroundColor: Colors.transparent,
+                ),
+            ],
+          ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildErrorState() {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.wifi_off_rounded,
-            size: 80,
-            color: ColorManager.lightGrey1,
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'No Internet Connection',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: controller
-                  .themeController.theme.appBarTheme.titleTextStyle!.color,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Please check your connection and try again',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: controller
-                  .themeController.theme.appBarTheme.titleTextStyle!.color
-                  ?.withValues(alpha: 0.6),
-            ),
-          ),
-          const SizedBox(height: 32),
-          CustomButton(
-            title: 'Retry',
-            color: ColorManager.primary,
-            textColor: ColorManager.white,
-            widthFactor: 0.5,
-            onPressed: () {
-              controller.reload();
-            },
-          ),
-        ],
-      ),
-    );
-  }
+class _StartingState extends StatelessWidget {
+  const _StartingState();
 
-  Widget _buildInitErrorState() {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      color: controller.themeController.theme.scaffoldBackgroundColor,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.error_outline_rounded,
-            size: 80,
-            color: ColorManager.error,
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Failed to Load',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: controller
-                  .themeController.theme.appBarTheme.titleTextStyle!.color,
+  @override
+  Widget build(BuildContext context) => Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(
+              width: 32,
+              height: 32,
+              child: CircularProgressIndicator(strokeWidth: 3),
+            ),
+            const SizedBox(height: 16),
+            Text('Opening portal…',
+                style: Theme.of(context).textTheme.titleMedium),
+          ],
+        ),
+      );
+}
+
+class _SlowBanner extends StatelessWidget {
+  const _SlowBanner({required this.onRetry, required this.onBrowser});
+
+  final VoidCallback onRetry;
+  final VoidCallback onBrowser;
+
+  @override
+  Widget build(BuildContext context) => Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: AppGlassSurface(
+            padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
+            child: Row(
+              children: [
+                const Icon(Icons.schedule_rounded, size: 20),
+                const SizedBox(width: 10),
+                const Expanded(
+                    child: Text('The portal is taking longer than usual.')),
+                TextButton(onPressed: onRetry, child: const Text('Retry')),
+                TextButton(onPressed: onBrowser, child: const Text('Browser')),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            controller.errorMessage.value,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: controller
-                  .themeController.theme.appBarTheme.titleTextStyle!.color
-                  ?.withValues(alpha: 0.6),
+        ),
+      );
+}
+
+class _ErrorState extends StatelessWidget {
+  const _ErrorState({
+    required this.offline,
+    required this.message,
+    required this.onRetry,
+    required this.onBrowser,
+  });
+
+  final bool offline;
+  final String message;
+  final VoidCallback onRetry;
+  final VoidCallback onBrowser;
+
+  @override
+  Widget build(BuildContext context) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  offline
+                      ? Icons.cloud_off_rounded
+                      : Icons.web_asset_off_rounded,
+                  size: 48,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  offline ? 'You’re offline' : 'Portal unavailable',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 8),
+                Text(message, textAlign: TextAlign.center),
+                const SizedBox(height: 24),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    FilledButton.icon(
+                      onPressed: onRetry,
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text('Try again'),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: onBrowser,
+                      icon: const Icon(Icons.open_in_browser_rounded),
+                      label: const Text('Open in browser'),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 32),
-          CustomButton(
-            title: 'Try Again',
-            color: ColorManager.primary,
-            textColor: ColorManager.white,
-            widthFactor: 0.5,
-            onPressed: () {
-              controller.initializeWebView();
-            },
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+      );
 }

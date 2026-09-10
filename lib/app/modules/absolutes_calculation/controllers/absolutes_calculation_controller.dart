@@ -4,21 +4,20 @@ import 'dart:typed_data';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:nust/app/controllers/database_controller.dart';
+import 'package:nust/app/controllers/review_prompt_controller.dart';
+import 'package:nust/app/modules/widgets/app_dialog.dart';
 import 'package:nust/app/modules/widgets/custom_snackbar.dart';
-import 'package:nust/app/resources/color_manager.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../data/assessment.dart';
 
 class AbsolutesCalculationController extends GetxController {
-  ThemeController themeController = Get.find();
   DatabaseController databaseController = Get.find();
   ScrollController scrollController = ScrollController();
 
-  RxString selectedType = "both".obs;
+  RxString selectedType = "lecture".obs;
 
   RxDouble labWeight = 50.0.obs;
   RxDouble lectureWeight = 50.0.obs;
@@ -53,6 +52,36 @@ class AbsolutesCalculationController extends GetxController {
     saveAssessments();
   }
 
+  void addAssessmentEntry({
+    required String name,
+    required double weight,
+    required double totalMarks,
+    required double obtainedMarks,
+    required String type,
+  }) {
+    assessments.add(Assessment(
+      name: name,
+      weight: weight,
+      totalMarks: totalMarks,
+      obtainedMarks: obtainedMarks,
+      type: type,
+    ));
+    saveAssessments();
+  }
+
+  void loadExample() {
+    selectedType.value = 'lecture';
+    if (assessments.any((assessment) => assessment.type == 'lecture')) return;
+    assessments.add(Assessment(
+      name: 'Quiz 1',
+      weight: 10,
+      totalMarks: 10,
+      obtainedMarks: 8,
+      type: 'lecture',
+    ));
+    saveAssessments();
+  }
+
   void removeAssessment(int index) {
     if (index >= 0 && index < assessments.length) {
       assessments.removeAt(index);
@@ -71,9 +100,14 @@ class AbsolutesCalculationController extends GetxController {
     List<double> weights = databaseController.getAbsolutesWeights();
     labWeight.value = weights[0];
     lectureWeight.value = weights[1];
+    if (labWeight.value + lectureWeight.value == 0) {
+      labWeight.value = 50;
+      lectureWeight.value = 50;
+      saveWeights();
+    }
   }
 
-  void calculateAbsolutes() {
+  Future<void> calculateAbsolutes() async {
     Get.focusScope!.unfocus();
     double totalScore = 0.0;
     double labScore = 0.0;
@@ -104,191 +138,22 @@ class AbsolutesCalculationController extends GetxController {
     }
     absolutes.value = totalScore;
     confettiController.play();
-    Color color = absolutes.value <= 30
-        ? ColorManager.error
-        : absolutes.value <= 60
-            ? ColorManager.orange
-            : absolutes.value <= 80
-                ? ColorManager.green
-                : ColorManager.primary;
-    Get.bottomSheet(
-      Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: themeController.theme.scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        width: Get.width,
-        height: (selectedType.value == "both"
-            ? Get.height * 0.3
-            : Get.height * 0.24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.close,
-                    color: themeController.isDarkMode.value
-                        ? ColorManager.lightGrey1
-                        : ColorManager.black,
-                  ),
-                  onPressed: Get.back,
-                ),
-                Container(
-                  width: 100,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: themeController.isDarkMode.value
-                        ? ColorManager.lightGrey1
-                        : ColorManager.black,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.share,
-                    color: themeController.isDarkMode.value
-                        ? ColorManager.lightGrey1
-                        : ColorManager.black,
-                  ),
-                  onPressed: () async {
-                    await captureScreenShot(selectedType.value == "both"
-                        ? " "
-                        : " ${selectedType.value.capitalizeFirst} ");
-                  },
-                ),
-              ],
-            ),
-            Screenshot(
-              controller: screenshotController,
-              child: Container(
-                color: themeController.theme.scaffoldBackgroundColor,
-                width: Get.width,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Absolutes Score${selectedType.value == "both" ? "" : " in ${selectedType.value.capitalizeFirst}"}",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: themeController.isDarkMode.value
-                                ? ColorManager.lightGrey1
-                                : ColorManager.black,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text.rich(
-                          TextSpan(
-                            text: absolutes.value.toStringAsFixed(2),
-                            style: TextStyle(
-                              fontSize: 24,
-                              color: color,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: " out of 100",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: themeController.isDarkMode.value
-                                      ? ColorManager.lightGrey1
-                                      : ColorManager.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (selectedType.value == "both")
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 8),
-                              Text.rich(
-                                TextSpan(
-                                  text: "Absolutes Score in Lab: ",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: themeController.isDarkMode.value
-                                        ? ColorManager.lightGrey1
-                                        : ColorManager.black,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: labScore.toStringAsFixed(2),
-                                      style: TextStyle(
-                                        color: color,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text.rich(
-                                TextSpan(
-                                  text: "Absolutes Score in Lecture: ",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: themeController.isDarkMode.value
-                                        ? ColorManager.lightGrey1
-                                        : ColorManager.black,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: lectureScore.toStringAsFixed(2),
-                                      style: TextStyle(
-                                        color: color,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                      ],
-                    ),
-                    Positioned(
-                      top: 24,
-                      right: 2,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            gradient: ColorManager.gradientColor),
-                        alignment: Alignment.center,
-                        child: Text("My NUST",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: !themeController.isDarkMode.value
-                                  ? ColorManager.black
-                                  : ColorManager.white,
-                            )),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+    final context = Get.context;
+    if (context == null) return;
+    await showAppSheet<void>(
+      context: context,
+      child: _AbsoluteResultSheet(
+        screenshotController: screenshotController,
+        score: totalScore,
+        type: selectedType.value,
+        labScore: labScore,
+        lectureScore: lectureScore,
+        onShare: () => captureScreenShot(selectedType.value == "both"
+            ? " "
+            : " ${selectedType.value.capitalizeFirst} "),
       ),
-      backgroundColor: themeController.theme.scaffoldBackgroundColor,
-      isScrollControlled: true,
     );
+    await Get.find<ReviewPromptController>().recordSuccessfulOutcome();
   }
 
   double _calculateAssessmentScore(List<Assessment> list) {
@@ -360,4 +225,184 @@ class AbsolutesCalculationController extends GetxController {
     });
     return true;
   }
+}
+
+class _AbsoluteResultSheet extends StatelessWidget {
+  const _AbsoluteResultSheet({
+    required this.screenshotController,
+    required this.score,
+    required this.type,
+    required this.labScore,
+    required this.lectureScore,
+    required this.onShare,
+  });
+
+  final ScreenshotController screenshotController;
+  final double score;
+  final String type;
+  final double labScore;
+  final double lectureScore;
+  final Future<bool> Function() onShare;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final scoreColor = score <= 30
+        ? scheme.error
+        : score <= 60
+            ? scheme.tertiary
+            : scheme.primary;
+    final title =
+        type == 'both' ? 'Absolute score' : '${type.capitalizeFirst} score';
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(Icons.insights_rounded, color: scheme.primary),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: theme.textTheme.titleLarge),
+                  Text(
+                    'Based on the assessments entered',
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
+            IconButton.outlined(
+              tooltip: 'Share result',
+              onPressed: onShare,
+              icon: const Icon(Icons.ios_share_rounded),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        Screenshot(
+          controller: screenshotController,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: scheme.surfaceContainerLow,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: scheme.outlineVariant),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  score.toStringAsFixed(2),
+                  style: theme.textTheme.displaySmall?.copyWith(
+                    color: scoreColor,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                Text(
+                  'out of 100',
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(color: scheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 14),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(999),
+                  child: LinearProgressIndicator(
+                    value: (score / 100).clamp(0, 1),
+                    minHeight: 8,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  score >= 80
+                      ? 'Achievement: Excellent momentum'
+                      : score >= 60
+                          ? 'Achievement: Solid progress'
+                          : 'Next goal: Reach 60 points',
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: scoreColor,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                if (type == 'both') ...[
+                  const SizedBox(height: 18),
+                  Divider(color: scheme.outlineVariant),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _ScoreDetail(
+                          label: 'Lecture',
+                          value: lectureScore,
+                        ),
+                      ),
+                      Expanded(
+                        child: _ScoreDetail(label: 'Lab', value: labScore),
+                      ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 16),
+                Text(
+                  'MY NUST',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: scheme.primary,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Done'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ScoreDetail extends StatelessWidget {
+  const _ScoreDetail({required this.label, required this.value});
+
+  final String label;
+  final double value;
+
+  @override
+  Widget build(BuildContext context) => Column(
+        children: [
+          Text(
+            value.toStringAsFixed(2),
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ],
+      );
 }

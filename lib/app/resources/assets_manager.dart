@@ -7,13 +7,9 @@ const String LOTTIE_PATH = "assets/lottie";
 class AssetsManager {
   static const String logo = "$IMAGE_PATH/appLogo.png";
   static const String hexagone = "$IMAGE_PATH/Hexagone.png";
-  static const String hexagone_blue = "$IMAGE_PATH/Hexagone_blue.png";
   static const String transparentLogo = "$IMAGE_PATH/transparent.png";
   static const String nustLogo = "$IMAGE_PATH/nust-logo.png";
   static const String error = "$IMAGE_PATH/Error.png";
-  static const String settingsBanner = "$IMAGE_PATH/settings.png";
-  static const String helpBanner = "$IMAGE_PATH/feedback.png";
-  static const String aboutBanner = "$IMAGE_PATH/aboutUs.png";
 
   static const String lms = "$ICON_PATH/lms.svg";
   static const String qalam = "$ICON_PATH/qalam.svg";

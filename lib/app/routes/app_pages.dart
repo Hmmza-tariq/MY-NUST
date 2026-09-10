@@ -14,6 +14,8 @@ import '../modules/absolutes_calculation/bindings/absolutes_calculation_binding.
 import '../modules/absolutes_calculation/views/absolutes_calculation_view.dart';
 import '../modules/gpa_calculation/bindings/gpa_calculation_binding.dart';
 import '../modules/gpa_calculation/views/gpa_calculation_view.dart';
+import '../modules/downloads/bindings/downloads_binding.dart';
+import '../modules/downloads/views/downloads_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/web/bindings/web_binding.dart';
@@ -76,6 +78,13 @@ class AppPages {
         binding: AbsolutesCalculationBinding(),
         transition: Transition.fadeIn,
         transitionDuration: const Duration(milliseconds: 300)),
+    GetPage(
+      name: _Paths.DOWNLOADS,
+      page: () => const DownloadsView(),
+      binding: DownloadsBinding(),
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
     GetPage(
       name: _Paths.AUTHENTICATION,
       page: () => const AuthenticationView(),

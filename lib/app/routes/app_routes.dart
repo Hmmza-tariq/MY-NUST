@@ -13,6 +13,7 @@ abstract class Routes {
   static const ABOUT = _Paths.ABOUT;
   static const ABSOLUTES_CALCULATION = _Paths.ABSOLUTES_CALCULATION;
   static const AUTHENTICATION = _Paths.AUTHENTICATION;
+  static const DOWNLOADS = _Paths.DOWNLOADS;
 }
 
 abstract class _Paths {
@@ -25,4 +26,5 @@ abstract class _Paths {
   static const ABOUT = '/about';
   static const ABSOLUTES_CALCULATION = '/absolutes-calculation';
   static const AUTHENTICATION = '/authentication';
+  static const DOWNLOADS = '/downloads';
 }
