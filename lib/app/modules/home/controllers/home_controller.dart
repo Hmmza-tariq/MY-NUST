@@ -6,6 +6,10 @@ import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:nust/app/domain/portal/portal_endpoints.dart';
 import '../../../controllers/internet_controller.dart';
 import '../../../services/notification_service.dart';
+import '../../../services/academic_sync_service.dart';
+import '../../../controllers/database_controller.dart';
+import '../../../routes/app_pages.dart';
+import '../../widgets/portal_sync_setup_dialog.dart';
 
 class HomeController extends GetxController {
   final CarouselSliderController pageController = CarouselSliderController();
@@ -36,6 +40,26 @@ class HomeController extends GetxController {
       isLoading.value = false;
     }
     checkInternet();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    _setupAcademicSync();
+  }
+
+  Future<void> _setupAcademicSync() async {
+    final database = Get.find<DatabaseController>();
+    final sync = Get.find<AcademicSyncService>();
+    if (!database.getAcademicSetupSeen() && Get.context != null) {
+      final enabled = await showPortalSyncSetup(Get.context!);
+      await database.setAcademicSetupSeen();
+      if (enabled == true) {
+        await sync.setAutomaticSync(true);
+        if (!sync.canAutoSync) await Get.toNamed(Routes.SETTINGS);
+      }
+    }
+    if (!isClosed) await sync.syncOnOpen();
   }
 
   void checkInternet() {
@@ -77,6 +101,10 @@ class HomeController extends GetxController {
   }
 
   Future<void> fetchStories() async {
+    await refreshAll();
+  }
+
+  Future<void> refreshAll() async {
     if (!internetController.isOnline.value) {
       internetController.noInternetDialog(fetchStories);
       return;
@@ -84,15 +112,17 @@ class HomeController extends GetxController {
 
     isLoading.value = true;
 
-    Future.delayed(const Duration(milliseconds: 300), () {
-      pageController.animateToPage(0);
-    });
     activePage.value = 0;
     try {
-      isError.value = !await campusController.fetchTopStories();
+      await Future.wait([
+        campusController
+            .fetchTopStories()
+            .then((success) => isError.value = !success),
+        if (Get.find<AcademicSyncService>().canAutoSync)
+          Get.find<AcademicSyncService>().syncSavedPortals(),
+      ]);
     } finally {
       isLoading.value = false;
-      pageController.animateToPage(0);
       activePage.value = 0;
     }
   }

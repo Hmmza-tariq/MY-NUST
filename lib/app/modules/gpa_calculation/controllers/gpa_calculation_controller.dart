@@ -14,6 +14,9 @@ import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import '../../../domain/calculators/planner_result_importer.dart';
+import '../../../services/academic_sync_service.dart';
+import '../../../routes/app_pages.dart';
 
 class GpaCalculationController extends GetxController {
   DatabaseController databaseController = Get.find();
@@ -24,26 +27,123 @@ class GpaCalculationController extends GetxController {
   var semesters = <Rx<Semester>>[].obs;
   var courses = <Rx<Course>>[].obs;
   var selectedSemester = "Semester 1".obs;
-  var semesterNames = [
-    "Semester 1",
-    "Semester 2",
-    "Semester 3",
-    "Semester 4",
-    "Semester 5",
-    "Semester 6",
-    "Semester 7",
-    "Semester 8",
-    "Summer 1",
-    "Summer 2",
-    "Summer 3",
-    "Summer 4",
-  ];
+  List<String> get semesterNames => {
+        ...databaseController.getCourseTerms(),
+        ...semesters.map((e) => e.value.name),
+        ...Get.find<AcademicSyncService>()
+            .data
+            .value
+            .results
+            .map((e) => e.name),
+        selectedSemester.value,
+      }.toList();
+
+  String get nextSemesterName {
+    var number = 1;
+    while (semesterNames.contains('Semester $number') ||
+        academicSync.data.value.results
+            .any((term) => term.regularSemesterCount == number)) {
+      number++;
+    }
+    return 'Semester $number';
+  }
+
+  String semesterLabel(String name) {
+    final terms = academicSync.data.value.results;
+    final index = terms.indexWhere((term) => term.name == name);
+    if (index < 0) return name;
+    final term = terms[index];
+    final date = name.toLowerCase().replaceAll(' ', '-');
+    if (term.regularSemesterCount != null && term.regularSemesterCount! > 0) {
+      return 'Semester ${term.regularSemesterCount} ($date)';
+    }
+    if (term.termType == 'defer') return 'Deferred term ($date)';
+    if (name.toLowerCase().startsWith('summer')) return 'Summer term ($date)';
+    // Old snapshots did not include the university semester counter.
+    final number = terms
+        .take(index + 1)
+        .where((e) =>
+            !e.name.toLowerCase().startsWith('summer') && e.termType != 'defer')
+        .length;
+    return 'Semester $number ($date)';
+  }
+
+  final importing = false.obs;
+  final AcademicSyncService academicSync = Get.find();
+
+  Future<void> importQalamResults() async {
+    if (importing.value) return;
+    if (academicSync.data.value.results.isEmpty) {
+      if (!academicSync.canAutoSync) {
+        Get.toNamed(Routes.SETTINGS);
+        AppSnackbar.info(
+            message:
+                'Save your Qalam credentials to sync results, or open Results in the official portal.');
+        return;
+      }
+      await academicSync.syncSavedPortals();
+    }
+    final snapshot = academicSync.data.value;
+    if (snapshot.results.isEmpty) {
+      AppSnackbar.error(
+          message:
+              'No previous results found. Open Qalam Results and sync again.');
+      return;
+    }
+    final unsupported = snapshot.results
+        .expand((e) => e.courses)
+        .where((e) => e.credits != e.credits.roundToDouble())
+        .length;
+    final confirmed = await showAppConfirmationDialog(
+      context: Get.context!,
+      title: 'Import Qalam history?',
+      message:
+          '${snapshot.results.length} terms and ${snapshot.results.fold<int>(0, (n, e) => n + e.courses.length)} graded courses are ready.\n\n'
+          'Terms and courses are saved locally. Existing matching entries and your edits are kept; importing again will not duplicate them.\n\n'
+          '${unsupported == 0 ? '' : '$unsupported courses have fractional credits unsupported by this planner and will be skipped.\n\n'}'
+          'Term SGPA uses Qalam’s earned-credit basis. Planner estimates can differ from official CGPA because of repeats and university rules. The official result remains authoritative.',
+      confirmLabel: 'Import',
+      icon: Icons.download_rounded,
+    );
+    if (confirmed != true) return;
+    importing.value = true;
+    try {
+      final old = databaseController.getSemesters();
+      final merged =
+          PlannerResultImporter.mergeSemesters(old, snapshot.results);
+      await databaseController.saveSemesters(merged);
+      var courseCount = 0;
+      for (final term in snapshot.results) {
+        final existing = databaseController.getCourses(term.name);
+        final courses = PlannerResultImporter.mergeCourses(existing, term);
+        courseCount += courses.length - existing.length;
+        await databaseController.saveCourses(courses, term.name);
+      }
+      await databaseController.setData(
+          'qalamPlannerImportedAt', DateTime.now().toIso8601String());
+      loadSemesters();
+      selectedSemester.value = snapshot.results.last.name;
+      loadCourses(selectedSemester.value);
+      AppSnackbar.success(
+          message:
+              '${merged.length - old.length} terms and $courseCount courses added. Existing entries kept.');
+    } finally {
+      importing.value = false;
+    }
+  }
+
   List<String> grades = ["F", "D", "D+", "C", "C+", "B", "B+", "A"];
 
   @override
   void onInit() {
     super.onInit();
     loadSemesters();
+    selectedSemester.value = databaseController.getPlannerSemester();
+    if (databaseController.getCourses(selectedSemester.value).isEmpty &&
+        !semesters.any((e) => e.value.name == selectedSemester.value) &&
+        academicSync.data.value.results.isNotEmpty) {
+      selectedSemester.value = academicSync.data.value.results.last.name;
+    }
     loadCourses(selectedSemester.value);
   }
 
@@ -56,7 +156,7 @@ class GpaCalculationController extends GetxController {
 
   void addSemester() {
     addSemesterEntry(
-      name: semesterNames[semesters.length.clamp(0, semesterNames.length - 1)],
+      name: nextSemesterName,
       credit: 1,
       gpa: 4,
     );
@@ -156,9 +256,13 @@ class GpaCalculationController extends GetxController {
         ),
       );
 
-  double get projectedCgpa => GpaProjection.projectedCgpa(
-        currentCgpa: currentCgpa,
-        completedCredits: completedCredits,
+  double get projectedCgpa => GpaProjection.replacingTerm(
+        terms: semesters.map((e) => (
+              name: e.value.name,
+              gradePoints: e.value.gpa,
+              credits: e.value.credit.toDouble()
+            )),
+        selectedTerm: selectedSemester.value,
         plannedSgpa: plannedSgpa,
         plannedCredits: plannedCredits,
       );
@@ -207,6 +311,8 @@ class GpaCalculationController extends GetxController {
   }
 
   void loadCourses(String semester) {
+    selectedSemester.value = semester;
+    databaseController.setPlannerSemester(semester);
     var loadedCourses = databaseController.getCourses(semester);
     courses.assignAll(loadedCourses.map((c) => c.obs));
   }

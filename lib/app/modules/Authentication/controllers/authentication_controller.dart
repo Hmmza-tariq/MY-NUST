@@ -31,16 +31,17 @@ class AuthenticationController extends GetxController {
     databaseController.setBiometric(value);
   }
 
-  void toggleAutofill(bool value) {
+  Future<void> toggleAutofill(bool value) async {
     isAutofillEnabled.value = value;
-    databaseController.setAutoFill(value);
+    await databaseController.setAutoFill(value);
   }
 
-  void setCredentials(String id, String lmsPassword, String qalamPassword) {
+  Future<void> setCredentials(
+      String id, String lmsPassword, String qalamPassword) async {
     this.id.value = id;
     this.lmsPassword.value = lmsPassword;
     this.qalamPassword.value = qalamPassword;
-    databaseController.setCredentials(id, lmsPassword, qalamPassword);
+    await databaseController.setCredentials(id, lmsPassword, qalamPassword);
   }
 
   void resetSettings() {

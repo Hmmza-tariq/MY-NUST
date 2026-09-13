@@ -32,4 +32,24 @@ class GpaProjection {
         totalCredits;
     return result.clamp(0, 4);
   }
+
+  static double replacingTerm({
+    required Iterable<({String name, double gradePoints, double credits})>
+        terms,
+    required String selectedTerm,
+    required double plannedSgpa,
+    required double plannedCredits,
+  }) {
+    final remaining = terms
+        .where((e) =>
+            e.name.trim().toLowerCase() != selectedTerm.trim().toLowerCase())
+        .toList();
+    return projectedCgpa(
+      currentCgpa: weightedAverage(remaining
+          .map((e) => (gradePoints: e.gradePoints, credits: e.credits))),
+      completedCredits: remaining.fold<double>(0, (n, e) => n + e.credits),
+      plannedSgpa: plannedSgpa,
+      plannedCredits: plannedCredits,
+    );
+  }
 }

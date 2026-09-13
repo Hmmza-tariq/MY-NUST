@@ -9,6 +9,8 @@ import 'package:nust/app/resources/assets_manager.dart';
 import 'package:nust/app/routes/app_pages.dart';
 
 import '../controllers/home_controller.dart';
+import '../../../services/academic_sync_service.dart';
+import '../../widgets/academic_home_summary.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -27,7 +29,7 @@ class HomeView extends GetView<HomeController> {
                 behavior:
                     const MaterialScrollBehavior().copyWith(overscroll: false),
                 child: RefreshIndicator(
-                  onRefresh: controller.fetchStoriesInBackground,
+                  onRefresh: controller.refreshAll,
                   child: CustomScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
@@ -51,7 +53,44 @@ class HomeView extends GetView<HomeController> {
                               order: 1,
                               child: _WelcomeHeader(controller: controller),
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 16),
+                            Obx(() {
+                              final sync = Get.find<AcademicSyncService>();
+                              final data = sync.data.value;
+                              if (data.stats.cgpa == null) {
+                                if (sync.connectionBannerHidden.value) {
+                                  return const SizedBox.shrink();
+                                }
+                                return AcademicConnectionBanner(
+                                  onDismiss: sync.hideConnectionBanner,
+                                  needsCredentialUpdate:
+                                      sync.credentialsRejected.value,
+                                  message: sync.credentialsRejected.value
+                                      ? sync.statusText.value
+                                      : null,
+                                  hasCredentials: sync.canSyncQalam,
+                                  syncing: sync.isSyncing.value,
+                                  onPressed: () {
+                                    if (sync.canSyncQalam &&
+                                        !sync.credentialsRejected.value) {
+                                      sync.syncSavedPortals();
+                                    } else {
+                                      Get.toNamed(Routes.SETTINGS);
+                                    }
+                                  },
+                                );
+                              }
+                              return Padding(
+                                padding: EdgeInsets.zero,
+                                child: AcademicHomeSummary(
+                                  data: data,
+                                  syncing: sync.isSyncing.value,
+                                  onOpen: () =>
+                                      Get.toNamed(Routes.ACADEMIC_DASHBOARD),
+                                ),
+                              );
+                            }),
+                            const SizedBox(height: 16),
                             const _SectionTitle(
                               title: 'Student portals',
                               subtitle: 'Your academic services in one place',
@@ -98,6 +137,7 @@ class HomeView extends GetView<HomeController> {
                             _Entrance(
                               order: 3,
                               child: AppGlassSurface(
+                                borderRadius: 12,
                                 child: Column(
                                   children: [
                                     _HomeAction(
@@ -187,7 +227,7 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppGlassSurface(
-        borderRadius: 16,
+        borderRadius: 12,
         padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
         child: Row(
           children: [
@@ -382,14 +422,19 @@ class _WelcomeHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'MY NUST',
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        letterSpacing: 1.4,
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w800,
-                      ),
-                ),
+                Obx(() => Text(
+                      Get.find<AcademicSyncService>()
+                              .data
+                              .value
+                              .stats
+                              .greeting ??
+                          'MY NUST',
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            letterSpacing: 1.4,
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.w800,
+                          ),
+                    )),
                 const SizedBox(height: 6),
                 Text(
                   'Everything you need\nfor the semester.',
@@ -411,16 +456,10 @@ class _WelcomeHeader extends StatelessWidget {
                   controller.isLoading.value ? null : controller.fetchStories,
               icon: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
-                child: controller.isLoading.value
-                    ? const SizedBox.square(
-                        key: ValueKey('loading'),
-                        dimension: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2.5),
-                      )
-                    : const Icon(
-                        Icons.refresh_rounded,
-                        key: ValueKey('ready'),
-                      ),
+                child: const Icon(
+                  Icons.refresh_rounded,
+                  key: ValueKey('ready'),
+                ),
               ),
             ),
           ),
@@ -624,6 +663,7 @@ class _UpdatesList extends StatelessWidget {
         }
         if (stories.isEmpty) {
           return AppGlassSurface(
+            borderRadius: 12,
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [

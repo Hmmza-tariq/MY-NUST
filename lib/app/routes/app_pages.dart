@@ -20,6 +20,8 @@ import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/web/bindings/web_binding.dart';
 import '../modules/web/views/web_view.dart';
+import '../modules/academic_dashboard/bindings/academic_dashboard_binding.dart';
+import '../modules/academic_dashboard/views/academic_dashboard_view.dart';
 
 part 'app_routes.dart';
 
@@ -82,6 +84,13 @@ class AppPages {
       name: _Paths.DOWNLOADS,
       page: () => const DownloadsView(),
       binding: DownloadsBinding(),
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 300),
+    ),
+    GetPage(
+      name: _Paths.ACADEMIC_DASHBOARD,
+      page: () => const AcademicDashboardView(),
+      binding: AcademicDashboardBinding(),
       transition: Transition.fadeIn,
       transitionDuration: const Duration(milliseconds: 300),
     ),

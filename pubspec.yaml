@@ -1,7 +1,7 @@
 name: nust
 description: Nust unofficial Student app
 
-version: 3.0.0+32
+version: 3.0.1+33
 publish_to: none
 
 environment: 

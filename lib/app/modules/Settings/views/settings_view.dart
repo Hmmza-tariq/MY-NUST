@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/modules/widgets/app_page_shell.dart';
+import 'package:nust/app/services/academic_sync_service.dart';
 import 'package:nust/app/modules/widgets/app_dialog.dart';
+import 'package:nust/app/controllers/database_controller.dart';
+import 'package:nust/app/modules/widgets/portal_sync_setup_dialog.dart';
+import 'package:nust/app/modules/widgets/portal_connection_tile.dart';
 
 import '../controllers/settings_controller.dart';
 
@@ -43,19 +47,51 @@ class SettingsView extends GetView<SettingsController> {
                           : null,
                     ),
                     const Divider(height: 24),
-                    SettingSwitchButton(
-                      title: 'Autofill ID / Password',
-                      icon: Icons.password_rounded,
-                      subTitle: 'Fill saved credentials in LMS and Qalam',
-                      isSwitched:
-                          controller.authenticationController.isAutofillEnabled,
-                      onChanged: (bool value) {
-                        if (value) {
-                          addCredentials(controller);
-                        } else {
-                          controller.authenticationController.isAutofillEnabled
-                              .value = false;
+                    PortalConnectionTile(
+                      enabled: Get.find<AcademicSyncService>()
+                          .automaticEnabled
+                          .value,
+                      syncing: Get.find<AcademicSyncService>().isSyncing.value,
+                      hasCredentials: controller
+                          .authenticationController.id.value.isNotEmpty,
+                      needsAttention: Get.find<AcademicSyncService>()
+                          .credentialsRejected
+                          .value,
+                      bannerHidden: Get.find<AcademicSyncService>()
+                          .connectionBannerHidden
+                          .value,
+                      onManage: () => addCredentials(controller),
+                      onPrivacy: () async {
+                        if (await showPortalSyncSetup(context) == true &&
+                            !Get.find<AcademicSyncService>()
+                                .automaticEnabled
+                                .value) {
+                          addCredentials(controller, consentAccepted: true);
                         }
+                      },
+                      onShowBanner: () async {
+                        await Get.find<DatabaseController>()
+                            .setConnectionBannerHidden(false);
+                        Get.find<AcademicSyncService>()
+                            .connectionBannerHidden
+                            .value = false;
+                      },
+                      onChanged: (enabled) async {
+                        final auth = controller.authenticationController;
+                        final sync = Get.find<AcademicSyncService>();
+                        if (enabled) {
+                          if (auth.id.value.trim().isEmpty ||
+                              (auth.qalamPassword.value.isEmpty &&
+                                  auth.lmsPassword.value.isEmpty)) {
+                            addCredentials(controller);
+                            return;
+                          }
+                          if (await showPortalSyncSetup(context) != true) {
+                            return;
+                          }
+                        }
+                        await sync.setAutomaticSync(enabled);
+                        if (enabled) await sync.syncSavedPortals();
                       },
                     ),
                   ],
@@ -65,19 +101,29 @@ class SettingsView extends GetView<SettingsController> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  icon: const Icon(Icons.restart_alt_rounded),
-                  label: const Text('Reset settings'),
+                  icon: const Icon(Icons.delete_outline_rounded),
+                  label: const Text('Delete all saved app data'),
                   onPressed: () async {
                     final confirmed = await showAppConfirmationDialog(
                       context: context,
-                      title: 'Reset settings?',
+                      title: 'Delete all saved app data?',
                       message:
-                          'Theme, campus, saved calculator entries, and preferences will return to their defaults.',
-                      confirmLabel: 'Reset',
-                      icon: Icons.restart_alt_rounded,
+                          'Saved credentials, portal cookies, synced summaries, GPA and absolute planner entries, and preferences will be deleted. This cannot be undone. Downloaded files are kept.',
+                      confirmLabel: 'Delete data',
+                      icon: Icons.delete_outline_rounded,
                       destructive: true,
                     );
-                    if (confirmed == true) controller.resetSettings();
+                    if (confirmed == true) {
+                      try {
+                        await controller.deleteAllSavedData();
+                      } catch (_) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              content: Text(
+                                  'Could not remove all saved data. Please try again.')));
+                        }
+                      }
+                    }
                   },
                 ),
               ),
@@ -152,8 +198,15 @@ class SettingSwitchButton extends StatelessWidget {
   }
 }
 
-void addCredentials(SettingsController controller) {
+Future<void> addCredentials(SettingsController controller,
+    {bool consentAccepted = false}) async {
   final context = Get.context!;
+  if (!consentAccepted &&
+      !Get.find<AcademicSyncService>().automaticEnabled.value &&
+      await showPortalSyncSetup(context) != true) {
+    return;
+  }
+  if (!context.mounted) return;
   final idController = TextEditingController(
     text: controller.authenticationController.id.value,
   );
@@ -163,10 +216,12 @@ void addCredentials(SettingsController controller) {
   final qalamPasswordController = TextEditingController(
     text: controller.authenticationController.qalamPassword.value,
   );
+  final error = ''.obs;
+  final saving = false.obs;
   final showLms = false.obs;
   final showQalam = false.obs;
 
-  showAppSheet<void>(
+  await showAppSheet<void>(
     context: context,
     child: Obx(
       () => SingleChildScrollView(
@@ -175,7 +230,7 @@ void addCredentials(SettingsController controller) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Portal autofill',
+              'Portal connection',
               style: Theme.of(context)
                   .textTheme
                   .headlineSmall
@@ -183,7 +238,7 @@ void addCredentials(SettingsController controller) {
             ),
             const SizedBox(height: 6),
             Text(
-              'Saved credentials stay encrypted on this device and are only inserted into the selected portal.',
+              'Save your portal details on this device. Connecting enables autofill and automatic sync; you can turn both off in Settings.',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                 height: 1.45,
@@ -231,6 +286,12 @@ void addCredentials(SettingsController controller) {
                 ),
               ),
             ),
+            if (error.value.isNotEmpty)
+              Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Text(error.value,
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.error))),
             const SizedBox(height: 20),
             Row(
               children: [
@@ -243,23 +304,72 @@ void addCredentials(SettingsController controller) {
                 const SizedBox(width: 12),
                 Expanded(
                   child: FilledButton(
-                    onPressed: () {
-                      controller.authenticationController.setCredentials(
-                        idController.text.trim(),
-                        lmsPasswordController.text,
-                        qalamPasswordController.text,
-                      );
-                      controller.authenticationController.toggleAutofill(true);
-                      Get.back();
-                    },
-                    child: const Text('Save securely'),
+                    onPressed: saving.value
+                        ? null
+                        : () async {
+                            error.value = validatePortalCredentials(
+                                    idController.text,
+                                    lmsPasswordController.text,
+                                    qalamPasswordController.text) ??
+                                '';
+                            if (error.value.isNotEmpty) return;
+                            saving.value = true;
+                            try {
+                              final sync = Get.find<AcademicSyncService>();
+                              await sync.saveConnection(
+                                  idController.text.trim(),
+                                  lmsPasswordController.text,
+                                  qalamPasswordController.text);
+                              await Get.find<DatabaseController>()
+                                  .setAcademicSetupSeen();
+                              sync.credentialsRejected.value = false;
+                              Get.back();
+                              sync.syncSavedPortals();
+                            } catch (_) {
+                              error.value =
+                                  'Could not save credentials. Please try again.';
+                              saving.value = false;
+                            }
+                          },
+                    child: Text(saving.value ? 'Saving…' : 'Save & connect'),
                   ),
                 ),
               ],
             ),
+            TextButton.icon(
+                icon: const Icon(Icons.link_off_outlined),
+                label: const Text('Remove connection data'),
+                onPressed: saving.value
+                    ? null
+                    : () async {
+                        if (await showAppConfirmationDialog(
+                                context: context,
+                                title: 'Remove connection?',
+                                message:
+                                    'Saved credentials, portal cookies, and synced summaries will be removed. Planner entries and downloaded files are kept.',
+                                confirmLabel: 'Remove',
+                                destructive: true) ==
+                            true) {
+                          await Get.find<AcademicSyncService>().disconnect();
+                          Get.back();
+                        }
+                      }),
           ],
         ),
       ),
     ),
   );
+  await Future<void>.delayed(const Duration(milliseconds: 400));
+  idController.dispose();
+  lmsPasswordController.dispose();
+  qalamPasswordController.dispose();
+}
+
+String? validatePortalCredentials(
+    String id, String lmsPassword, String qalamPassword) {
+  if (id.trim().isEmpty) return 'Enter your student ID.';
+  if (lmsPassword.isEmpty && qalamPassword.isEmpty) {
+    return 'Add a Qalam or LMS password to connect.';
+  }
+  return null;
 }
