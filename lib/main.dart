@@ -16,6 +16,7 @@ import 'package:quick_actions/quick_actions.dart';
 import 'app/modules/widgets/error_widget.dart';
 import 'app/routes/app_pages.dart';
 import 'app/services/academic_sync_service.dart';
+import 'app/services/notification_service.dart';
 import 'firebase_options.dart';
 
 @pragma('vm:entry-point')
@@ -134,6 +135,7 @@ void main() async {
     );
   };
   WidgetsBinding.instance.addPostFrameCallback((_) {
+    NotificationsService().init();
     Get.find<AcademicSyncService>().syncOnOpen();
   });
 }

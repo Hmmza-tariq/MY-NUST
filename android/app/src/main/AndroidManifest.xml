@@ -1,4 +1,9 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- This app does not need broad photo/video library access. Block
+         permissions contributed by transitive plugin manifests as well. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
     <uses-permission android:name="android.permission.INTERNET"/> 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
@@ -40,7 +45,7 @@
             android:value="default_channel_id" />
         <meta-data
                 android:name="com.hexagone.mynust.default_notification_icon"
-                android:resource="@drawable/logo" />
+                android:resource="@drawable/notification_icon" />
 
         <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
             android:exported="true">
@@ -50,19 +55,12 @@
         </receiver>
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/logo" />
+            android:resource="@drawable/notification_icon" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/notification" />
 
-        <service
-            android:name="com.google.firebase.messaging.FirebaseMessagingService"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
         <provider
             android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider"
             android:authorities="${applicationId}.flutter_downloader.provider"

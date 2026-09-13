@@ -6,6 +6,7 @@ import 'package:nust/app/modules/widgets/app_dialog.dart';
 import 'package:nust/app/controllers/database_controller.dart';
 import 'package:nust/app/modules/widgets/portal_sync_setup_dialog.dart';
 import 'package:nust/app/modules/widgets/portal_connection_tile.dart';
+import 'package:nust/app/routes/app_pages.dart';
 
 import '../controllers/settings_controller.dart';
 
@@ -98,6 +99,16 @@ class SettingsView extends GetView<SettingsController> {
                 ),
               ),
               const SizedBox(height: 18),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                leading: Icon(Icons.info_outline_rounded,
+                    color: Theme.of(context).colorScheme.primary),
+                title: const Text('About My NUST'),
+                subtitle: const Text('Powered by Hexagone'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => Get.toNamed(Routes.ABOUT),
+              ),
+              const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(

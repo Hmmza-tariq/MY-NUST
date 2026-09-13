@@ -27,7 +27,7 @@
 		<key>FDAllFilesDownloadedMessage</key>
 		<string>File(s) have been downloaded</string>
 		<key>FirebaseAppDelegateProxyEnabled</key>
-		<false/>
+		<true/>
 		<key>LSRequiresIPhoneOS</key>
 		<true/>
 		<key>LSSupportsOpeningDocumentsInPlace</key>
