@@ -124,7 +124,7 @@ class StoriesController extends GetxController {
       data.add(Story(
         title: 'NUST News',
         category: 'NUST',
-        imageUrl: 'assets/images/nust_logo.png',
+        imageUrl: 'assets/images/nust-logo.png',
         link: baseUrl,
       ));
       topStories.value = data;

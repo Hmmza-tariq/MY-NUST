@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:nust/app/resources/assets_manager.dart';
 
 import '../../widgets/app_page_shell.dart';
 import '../controllers/about_controller.dart';
@@ -34,6 +35,33 @@ class AboutView extends GetView<AboutController> {
                     title: 'Privacy',
                     body:
                         'Credentials and GPA planning data are stored locally on your device. The app does not send your LMS or Qalam password to our servers.',
+                  ),
+                  const Divider(height: 32),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Image.asset(
+                        Theme.of(context).brightness == Brightness.dark
+                            ? AssetsManager.hexagoneDark
+                            : AssetsManager.hexagone,
+                        width: 40,
+                        height: 40,
+                        color: Theme.of(context).colorScheme.primary,
+                        semanticLabel: 'Hexagone logo',
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                          child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Powered by Hexagone',
+                              style: Theme.of(context).textTheme.titleMedium),
+                          const SizedBox(height: 8),
+                          const Text(
+                              'Designed and developed by Hexagone for students.'),
+                        ],
+                      )),
+                    ],
                   ),
                   const Divider(height: 32),
                   _LinkRow(

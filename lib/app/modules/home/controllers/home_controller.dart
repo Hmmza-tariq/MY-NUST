@@ -5,7 +5,6 @@ import 'package:nust/app/controllers/stories_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:nust/app/domain/portal/portal_endpoints.dart';
 import '../../../controllers/internet_controller.dart';
-import '../../../services/notification_service.dart';
 import '../../../services/academic_sync_service.dart';
 import '../../../controllers/database_controller.dart';
 import '../../../routes/app_pages.dart';
@@ -31,7 +30,6 @@ class HomeController extends GetxController {
   void onInit() {
     super.onInit();
     _initialize();
-    NotificationsService().init(Get.context!);
   }
 
   void _initialize() {
