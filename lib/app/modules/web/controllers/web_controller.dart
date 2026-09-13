@@ -11,6 +11,8 @@ import 'package:nust/app/controllers/internet_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:nust/app/domain/portal/portal_load_state.dart';
 import 'package:nust/app/domain/portal/portal_url_classifier.dart';
+import 'package:nust/app/data/academic_dashboard.dart';
+import 'package:nust/app/domain/portal/portal_snapshot_parser.dart';
 import 'package:nust/app/modules/Authentication/controllers/authentication_controller.dart';
 import 'package:nust/app/modules/widgets/custom_snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -45,6 +47,7 @@ class WebController extends GetxController {
   Timer? _slowTimer;
   Timer? _timeoutTimer;
   String _activeUrl = '';
+  bool _autoLoginSubmitted = false;
 
   @override
   void onInit() {
@@ -124,7 +127,8 @@ class WebController extends GetxController {
       pageTitle.value =
           title?.trim().isNotEmpty == true ? title!.trim() : 'Portal';
       await _installPortalBridge();
-      runJavaScriptOnPageLoad(value);
+      await runJavaScriptOnPageLoad(value);
+      await _captureAcademicSnapshot(value);
     } catch (error) {
       debugPrint('Post-load setup skipped: $error');
     }
@@ -162,6 +166,25 @@ class WebController extends GetxController {
   }
 
   Future<void> _handlePortalMessage(String value) async {
+    if (value.startsWith('{')) {
+      try {
+        final message = jsonDecode(value);
+        if (message is Map && message['type'] == 'academicSnapshot') {
+          final saved = AcademicDashboardData.fromMap(
+            databaseController.getAcademicDashboard(),
+          );
+          final updated = PortalSnapshotParser.merge(
+            current: saved,
+            url: message['url']?.toString() ?? _activeUrl,
+            markup: message['html']?.toString() ?? '',
+          );
+          await databaseController.saveAcademicDashboard(updated.toMap());
+          return;
+        }
+      } catch (error) {
+        debugPrint('Academic portal snapshot ignored: $error');
+      }
+    }
     if (value == 'print') {
       await openInBrowser(_activeUrl.isEmpty ? url : _activeUrl);
       AppSnackbar.info(
@@ -242,6 +265,28 @@ class WebController extends GetxController {
             PortalBridge.postMessage(anchor.href);
           }
         }, true);
+      })();
+    ''');
+  }
+
+  Future<void> _captureAcademicSnapshot(String value) async {
+    final uri = Uri.tryParse(value);
+    final host = uri?.host.toLowerCase() ?? '';
+    if (!host.contains('qalam.nust.edu.pk') &&
+        !host.contains('lms.nust.edu.pk')) {
+      return;
+    }
+    final path = uri?.path.toLowerCase() ?? '';
+    if (path.contains('login') || path.contains('signin')) return;
+    await webViewController?.runJavaScript(r'''
+      (function () {
+        try {
+          PortalBridge.postMessage(JSON.stringify({
+            type: 'academicSnapshot',
+            url: location.href,
+            html: document.documentElement.outerHTML
+          }));
+        } catch (_) {}
       })();
     ''');
   }
@@ -335,40 +380,59 @@ class WebController extends GetxController {
     }
   }
 
-  void runJavaScriptOnPageLoad(String value) {
+  Future<void> runJavaScriptOnPageLoad(String value) async {
     if (authenticationController.isAutofillEnabled.value) {
-      autoFillLoginDetails(value);
+      await autoFillLoginDetails(value);
     } else if (value.contains('kuickpay')) {
       kuickPayQuery();
     }
   }
 
-  void autoFillLoginDetails(String value) {
+  Future<void> autoFillLoginDetails(String value) async {
+    final path = Uri.tryParse(value)?.path.toLowerCase() ?? '';
     String? userSelector;
     String? passwordSelector;
     String? password;
     if (value.contains('lms.nust.edu.pk')) {
+      if (!path.contains('login')) return;
       userSelector = 'username';
       passwordSelector = 'password';
       password = authenticationController.lmsPassword.value;
     } else if (value.contains('qalam.nust.edu.pk')) {
+      if (!path.contains('login')) return;
       userSelector = 'login';
       passwordSelector = 'password';
       password = authenticationController.qalamPassword.value;
     }
     if (userSelector == null || passwordSelector == null) return;
-    webViewController?.runJavaScript('''
-      (function () {
-        var user = document.getElementById(${jsonEncode(userSelector)});
-        var pass = document.getElementById(${jsonEncode(passwordSelector)});
-        if (user && pass) {
-          user.value = ${jsonEncode(authenticationController.id.value)};
-          pass.value = ${jsonEncode(password)};
-          user.dispatchEvent(new Event('input', { bubbles: true }));
-          pass.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-      })();
-    ''');
+    if (_autoLoginSubmitted) return;
+    final hasPassword = password?.isNotEmpty == true;
+    debugPrint(
+      'Portal autofill ${value.contains('qalam.nust.edu.pk') ? 'Qalam' : 'LMS'}: '
+      'studentId=${authenticationController.id.value.isNotEmpty}, password=$hasPassword',
+    );
+    _autoLoginSubmitted = true;
+    final controller = webViewController;
+    if (controller == null) return;
+    for (var attempt = 0; attempt < 8; attempt++) {
+      await controller.runJavaScript('''
+        (function () {
+          var user = document.getElementById(${jsonEncode(userSelector)});
+          var pass = document.getElementById(${jsonEncode(passwordSelector)});
+          if (!user || !pass) return;
+          function setValue(input, value) {
+            input.value = value;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+          setValue(user, ${jsonEncode(authenticationController.id.value)});
+          setValue(pass, ${jsonEncode(password ?? '')});
+        })();
+      ''');
+      if (attempt < 7) {
+        await Future<void>.delayed(const Duration(milliseconds: 400));
+      }
+    }
   }
 
   void kuickPayQuery() {

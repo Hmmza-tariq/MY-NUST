@@ -13,6 +13,7 @@ class AppPageShell extends StatelessWidget {
     required this.child,
     this.subtitle,
     this.trailing,
+    this.floatingActionButton,
     this.scrollable = true,
     super.key,
   });
@@ -20,6 +21,7 @@ class AppPageShell extends StatelessWidget {
   final String title;
   final String? subtitle;
   final Widget? trailing;
+  final Widget? floatingActionButton;
   final Widget child;
   final bool scrollable;
 
@@ -72,6 +74,7 @@ class AppPageShell extends StatelessWidget {
     );
 
     return Scaffold(
+      floatingActionButton: floatingActionButton,
       body: AppBackground(
         child: SafeArea(
           child: scrollable

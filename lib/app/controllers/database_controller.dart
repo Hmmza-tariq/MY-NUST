@@ -51,18 +51,43 @@ class DatabaseController extends GetxController {
     return _sharedPref.getString('campus') ?? 'CEME';
   }
 
-  void setAutoFill(bool autoFill) {
-    _sharedPref.setBoolean('autoFill', autoFill);
+  Future<void> setAutoFill(bool autoFill) async {
+    await _sharedPref.setBoolean('autoFill', autoFill);
   }
 
   bool getAutoFill() {
     return _sharedPref.getBoolean('autoFill') ?? false;
   }
 
-  void setCredentials(String id, String lmsPassword, String qalamPassword) {
-    _sharedPref.setString('id', id);
-    _sharedPref.setString('lmsPassword', lmsPassword);
-    _sharedPref.setString('qalamPassword', qalamPassword);
+  bool getAcademicAutoSync() =>
+      _sharedPref.getBoolean('academicAutoSync') ?? false;
+  String getPlannerSemester() =>
+      _sharedPref.getString('plannerSelectedSemester') ?? 'Semester 1';
+  void setPlannerSemester(String semester) {
+    _sharedPref.setString('plannerSelectedSemester', semester);
+  }
+
+  Future<void> setAcademicAutoSync(bool enabled) async {
+    await _sharedPref.setBoolean('academicAutoSync', enabled);
+  }
+
+  bool getAcademicSetupSeen() =>
+      _sharedPref.getBoolean('academicSetupSeen') ?? false;
+  Future<void> setAcademicSetupSeen() async {
+    await _sharedPref.setBoolean('academicSetupSeen', true);
+  }
+
+  Future<void> setCredentials(
+      String id, String lmsPassword, String qalamPassword) async {
+    await _sharedPref.setString('id', id);
+    await _sharedPref.setString('lmsPassword', lmsPassword);
+    await _sharedPref.setString('qalamPassword', qalamPassword);
+  }
+
+  bool getConnectionBannerHidden() =>
+      _sharedPref.getBoolean('connectionBannerHidden') ?? false;
+  Future<void> setConnectionBannerHidden(bool value) async {
+    await _sharedPref.setBoolean('connectionBannerHidden', value);
   }
 
   Map<String, String> getCredentials() {
@@ -77,7 +102,7 @@ class DatabaseController extends GetxController {
     Map<String, dynamic> data = {
       'semesters': semesters.map((semester) => semester.toMap()).toList(),
     };
-    _sharedPref.setString('semesters', jsonEncode(data));
+    await _sharedPref.setString('semesters', jsonEncode(data));
   }
 
   List<Semester> getSemesters() {
@@ -102,7 +127,30 @@ class DatabaseController extends GetxController {
       key: courses.map((course) => course.toMap()).toList(),
     };
 
-    _sharedPref.setString(key, jsonEncode(data));
+    await _sharedPref.setString(key, jsonEncode(data));
+    final terms = getCourseTerms();
+    if (!terms.contains(semester)) {
+      terms.add(semester);
+      await _sharedPref.setString('plannerCourseTerms', jsonEncode(terms));
+    }
+  }
+
+  List<String> getCourseTerms() {
+    final stored =
+        (jsonDecode(_sharedPref.getString('plannerCourseTerms') ?? '[]')
+                as List)
+            .whereType<String>()
+            .toList();
+    // Discover old course-only planners without adding unused default terms.
+    for (final name in [
+      for (var i = 1; i <= 8; i++) 'Semester $i',
+      for (var i = 1; i <= 4; i++) 'Summer $i'
+    ]) {
+      if (!stored.contains(name) && getCourses(name).isNotEmpty) {
+        stored.add(name);
+      }
+    }
+    return stored;
   }
 
   List<Course> getCourses(String semester) {
@@ -164,5 +212,21 @@ class DatabaseController extends GetxController {
 
   Future<String> getData(String key) async {
     return _sharedPref.getString(key) ?? '';
+  }
+
+  Future<void> saveAcademicDashboard(Map<String, dynamic> value) async {
+    await _sharedPref.setString('academicDashboard', jsonEncode(value));
+  }
+
+  Map<String, dynamic> getAcademicDashboard() {
+    try {
+      final value = jsonDecode(
+        _sharedPref.getString('academicDashboard') ?? '{}',
+      );
+      return value is Map<String, dynamic> ? value : <String, dynamic>{};
+    } catch (error) {
+      debugPrint('Error reading academic dashboard: $error');
+      return <String, dynamic>{};
+    }
   }
 }

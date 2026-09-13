@@ -6,6 +6,8 @@ import '../../../routes/app_pages.dart';
 import '../../widgets/app_dialog.dart';
 import '../../widgets/app_glass_surface.dart';
 import '../../widgets/app_page_shell.dart';
+import '../../widgets/academic_sync_sheet.dart';
+import '../../widgets/gpa_impact_summary.dart';
 import '../controllers/gpa_calculation_controller.dart';
 
 class GpaCalculationView extends GetView<GpaCalculationController> {
@@ -29,6 +31,17 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                         .withValues(alpha: .96),
                     surfaceTintColor: Colors.transparent,
                     titleSpacing: 16,
+                    actions: [
+                      IconButton(
+                        tooltip: 'Sync & import results',
+                        onPressed: () => showAppSheet<void>(
+                            context: context,
+                            child: SingleChildScrollView(
+                                child:
+                                    _QalamImportCard(controller: controller))),
+                        icon: const Icon(Icons.sync_rounded),
+                      )
+                    ],
                     title: _Header(
                       onBack: () => Get.previousRoute.isEmpty
                           ? Get.offAllNamed(Routes.HOME)
@@ -86,6 +99,41 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
       );
 }
 
+class _QalamImportCard extends StatelessWidget {
+  const _QalamImportCard({required this.controller});
+  final GpaCalculationController controller;
+  @override
+  Widget build(BuildContext context) => Obx(() {
+        final sync = controller.academicSync;
+        final snapshot = sync.data.value;
+        return AcademicSyncSheet(
+          termCount: snapshot.results.length,
+          courseCount: snapshot.results
+              .fold<int>(0, (n, term) => n + term.courses.length),
+          syncedAt: snapshot.resultsSyncedAt,
+          busy: sync.isSyncing.value || controller.importing.value,
+          onImport: () {
+            Navigator.pop(context);
+            controller.importQalamResults();
+          },
+          onSync: () {
+            if (sync.canAutoSync) {
+              sync.syncSavedPortals();
+            } else {
+              Navigator.pop(context);
+              Get.toNamed(Routes.SETTINGS);
+            }
+          },
+          onOpenPortal: () {
+            Navigator.pop(context);
+            Get.toNamed(Routes.WEB, parameters: const {
+              'url': 'https://qalam.nust.edu.pk/student/results/'
+            });
+          },
+        );
+      });
+}
+
 class _PinnedPlannerHeader extends SliverPersistentHeaderDelegate {
   const _PinnedPlannerHeader({required this.child});
   final Widget child;
@@ -139,6 +187,8 @@ class _Header extends StatelessWidget {
                 ),
                 Text(
                   'Plan, adjust, and compare instantly',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: appSecondaryText(context)),
                 ),
               ],
@@ -169,7 +219,7 @@ class _CgpaPane extends StatelessWidget {
         return Column(
           children: [
             _SummaryCard(
-              title: 'Current CGPA',
+              title: 'Planner CGPA',
               value: controller.currentCgpa.toStringAsFixed(2),
               detail:
                   '${controller.completedCredits.toInt()} completed credits',
@@ -202,56 +252,61 @@ class _CgpaPane extends StatelessWidget {
 class _SgpaPane extends StatelessWidget {
   const _SgpaPane({required this.controller, super.key});
   final GpaCalculationController controller;
-
   @override
-  Widget build(BuildContext context) => Obx(() => Column(
-        children: [
-          _SemesterSelector(
-            label: 'Planning semester',
-            value: controller.selectedSemester.value,
-            values: controller.semesterNames,
-            onChanged: (value) {
-              controller.selectedSemester.value = value;
-              controller.loadCourses(value);
-            },
-          ),
-          if (controller.courses.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            _ProjectionCard(controller: controller),
-          ],
-          const SizedBox(height: 12),
+  Widget build(BuildContext context) => Obx(() {
+        final selector = _SemesterSelector(
+          label: 'Planning semester',
+          value: controller.selectedSemester.value,
+          values: controller.semesterNames,
+          displayLabel: controller.semesterLabel,
+          onChanged: (value) {
+            controller.selectedSemester.value = value;
+            controller.loadCourses(value);
+          },
+        );
+        return Column(children: [
           Expanded(
-            child: controller.courses.isEmpty
-                ? _EmptyPlanner(
-                    icon: Icons.menu_book_outlined,
-                    title: 'Plan this semester',
-                    message:
-                        'Add courses, select credit hours and choose an expected grade.',
-                    primaryLabel: 'Add course',
-                    onPrimary: () => _showAddCourseSheet(context, controller),
-                    exampleLabel: 'Use example: Calculus · 3 credits · B+',
-                    onExample: controller.loadSgpaExample,
-                  )
-                : ListView.separated(
-                    physics: const ClampingScrollPhysics(),
-                    padding: const EdgeInsets.only(bottom: 16),
-                    itemCount: controller.courses.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) => _CourseCard(
-                      controller: controller,
-                      index: index,
-                    ),
-                  ),
-          ),
+              child: controller.courses.isEmpty
+                  ? Column(children: [
+                      selector,
+                      const SizedBox(height: 12),
+                      Expanded(
+                          child: _EmptyPlanner(
+                              icon: Icons.menu_book_outlined,
+                              title: 'Plan this semester',
+                              message:
+                                  'Add courses, select credit hours and choose an expected grade.',
+                              primaryLabel: 'Add course',
+                              onPrimary: () =>
+                                  _showAddCourseSheet(context, controller),
+                              exampleLabel:
+                                  'Use example: Calculus · 3 credits · B+',
+                              onExample: controller.loadSgpaExample))
+                    ])
+                  : ListView.separated(
+                      key: ValueKey(
+                          'semester-courses-${controller.selectedSemester.value}'),
+                      physics: const ClampingScrollPhysics(),
+                      padding: const EdgeInsets.only(bottom: 16),
+                      itemCount: controller.courses.length + 2,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        if (index == 0) return selector;
+                          if (index == 1) {
+                            return _ProjectionCard(controller: controller);
+                          }
+                        return _CourseCard(
+                            controller: controller, index: index - 2);
+                      },
+                    )),
           if (controller.courses.isNotEmpty)
             _ActionBar(
-              addLabel: 'Add course',
-              calculateLabel: 'Calculate SGPA',
-              onAdd: () => _showAddCourseSheet(context, controller),
-              onCalculate: controller.calculateSGPA,
-            ),
-        ],
-      ));
+                addLabel: 'Add course',
+                calculateLabel: 'Calculate SGPA',
+                onAdd: () => _showAddCourseSheet(context, controller),
+                onCalculate: controller.calculateSGPA),
+        ]);
+      });
 }
 
 class _SemesterCard extends StatelessWidget {
@@ -269,16 +324,24 @@ class _SemesterCard extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: _SemesterSelector(
-                      label: 'Completed semester',
-                      value: semester.name,
-                      values: controller.semesterNames,
-                      onChanged: (value) {
-                        controller.semesters[index]
-                            .update((item) => item?.name = value);
-                        controller.saveSemesters();
-                      },
-                    ),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(controller.semesterLabel(semester.name),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(fontWeight: FontWeight.w700)),
+                          const SizedBox(height: 2),
+                          Text(
+                              semester.source == 'qalam'
+                                  ? 'Imported from Qalam'
+                                  : 'Your entry',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelSmall
+                                  ?.copyWith(color: appSecondaryText(context))),
+                        ]),
                   ),
                   IconButton(
                     tooltip: 'Delete semester',
@@ -449,115 +512,16 @@ class _CourseCard extends StatelessWidget {
 class _ProjectionCard extends StatelessWidget {
   const _ProjectionCard({required this.controller});
   final GpaCalculationController controller;
-
   @override
   Widget build(BuildContext context) => Obx(() {
         final hasHistory =
             controller.semesters.isNotEmpty && controller.completedCredits > 0;
-        final change = controller.projectedChange;
-        return AppGlassSurface(
-          emphasized: true,
-          padding: const EdgeInsets.all(16),
-          child: hasHistory
-              ? Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.insights_rounded,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Live CGPA impact',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall
-                                ?.copyWith(fontWeight: FontWeight.w800),
-                          ),
-                        ),
-                        _ValuePill(
-                          value: (change >= 0 ? '+' : '') +
-                              change.toStringAsFixed(2),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    Row(
-                      children: [
-                        _Metric(
-                          label: 'Current',
-                          value: controller.currentCgpa.toStringAsFixed(2),
-                        ),
-                        const Icon(Icons.arrow_forward_rounded, size: 18),
-                        _Metric(
-                          label: 'Projected',
-                          value: controller.projectedCgpa.toStringAsFixed(2),
-                        ),
-                        _Metric(
-                          label: 'SGPA',
-                          value: controller.plannedSgpa.toStringAsFixed(2),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(999),
-                      child: LinearProgressIndicator(
-                        value: (controller.plannedSgpa / 4).clamp(0, 1),
-                        minHeight: 8,
-                        backgroundColor:
-                            Theme.of(context).colorScheme.surfaceContainerHigh,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.bolt_rounded,
-                          size: 18,
-                          color: Theme.of(context).colorScheme.tertiary,
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          controller.plannedSgpa >= 3.5
-                              ? 'Strong target'
-                              : controller.plannedSgpa >= 3
-                                  ? 'On track'
-                                  : 'Room to grow',
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelLarge
-                              ?.copyWith(fontWeight: FontWeight.w800),
-                        ),
-                        const Spacer(),
-                        Text(
-                          '${(controller.plannedSgpa / 4 * 100).round()}% of 4.0',
-                          style:
-                              Theme.of(context).textTheme.labelMedium?.copyWith(
-                                    color: appSecondaryText(context),
-                                  ),
-                        ),
-                      ],
-                    ),
-                  ],
-                )
-              : Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline_rounded,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(width: 12),
-                    const Expanded(
-                      child: Text(
-                        'Add a completed CGPA semester to see the projected change.',
-                      ),
-                    ),
-                  ],
-                ),
-        );
+        return GpaImpactSummary(
+            sgpa: controller.plannedSgpa,
+            termLabel:
+                controller.semesterLabel(controller.selectedSemester.value),
+            currentCgpa: hasHistory ? controller.currentCgpa : null,
+            projectedCgpa: hasHistory ? controller.projectedCgpa : null);
       });
 }
 
@@ -840,8 +804,10 @@ class _SemesterSelector extends StatelessWidget {
     required this.value,
     required this.values,
     required this.onChanged,
+    this.displayLabel,
   });
 
+  final String Function(String)? displayLabel;
   final String label;
   final String value;
   final List<String> values;
@@ -850,78 +816,148 @@ class _SemesterSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return MenuAnchor(
-      style: MenuStyle(
-        shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        ),
+    return Material(
+      color: scheme.surfaceContainerLow,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: scheme.outlineVariant),
       ),
-      menuChildren: values
-          .map(
-            (item) => MenuItemButton(
-              leadingIcon: Icon(
-                item == value
-                    ? Icons.check_circle_rounded
-                    : Icons.circle_outlined,
-                size: 19,
-              ),
-              onPressed: () => onChanged(item),
-              child: Text(item),
-            ),
-          )
-          .toList(),
-      builder: (context, menuController, child) => Material(
-        color: scheme.surfaceContainerLow,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: BorderSide(color: scheme.outlineVariant),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () => menuController.isOpen
-              ? menuController.close()
-              : menuController.open(),
-          child: SizedBox(
-            height: 64,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: Row(
-                children: [
-                  Icon(Icons.calendar_month_outlined, color: scheme.primary),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          label,
-                          style:
-                              Theme.of(context).textTheme.labelSmall?.copyWith(
-                                    color: scheme.onSurfaceVariant,
-                                  ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          value,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                        ),
-                      ],
-                    ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () async {
+          final selected = await showAppSheet<String>(
+              context: context,
+              child: _TermPicker(
+                  values: values, selected: value, displayLabel: displayLabel));
+          if (selected != null) onChanged(selected);
+        },
+        child: SizedBox(
+          height: 64,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Row(
+              children: [
+                Icon(Icons.calendar_month_outlined, color: scheme.primary),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: scheme.onSurfaceVariant,
+                            ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        displayLabel?.call(value) ?? value,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.unfold_more_rounded, size: 20),
-                ],
-              ),
+                ),
+                const SizedBox(width: 8),
+                const Icon(Icons.chevron_right_rounded, size: 20),
+              ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _TermPicker extends StatefulWidget {
+  const _TermPicker(
+      {required this.values, required this.selected, this.displayLabel});
+  final List<String> values;
+  final String selected;
+  final String Function(String)? displayLabel;
+  @override
+  State<_TermPicker> createState() => _TermPickerState();
+}
+
+class _TermPickerState extends State<_TermPicker> {
+  String query = '';
+  @override
+  Widget build(BuildContext context) {
+    final values = widget.values
+        .where((value) => (widget.displayLabel?.call(value) ?? value)
+            .toLowerCase()
+            .contains(query.toLowerCase()))
+        .toList();
+    return SizedBox(
+      height: (MediaQuery.sizeOf(context).height -
+              MediaQuery.viewInsetsOf(context).bottom -
+              MediaQuery.paddingOf(context).vertical -
+              48) *
+          .7,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Choose a semester',
+            style: Theme.of(context).textTheme.titleLarge),
+        const SizedBox(height: 12),
+        TextField(
+            decoration: const InputDecoration(
+                hintText: 'Search semester or year',
+                prefixIcon: Icon(Icons.search_rounded)),
+            onChanged: (value) => setState(() => query = value)),
+        const SizedBox(height: 8),
+        Expanded(
+            child: values.isEmpty
+                ? const Center(child: Text('No matching semesters'))
+                : ListView.builder(
+                    itemCount: values.length,
+                    itemBuilder: (context, index) {
+                      final value = values[index];
+                      return ListTile(
+                        selected: value == widget.selected,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        title: Text(widget.displayLabel?.call(value) ?? value),
+                        trailing: value == widget.selected
+                            ? const Icon(Icons.check_rounded)
+                            : null,
+                        onTap: () => Navigator.pop(context, value),
+                      );
+                    })),
+        TextButton.icon(
+          icon: const Icon(Icons.add_rounded),
+          label: const Text('New planning semester'),
+          onPressed: () async {
+            var name = '';
+            final added = await showDialog<String>(
+                context: context,
+                builder: (context) => AlertDialog(
+                      title: const Text('New planning semester'),
+                      content: TextField(
+                          autofocus: true,
+                          maxLength: 60,
+                          decoration: const InputDecoration(
+                              labelText: 'Semester name',
+                              hintText: 'For example: Fall 2026'),
+                          onChanged: (value) => name = value.trim()),
+                      actions: [
+                        TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Cancel')),
+                        FilledButton(
+                            onPressed: () {
+                              if (name.isNotEmpty) Navigator.pop(context, name);
+                            },
+                            child: const Text('Create'))
+                      ],
+                    ));
+            if (added != null && context.mounted) Navigator.pop(context, added);
+          },
+        ),
+      ]),
     );
   }
 }
@@ -1152,8 +1188,7 @@ Future<void> _showAddSemesterSheet(
   BuildContext context,
   GpaCalculationController controller,
 ) async {
-  var name = controller.semesterNames[controller.semesters.length
-      .clamp(0, controller.semesterNames.length - 1)];
+  var name = controller.nextSemesterName;
   var credits = 18;
   var gpa = 3.0;
 
@@ -1178,19 +1213,12 @@ Future<void> _showAddSemesterSheet(
               style: TextStyle(color: appSecondaryText(context)),
             ),
             const SizedBox(height: 18),
-            DropdownButtonFormField<String>(
+            TextFormField(
               initialValue: name,
               decoration: const InputDecoration(
-                labelText: 'Semester',
-                prefixIcon: Icon(Icons.calendar_month_outlined),
-              ),
-              items: controller.semesterNames
-                  .map((item) =>
-                      DropdownMenuItem(value: item, child: Text(item)))
-                  .toList(),
-              onChanged: (value) {
-                if (value != null) setSheetState(() => name = value);
-              },
+                  labelText: 'Semester name',
+                  helperText: 'For example: Semester 2 or Summer 2026'),
+              onChanged: (value) => name = value.trim(),
             ),
             const SizedBox(height: 14),
             _StepperRow(
@@ -1220,7 +1248,7 @@ Future<void> _showAddSemesterSheet(
               child: FilledButton.icon(
                 onPressed: () {
                   controller.addSemesterEntry(
-                    name: name,
+                    name: name.isEmpty ? controller.nextSemesterName : name,
                     credit: credits,
                     gpa: gpa,
                   );
@@ -1325,54 +1353,4 @@ Future<void> _showAddCourseSheet(
     ),
   );
   nameController.dispose();
-}
-
-class _ValuePill extends StatelessWidget {
-  const _ValuePill({required this.value});
-  final String value;
-
-  @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primaryContainer,
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: Text(
-          value,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
-            fontWeight: FontWeight.w800,
-            fontFeatures: const [FontFeature.tabularFigures()],
-          ),
-        ),
-      );
-}
-
-class _Metric extends StatelessWidget {
-  const _Metric({required this.label, required this.value});
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) => Expanded(
-        child: Column(
-          children: [
-            Text(
-              value,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-                fontFeatures: const [FontFeature.tabularFigures()],
-              ),
-            ),
-            Text(
-              label,
-              style: TextStyle(
-                color: appSecondaryText(context),
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-      );
 }
