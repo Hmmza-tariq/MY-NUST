@@ -16,12 +16,6 @@ class AcademicHomeSummary extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final latest = data.results.isEmpty ? null : data.results.last;
     final synced = data.statsSyncedAt?.toLocal();
-    final risks = data.attendance.where((item) => item.meta?['atRisk'] == true);
-    final upcoming = data.deadlines
-        .where(
-            (item) => item.date != null && item.date!.isAfter(DateTime.now()))
-        .toList()
-      ..sort((a, b) => a.date!.compareTo(b.date!));
     return Card(
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -58,24 +52,6 @@ class AcademicHomeSummary extends StatelessWidget {
             ]);
           }),
           const SizedBox(height: 12),
-          if (risks.isNotEmpty || upcoming.isNotEmpty) ...[
-            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Icon(
-                  risks.isNotEmpty
-                      ? Icons.warning_amber_rounded
-                      : Icons.event_outlined,
-                  size: 18,
-                  color: risks.isNotEmpty ? scheme.error : scheme.primary),
-              const SizedBox(width: 8),
-              Expanded(
-                  child: Text(
-                      risks.isNotEmpty
-                          ? '${risks.first.title} · Attendance below 75% · Qalam'
-                          : '${upcoming.first.title} · Upcoming deadline · LMS',
-                      style: Theme.of(context).textTheme.bodySmall)),
-            ]),
-            const SizedBox(height: 8),
-          ],
           Row(children: [
             Expanded(
                 child: Text(

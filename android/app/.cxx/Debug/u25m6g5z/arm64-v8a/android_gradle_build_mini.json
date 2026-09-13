@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "/Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/hmmza/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/.cxx/Debug/u25m6g5z/arm64-v8a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/hmmza/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/.cxx/Debug/u25m6g5z/arm64-v8a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "datastore_shared_counter::@6890427a1f51a3e7e1df": {
+      "artifactName": "datastore_shared_counter",
+      "abi": "arm64-v8a",
+      "output": "/Users/hmmza/Documents/Projects/Personal/products/My-Nust/build/app/intermediates/cxx/Debug/u25m6g5z/obj/arm64-v8a/libdatastore_shared_counter.so",
+      "runtimeFiles": []
+    }
+  }
+}

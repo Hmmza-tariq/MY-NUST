@@ -5,7 +5,7 @@ Built with Flutter. Powered by Hexagone.
 
 ![My NUST — your semester, simplified](output/store/feature-1024x500.jpg)
 
-[Get it on Google Play](https://play.google.com/store/apps/details?id=com.hexagone.mynust) · [Report an issue](https://github.com/Hmmza-tariq/MY-NUST/issues)
+[Get it on Google Play](https://play.google.com/store/apps/details?id=com.hexagone.mynust) · [Website](https://mynust.web.app/) · [Report an issue](https://github.com/Hmmza-tariq/MY-NUST/issues)
 
 The app is open source. It is not affiliated with, authorized by, or endorsed by
 the National University of Sciences & Technology. NUST names, marks and portal
@@ -121,19 +121,24 @@ lib/
 Start with [architecture](docs/ARCHITECTURE.md) and
 [testing and release notes](docs/TESTING_AND_RELEASE.md) when making changes.
 
+The companion website lives in [site/](site/): a static landing page with the
+store artwork, privacy policy and terms. See [website setup](site/README.md)
+for preview and Firebase Hosting instructions.
+
 ## Privacy
 
 Portal connection is optional and requires consent. Saved credentials are kept
 in encrypted preferences on the device and used to sign in to the official
 portals; they are not sent to Hexagone servers. Academic summaries and planner
 entries are cached locally. Settings includes controls to disable the connection
-and delete saved app data.
+and delete saved app data. “Manage saved data” lets you select portal data, GPA
+entries, absolute assessments, app downloads and preferences separately.
 
 Official portals receive login requests, and Firebase services communicate with
 Google for app services such as notifications. Do not post account details,
 grades or identifiable screenshots in public issues.
 
-[Privacy policy](https://sites.google.com/view/my-nust-privacy-policy/home) · [Terms and conditions](https://sites.google.com/view/my-nust-terms-and-conditions/home)
+[Privacy policy](https://mynust.web.app/privacy/) · [Terms and conditions](https://mynust.web.app/terms/)
 
 ## Contributing
 

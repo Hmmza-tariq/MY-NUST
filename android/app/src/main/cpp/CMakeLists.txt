@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.22.1)
+project(datastore_counter LANGUAGES CXX)
+add_library(datastore_shared_counter SHARED shared/shared_counter.cc jni/androidx_datastore_core_SharedCounter.cc)
+target_compile_features(datastore_shared_counter PRIVATE cxx_std_17)
+target_link_options(datastore_shared_counter PRIVATE "-Wl,-z,max-page-size=16384")

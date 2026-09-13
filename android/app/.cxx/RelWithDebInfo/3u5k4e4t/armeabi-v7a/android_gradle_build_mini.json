@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "/Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/hmmza/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/.cxx/RelWithDebInfo/3u5k4e4t/armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/hmmza/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/.cxx/RelWithDebInfo/3u5k4e4t/armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "datastore_shared_counter::@6890427a1f51a3e7e1df": {
+      "artifactName": "datastore_shared_counter",
+      "abi": "armeabi-v7a",
+      "output": "/Users/hmmza/Documents/Projects/Personal/products/My-Nust/build/app/intermediates/cxx/RelWithDebInfo/3u5k4e4t/obj/armeabi-v7a/libdatastore_shared_counter.so",
+      "runtimeFiles": []
+    }
+  }
+}

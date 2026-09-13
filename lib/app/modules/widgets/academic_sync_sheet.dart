@@ -5,7 +5,7 @@ class AcademicSyncSheet extends StatelessWidget {
       {required this.termCount,
       required this.courseCount,
       required this.busy,
-      required this.onImport,
+      required this.onReset,
       required this.onSync,
       required this.onOpenPortal,
       this.syncedAt,
@@ -14,7 +14,7 @@ class AcademicSyncSheet extends StatelessWidget {
   final int courseCount;
   final bool busy;
   final DateTime? syncedAt;
-  final VoidCallback onImport;
+  final VoidCallback onReset;
   final VoidCallback onSync;
   final VoidCallback onOpenPortal;
 
@@ -62,7 +62,7 @@ class AcademicSyncSheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Sync & import',
+          Text('Qalam results',
               style: theme.textTheme.headlineSmall
                   ?.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 6),
@@ -78,17 +78,17 @@ class AcademicSyncSheet extends StatelessWidget {
             const SizedBox(height: 12)
           ],
           action(
-              icon: Icons.playlist_add_rounded,
-              title:
-                  termCount == 0 ? 'Connect & import' : 'Import saved results',
-              subtitle: 'Add terms and courses. Your existing edits stay safe.',
-              onTap: onImport,
+              icon: Icons.sync_rounded,
+              title: 'Sync with Qalam',
+              subtitle:
+                  'Fetch and import your history. Existing edits are kept.',
+              onTap: onSync,
               primary: true),
           action(
-              icon: Icons.sync_rounded,
-              title: 'Refresh from Qalam',
-              subtitle: 'Fetch the latest GPA and academic records.',
-              onTap: onSync),
+              icon: Icons.restart_alt_rounded,
+              title: 'Clear planner & start again',
+              subtitle: 'Delete saved semesters and courses from this device.',
+              onTap: onReset),
           action(
               icon: Icons.open_in_browser_rounded,
               title: 'Open official results',

@@ -4,6 +4,7 @@ import 'package:html/parser.dart' as html_parser;
 import '../../data/academic_dashboard.dart';
 import '../../data/academic_results.dart';
 import 'qalam_results_parser.dart';
+import 'course_gradebook_parser.dart';
 
 class PortalSnapshotParser {
   const PortalSnapshotParser._();
@@ -76,7 +77,20 @@ class PortalSnapshotParser {
     if (path == '/' || path.contains('dashboard')) {
       if (document.body?.text.contains('Academics') == true ||
           _attendancePattern.hasMatch(document.body?.text ?? '')) {
-        attendance = _parseDashboardAttendance(document);
+        attendance = _parseDashboardAttendance(document).map((item) {
+          final previous = current.attendance.where((old) =>
+              old.title == item.title &&
+              old.meta?['term'] == item.meta?['term']);
+          return AcademicItem(
+              title: item.title,
+              detail: item.detail,
+              url: item.url,
+              meta: {
+                ...?previous.firstOrNull?.meta,
+                ...?item.meta,
+                'attendanceSyncedAt': now.toIso8601String()
+              });
+        }).toList();
       }
       stats = _parseStats(document, current.stats);
       if (!identical(stats, current.stats)) statsSyncedAt = now;
@@ -99,6 +113,29 @@ class PortalSnapshotParser {
           ),
           ...parsed,
         ];
+      }
+    }
+
+    if (RegExp(r'^/student/course/gradebook/\d+/?$').hasMatch(path)) {
+      final categories = CourseGradebookParser.parse(document);
+      if (categories != null) {
+        attendance = attendance.map((item) {
+          if (Uri.tryParse(item.url ?? '')
+                  ?.path
+                  .replaceAll(RegExp(r'/$'), '') !=
+              path.replaceAll(RegExp(r'/$'), '')) {
+            return item;
+          }
+          return AcademicItem(
+              title: item.title,
+              detail: item.detail,
+              url: item.url,
+              meta: {
+                ...?item.meta,
+                'categories': categories,
+                'marksSyncedAt': now.toIso8601String()
+              });
+        }).toList();
       }
     }
 
@@ -239,6 +276,7 @@ class PortalSnapshotParser {
       result.add(AcademicItem(
         title: heading,
         detail: detail,
+        url: _gradebookUrl(element),
         meta: {
           'percent': percent,
           'atRisk': percent < 75,
@@ -251,6 +289,30 @@ class PortalSnapshotParser {
       ));
     }
     return result;
+  }
+
+  static String? _gradebookUrl(Element element) {
+    Element? enclosingLink;
+    for (Element? parent = element; parent != null; parent = parent.parent) {
+      if (parent.localName == 'a' && parent.attributes.containsKey('href')) {
+        enclosingLink = parent;
+        break;
+      }
+    }
+    for (final link in [
+      if (enclosingLink != null) enclosingLink,
+      ...element.querySelectorAll('a[href]')
+    ]) {
+      final uri = Uri.parse('https://qalam.nust.edu.pk/')
+          .resolve(link.attributes['href']!);
+      final match =
+          RegExp(r'^/student/course/(?:info|gradebook|attendance)/(\d+)/?$')
+              .firstMatch(uri.path);
+      if (uri.host == 'qalam.nust.edu.pk' && match != null) {
+        return 'https://qalam.nust.edu.pk/student/course/gradebook/${match.group(1)}';
+      }
+    }
+    return null;
   }
 
   static List<AcademicItem>? _parseInvoices(

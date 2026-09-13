@@ -45,7 +45,7 @@ class DownloadsController extends GetxController {
     return getApplicationDocumentsDirectory();
   }
 
-  Future<void> refreshFiles() async {
+  Future<void> refreshFiles({bool throwOnFailure = false}) async {
     isLoading.value = true;
     try {
       final directory = await _downloadDirectory();
@@ -62,6 +62,7 @@ class DownloadsController extends GetxController {
     } catch (error, stackTrace) {
       debugPrint('Could not read downloaded files: $error\n$stackTrace');
       AppSnackbar.error(message: 'Could not read the downloads folder');
+      if (throwOnFailure) rethrow;
     } finally {
       isLoading.value = false;
     }
@@ -153,6 +154,20 @@ class DownloadsController extends GetxController {
     } catch (error) {
       AppSnackbar.error(message: 'Could not delete ${item.name}');
     }
+  }
+
+  Future<void> deleteAllManagedFiles() async {
+    // Only files surfaced as app-managed downloads, never the public folder itself.
+    await refreshFiles(throwOnFailure: true);
+    final tasks = await FlutterDownloader.loadTasks() ?? const <DownloadTask>[];
+    for (final task in tasks) {
+      await FlutterDownloader.remove(
+          taskId: task.taskId, shouldDeleteContent: true);
+    }
+    for (final item in files.toList()) {
+      if (await item.file.exists()) await item.file.delete();
+    }
+    files.clear();
   }
 
   void browseCampusDownloads() {

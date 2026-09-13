@@ -1,0 +1,4 @@
+# ninja log v5
+0	181	1789322062303068164	CMakeFiles/datastore_shared_counter.dir/jni/androidx_datastore_core_SharedCounter.cc.o	3c9adaf8ecfc1695
+0	693	1789322062809906292	CMakeFiles/datastore_shared_counter.dir/shared/shared_counter.cc.o	d86c1c579c98a602
+695	785	1789322062908562151	/Users/hmmza/Documents/Projects/Personal/products/My-Nust/build/app/intermediates/cxx/Debug/u25m6g5z/obj/x86/libdatastore_shared_counter.so	31350c1d07116523

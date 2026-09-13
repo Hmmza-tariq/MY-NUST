@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/.cxx/Debug/u25m6g5z/armeabi-v7a",
+  "command": "/Users/hmmza/Library/Android/sdk/ndk/28.2.13676358/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=armv7-none-linux-androideabi24 --sysroot=/Users/hmmza/Library/Android/sdk/ndk/28.2.13676358/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Ddatastore_shared_counter_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security   -fno-limit-debug-info  -fPIC -o CMakeFiles/datastore_shared_counter.dir/shared/shared_counter.cc.o -c /Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/src/main/cpp/shared/shared_counter.cc",
+  "file": "/Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/src/main/cpp/shared/shared_counter.cc"
+},
+{
+  "directory": "/Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/.cxx/Debug/u25m6g5z/armeabi-v7a",
+  "command": "/Users/hmmza/Library/Android/sdk/ndk/28.2.13676358/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=armv7-none-linux-androideabi24 --sysroot=/Users/hmmza/Library/Android/sdk/ndk/28.2.13676358/toolchains/llvm/prebuilt/darwin-x86_64/sysroot -Ddatastore_shared_counter_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security   -fno-limit-debug-info  -fPIC -o CMakeFiles/datastore_shared_counter.dir/jni/androidx_datastore_core_SharedCounter.cc.o -c /Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/src/main/cpp/jni/androidx_datastore_core_SharedCounter.cc",
+  "file": "/Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/src/main/cpp/jni/androidx_datastore_core_SharedCounter.cc"
+}
+]

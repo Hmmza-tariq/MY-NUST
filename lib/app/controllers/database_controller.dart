@@ -1,6 +1,10 @@
 import 'dart:convert';
 
 import 'package:encrypt_shared_preferences/provider.dart';
+// Use the package's exact legacy key encoding for selective deletion.
+// ignore: implementation_imports
+import 'package:encrypt_shared_preferences/src/crypto/aes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -12,7 +16,7 @@ import '../data/semester.dart';
 class DatabaseController extends GetxController {
   final String key = dotenv.env['DATABASE_KEY'] ?? 'key';
   late EncryptedSharedPreferences _sharedPref;
-  final FirebaseDatabase _firebaseDatabase = FirebaseDatabase.instance;
+  late final FirebaseDatabase _firebaseDatabase = FirebaseDatabase.instance;
 
   Future<void> initialize() async {
     try {
@@ -24,11 +28,51 @@ class DatabaseController extends GetxController {
   }
 
   Future<bool> clear() async {
-    return _sharedPref.clear();
+    return (await SharedPreferences.getInstance()).clear();
+  }
+
+  Future<void> clearGpaPlanner() async {
+    await _removeSelectedKeys((key) =>
+        key.startsWith('courses-') ||
+        [
+          'semesters',
+          'plannerCourseTerms',
+          'plannerSelectedSemester',
+          'qalamPlannerImportedAt'
+        ].contains(key));
+    if (getSemesters().isNotEmpty || getCourseTerms().isNotEmpty) {
+      throw StateError('GPA planner data could not be removed');
+    }
+  }
+
+  Future<void> clearAbsolutePlanner() async {
+    await _removeSelectedKeys((key) => [
+          'absolutesAssessments',
+          'absolutesWeight1',
+          'absolutesWeight2'
+        ].contains(key));
   }
 
   void setBiometric(bool auth) {
     _sharedPref.setBoolean('biometric', auth);
+  }
+
+  // Bulk removal in the encryption package cannot handle plain plugin/cache
+  // keys in the same preferences store. Decode separately and await removals.
+  Future<void> _removeSelectedKeys(bool Function(String) matches) async {
+    final preferences = await SharedPreferences.getInstance();
+    final encryptor = AESEncryptor();
+    for (final storedKey in preferences.getKeys()) {
+      String decoded;
+      try {
+        decoded = encryptor.decrypt(key, storedKey);
+      } catch (_) {
+        continue;
+      }
+      if (matches(decoded) && !await preferences.remove(storedKey)) {
+        throw StateError('Selected saved data could not be removed');
+      }
+    }
   }
 
   bool getBiometric() {

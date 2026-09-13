@@ -1,0 +1,3 @@
+/Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/.cxx/Debug/u25m6g5z/x86_64/CMakeFiles/datastore_shared_counter.dir
+/Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/.cxx/Debug/u25m6g5z/x86_64/CMakeFiles/edit_cache.dir
+/Users/hmmza/Documents/Projects/Personal/products/My-Nust/android/app/.cxx/Debug/u25m6g5z/x86_64/CMakeFiles/rebuild_cache.dir

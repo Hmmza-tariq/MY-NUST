@@ -8,6 +8,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../controllers/database_controller.dart';
 import '../data/academic_dashboard.dart';
+import '../data/demo_academic_dashboard.dart';
 import '../domain/portal/portal_endpoints.dart';
 import '../domain/portal/portal_snapshot_parser.dart';
 import '../modules/Authentication/controllers/authentication_controller.dart';
@@ -19,6 +20,18 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
   final AuthenticationController _authentication = Get.find();
 
   final data = const AcademicDashboardData().obs;
+  final demoMode = const bool.fromEnvironment('DEMO_MODE').obs;
+
+  Future<void> setDemoMode(bool enabled) async {
+    _cancelled = true;
+    _finishPortal();
+    if (isSyncing.value) await _syncDone?.future;
+    demoMode.value = enabled;
+    reloadCache();
+    statusText.value =
+        enabled ? 'Demo data · No portal requests' : 'Demo mode off';
+  }
+
   final isSyncing = false.obs;
   final statusText = 'Not synced yet'.obs;
   final qalamAuthenticated = false.obs;
@@ -40,6 +53,7 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
   final List<String> _pendingUrls = [];
   final Set<String> _visitedUrls = {};
   Timer? _timeout;
+  bool _resultsOnly = false;
 
   @override
   void onInit() {
@@ -80,6 +94,10 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
   }
 
   Future<void> syncOnOpen() async {
+    if (demoMode.value) {
+      reloadCache();
+      return;
+    }
     if (!automaticEnabled.value || !canAutoSync || isSyncing.value) return;
     final now = DateTime.now();
     // Avoid repeated authentication when a file picker/dialog briefly resumes
@@ -98,23 +116,44 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
   }
 
   bool get canAutoSync =>
+      demoMode.value ||
       _authentication.isAutofillEnabled.value &&
-      _authentication.id.value.trim().isNotEmpty &&
-      (_authentication.qalamPassword.value.isNotEmpty ||
-          _authentication.lmsPassword.value.isNotEmpty);
+          _authentication.id.value.trim().isNotEmpty &&
+          (_authentication.qalamPassword.value.isNotEmpty ||
+              _authentication.lmsPassword.value.isNotEmpty);
 
   bool get canSyncQalam =>
+      demoMode.value ||
       _authentication.isAutofillEnabled.value &&
-      _authentication.id.value.trim().isNotEmpty &&
-      _authentication.qalamPassword.value.isNotEmpty;
+          _authentication.id.value.trim().isNotEmpty &&
+          _authentication.qalamPassword.value.isNotEmpty;
 
   void reloadCache() {
+    if (demoMode.value) {
+      data.value = createDemoDashboard();
+      return;
+    }
     data.value = AcademicDashboardData.fromMap(
       _database.getAcademicDashboard(),
     );
   }
 
-  Future<void> syncSavedPortals() async {
+  Future<void> syncSavedPortals(
+      {bool resultsOnly = false, String? courseUrl}) async {
+    if (demoMode.value) {
+      reloadCache();
+      statusText.value = 'Demo data refreshed';
+      return;
+    }
+    if (courseUrl != null) {
+      final uri = Uri.tryParse(courseUrl);
+      if (uri?.host != 'qalam.nust.edu.pk' ||
+          uri?.scheme != 'https' ||
+          !RegExp(r'^/student/course/gradebook/\d+/?$')
+              .hasMatch(uri?.path ?? '')) {
+        return;
+      }
+    }
     if (isSyncing.value) return;
     if (!canAutoSync) {
       statusText.value =
@@ -122,6 +161,7 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
       return;
     }
     _cancelled = false;
+    _resultsOnly = resultsOnly || courseUrl != null;
     _hadErrors = false;
     _failedPortals.clear();
     _qalamSignInRejected = false;
@@ -133,9 +173,16 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
       qalamAttempted.value = true;
       qalamAuthenticated.value = false;
       if (_authentication.qalamPassword.value.isNotEmpty) {
-        await _syncPortal('qalam', PortalEndpoints.qalam);
+        await _syncPortal(
+            'qalam',
+            courseUrl ??
+                (resultsOnly
+                    ? 'https://qalam.nust.edu.pk/student/results/'
+                    : PortalEndpoints.qalam));
       }
-      if (!_cancelled && _authentication.lmsPassword.value.isNotEmpty) {
+      if (!_resultsOnly &&
+          !_cancelled &&
+          _authentication.lmsPassword.value.isNotEmpty) {
         await _syncPortal('lms', PortalEndpoints.lms);
       }
       statusText.value = _cancelled
@@ -163,6 +210,11 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
     }
   }
 
+  Future<void> syncCourseGrades(String url) async {
+    if (isSyncing.value) await _syncDone?.future;
+    await syncSavedPortals(courseUrl: url);
+  }
+
   Future<void> disconnect() async {
     _cancelled = true;
     _finishPortal();
@@ -170,6 +222,9 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
     await setAutomaticSync(false);
     await _authentication.setCredentials('', '', '');
     await WebViewCookieManager().clearCookies();
+    final browser = _controller ?? WebViewController();
+    await browser.clearLocalStorage();
+    await browser.clearCache();
     await _database
         .saveAcademicDashboard(const AcademicDashboardData().toMap());
     await _database.setData('academicLastStatus', 'Not connected');
@@ -290,6 +345,7 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
   }
 
   Future<void> _discoverRelevantPages() async {
+    if (_resultsOnly) return;
     if (_portal == 'qalam') {
       if (_visitedUrls.length == 1) {
         _pendingUrls.addAll(const [

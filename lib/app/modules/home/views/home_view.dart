@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../../widgets/academic_agenda_rows.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/data/story.dart';
 import 'package:nust/app/modules/widgets/app_glass_surface.dart';
@@ -11,6 +12,7 @@ import 'package:nust/app/routes/app_pages.dart';
 import '../controllers/home_controller.dart';
 import '../../../services/academic_sync_service.dart';
 import '../../widgets/academic_home_summary.dart';
+import '../../widgets/active_course_cards.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -57,6 +59,19 @@ class HomeView extends GetView<HomeController> {
                             Obx(() {
                               final sync = Get.find<AcademicSyncService>();
                               final data = sync.data.value;
+                              if (sync.demoMode.value) {
+                                return Column(children: [
+                                  const Padding(
+                                      padding: EdgeInsets.only(bottom: 8),
+                                      child: Text(
+                                          'DEMO MODE · Sample academic data')),
+                                  AcademicHomeSummary(
+                                      data: data,
+                                      syncing: false,
+                                      onOpen: () => Get.toNamed(
+                                          Routes.ACADEMIC_DASHBOARD))
+                                ]);
+                              }
                               if (data.stats.cgpa == null) {
                                 if (sync.connectionBannerHidden.value) {
                                   return const SizedBox.shrink();
@@ -91,6 +106,50 @@ class HomeView extends GetView<HomeController> {
                               );
                             }),
                             const SizedBox(height: 16),
+                            Obx(() {
+                              final courses = Get.find<AcademicSyncService>()
+                                  .data
+                                  .value
+                                  .attendance;
+                              return courses.isEmpty
+                                  ? const SizedBox.shrink()
+                                  : Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 20),
+                                      child:
+                                          ActiveCourseCards(courses: courses));
+                            }),
+                            Obx(() => AcademicAgendaRows(
+                                data:
+                                    Get.find<AcademicSyncService>().data.value,
+                                onOpen: (item, deadline) {
+                                  final data = Get.find<AcademicSyncService>()
+                                      .data
+                                      .value;
+                                  var link = item.url;
+                                  if (!deadline &&
+                                      (link == null ||
+                                          link == '#' ||
+                                          link.trim().isEmpty)) {
+                                    for (final course in data.attendance) {
+                                      if (course.title.trim().toLowerCase() ==
+                                          item.title.trim().toLowerCase()) {
+                                        link = course.url;
+                                        break;
+                                      }
+                                    }
+                                  }
+                                  final base = Uri.parse(deadline
+                                      ? controller.lmsUrl
+                                      : controller.qalamUrl);
+                                  final target = link == null ||
+                                          link.trim().isEmpty ||
+                                          link == '#'
+                                      ? base
+                                      : base.resolve(link);
+                                  Get.toNamed(Routes.WEB,
+                                      parameters: {'url': target.toString()});
+                                })),
                             const _SectionTitle(
                               title: 'Student portals',
                               subtitle: 'Your academic services in one place',

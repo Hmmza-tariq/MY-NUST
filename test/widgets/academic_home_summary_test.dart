@@ -70,8 +70,7 @@ void main() {
     expect(opened, isTrue);
     expect(tester.takeException(), isNull);
   });
-  testWidgets(
-      'snapshot highlights a low attendance course without extra credit tiles',
+  testWidgets('snapshot does not duplicate course attendance warnings',
       (tester) async {
     await tester.pumpWidget(MaterialApp(
         home: Scaffold(
@@ -87,7 +86,7 @@ void main() {
                 syncing: false,
                 onOpen: () {}))));
     expect(
-        find.textContaining('Calculus · Attendance below 75%'), findsOneWidget);
+        find.textContaining('Calculus · Attendance below 75%'), findsNothing);
     expect(find.text('Earned credits'), findsNothing);
     expect(tester.takeException(), isNull);
   });

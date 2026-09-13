@@ -6,7 +6,10 @@ class AboutController extends GetxController {
   final ThemeController themeController = Get.find();
   String playStoreLink = dotenv.env['PLAY_STORE_LINK'] ?? '';
   String appStoreLink = dotenv.env['APP_STORE_LINK'] ?? '';
-  String privacyPolicyLink = dotenv.env['PRIVACY_POLICY_LINK'] ?? '';
-  String termsAndConditionsLink = dotenv.env['TERMS_AND_CONDITIONS_LINK'] ?? '';
+  String privacyPolicyLink = dotenv.env['PRIVACY_POLICY_LINK']?.trim() ??
+      'https://mynust.web.app/privacy/';
+  String termsAndConditionsLink =
+      dotenv.env['TERMS_AND_CONDITIONS_LINK']?.trim() ??
+          'https://mynust.web.app/terms/';
   String githubLink = dotenv.env['GITHUB_LINK'] ?? '';
 }

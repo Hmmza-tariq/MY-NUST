@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/modules/widgets/app_page_shell.dart';
 import 'package:nust/app/services/academic_sync_service.dart';
@@ -6,7 +7,8 @@ import 'package:nust/app/modules/widgets/app_dialog.dart';
 import 'package:nust/app/controllers/database_controller.dart';
 import 'package:nust/app/modules/widgets/portal_sync_setup_dialog.dart';
 import 'package:nust/app/modules/widgets/portal_connection_tile.dart';
-import 'package:nust/app/routes/app_pages.dart';
+import 'delete_data_sheet.dart';
+import 'package:nust/app/modules/widgets/custom_snackbar.dart';
 
 import '../controllers/settings_controller.dart';
 
@@ -19,6 +21,14 @@ class SettingsView extends GetView<SettingsController> {
           subtitle: 'Personalize access, appearance, and privacy.',
           child: Column(
             children: [
+              if (kDebugMode || const bool.fromEnvironment('DEMO_MODE'))
+                SwitchListTile(
+                  title: const Text('Demo mode'),
+                  subtitle: const Text(
+                      'Sample courses, marks and classes. Real data stays unchanged.'),
+                  value: Get.find<AcademicSyncService>().demoMode.value,
+                  onChanged: Get.find<AcademicSyncService>().setDemoMode,
+                ),
               AppSectionCard(
                 child: Column(
                   children: [
@@ -99,39 +109,28 @@ class SettingsView extends GetView<SettingsController> {
                 ),
               ),
               const SizedBox(height: 18),
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                leading: Icon(Icons.info_outline_rounded,
-                    color: Theme.of(context).colorScheme.primary),
-                title: const Text('About My NUST'),
-                subtitle: const Text('Powered by Hexagone'),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () => Get.toNamed(Routes.ABOUT),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.delete_outline_rounded),
-                  label: const Text('Delete all saved app data'),
-                  onPressed: () async {
-                    final confirmed = await showAppConfirmationDialog(
+              AppSectionCard(
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.delete_outline_rounded,
+                      color: Theme.of(context).colorScheme.error),
+                  title: const Text('Manage saved data'),
+                  subtitle:
+                      const Text('Choose what to delete, or reset everything'),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () async {
+                    final selected = await showAppSheet<Set<SavedDataCategory>>(
                       context: context,
-                      title: 'Delete all saved app data?',
-                      message:
-                          'Saved credentials, portal cookies, synced summaries, GPA and absolute planner entries, and preferences will be deleted. This cannot be undone. Downloaded files are kept.',
-                      confirmLabel: 'Delete data',
-                      icon: Icons.delete_outline_rounded,
-                      destructive: true,
+                      child: const DeleteDataSheet(),
                     );
-                    if (confirmed == true) {
+                    if (selected != null && selected.isNotEmpty) {
                       try {
-                        await controller.deleteAllSavedData();
+                        await controller.deleteSelectedData(selected);
                       } catch (_) {
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                              content: Text(
-                                  'Could not remove all saved data. Please try again.')));
+                          AppSnackbar.error(
+                              message:
+                                  'Could not remove all selected data. Please try again.');
                         }
                       }
                     }
