@@ -32,7 +32,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.hexagone.mynust"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -70,6 +70,14 @@ android {
     packaging {
         jniLibs {
             useLegacyPackaging = false
+            pickFirsts += ['**/libdatastore_shared_counter.so']
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+            version '3.22.1'
         }
     }
 
@@ -85,6 +93,9 @@ android {
    buildTypes {
        release {
            signingConfig = signingConfigs.release
+           minifyEnabled true
+           shrinkResources true
+           proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
        }
    }
 
@@ -95,6 +106,10 @@ flutter {
 }
 
 dependencies {
+    implementation 'androidx.core:core-ktx:1.17.0'
+    // Use the current stable native DataStore artifacts, not the plugin's older AARs.
+    implementation 'androidx.datastore:datastore:1.2.1'
+    implementation 'androidx.datastore:datastore-preferences:1.2.1'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
 }
 

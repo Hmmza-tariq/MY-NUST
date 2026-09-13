@@ -112,17 +112,13 @@ class _QalamImportCard extends StatelessWidget {
               .fold<int>(0, (n, term) => n + term.courses.length),
           syncedAt: snapshot.resultsSyncedAt,
           busy: sync.isSyncing.value || controller.importing.value,
-          onImport: () {
+          onReset: () {
             Navigator.pop(context);
-            controller.importQalamResults();
+            controller.resetPlanner();
           },
           onSync: () {
-            if (sync.canAutoSync) {
-              sync.syncSavedPortals();
-            } else {
-              Navigator.pop(context);
-              Get.toNamed(Routes.SETTINGS);
-            }
+            Navigator.pop(context);
+            controller.syncAndImportQalam();
           },
           onOpenPortal: () {
             Navigator.pop(context);
@@ -214,6 +210,10 @@ class _CgpaPane extends StatelessWidget {
             onPrimary: () => _showAddSemesterSheet(context, controller),
             exampleLabel: 'Use example: 18 credits · 3.25 GPA',
             onExample: controller.loadCgpaExample,
+            onSync: controller.syncAndImportQalam,
+            syncing: controller.academicSync.isSyncing.value ||
+                controller.importing.value,
+            syncStatus: controller.academicSync.statusText.value,
           );
         }
         return Column(
@@ -249,9 +249,53 @@ class _CgpaPane extends StatelessWidget {
       });
 }
 
-class _SgpaPane extends StatelessWidget {
+class _SgpaPane extends StatefulWidget {
   const _SgpaPane({required this.controller, super.key});
   final GpaCalculationController controller;
+  @override
+  State<_SgpaPane> createState() => _SgpaPaneState();
+}
+
+class _SgpaPaneState extends State<_SgpaPane> {
+  GpaCalculationController get controller => widget.controller;
+  final _scroll = ScrollController();
+  final _impactKey = GlobalKey();
+  final _viewportKey = GlobalKey();
+  bool _showCompact = false;
+  bool _measurementPending = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(() {
+      if (_measurementPending) return;
+      _measurementPending = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _measurementPending = false;
+        if (mounted) _updateCompact();
+      });
+    });
+  }
+
+  void _updateCompact() {
+    final card = _impactKey.currentContext?.findRenderObject() as RenderBox?;
+    final viewport =
+        _viewportKey.currentContext?.findRenderObject() as RenderBox?;
+    final hidden = card != null && viewport != null
+        ? card.localToGlobal(Offset(0, card.size.height)).dy <=
+            viewport.localToGlobal(Offset.zero).dy
+        : _scroll.hasClients && _scroll.offset > 0;
+    if (hidden != _showCompact && mounted) {
+      setState(() => _showCompact = hidden);
+    }
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) => Obx(() {
         final selector = _SemesterSelector(
@@ -260,6 +304,8 @@ class _SgpaPane extends StatelessWidget {
           values: controller.semesterNames,
           displayLabel: controller.semesterLabel,
           onChanged: (value) {
+            if (_scroll.hasClients) _scroll.jumpTo(0);
+            _showCompact = false;
             controller.selectedSemester.value = value;
             controller.loadCourses(value);
           },
@@ -281,24 +327,88 @@ class _SgpaPane extends StatelessWidget {
                                   _showAddCourseSheet(context, controller),
                               exampleLabel:
                                   'Use example: Calculus · 3 credits · B+',
-                              onExample: controller.loadSgpaExample))
+                              onExample: controller.loadSgpaExample,
+                              onSync: controller.syncAndImportQalam,
+                              syncing:
+                                  controller.academicSync.isSyncing.value ||
+                                      controller.importing.value,
+                              syncStatus:
+                                  controller.academicSync.statusText.value))
                     ])
-                  : ListView.separated(
-                      key: ValueKey(
-                          'semester-courses-${controller.selectedSemester.value}'),
-                      physics: const ClampingScrollPhysics(),
-                      padding: const EdgeInsets.only(bottom: 16),
-                      itemCount: controller.courses.length + 2,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, index) {
-                        if (index == 0) return selector;
+                  : Stack(key: _viewportKey, children: [
+                      ListView.separated(
+                        controller: _scroll,
+                        key: ValueKey(
+                            'semester-courses-${controller.selectedSemester.value}'),
+                        physics: const ClampingScrollPhysics(),
+                        padding: const EdgeInsets.only(bottom: 16),
+                        itemCount: controller.courses.length + 2,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          if (index == 0) return selector;
                           if (index == 1) {
-                            return _ProjectionCard(controller: controller);
+                            return KeyedSubtree(
+                                key: _impactKey,
+                                child: _ProjectionCard(controller: controller));
                           }
-                        return _CourseCard(
-                            controller: controller, index: index - 2);
-                      },
-                    )),
+                          return _CourseCard(
+                              controller: controller, index: index - 2);
+                        },
+                      ),
+                      if (_showCompact)
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          left: 0,
+                          child: Material(
+                            color:
+                                Theme.of(context).colorScheme.tertiaryContainer,
+                            borderRadius: BorderRadius.circular(12),
+                            clipBehavior: Clip.antiAlias,
+                            child: InkWell(
+                              onTap: () => _scroll.animateTo(0,
+                                  duration: const Duration(milliseconds: 220),
+                                  curve: Curves.easeOut),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                child: Row(children: [
+                                  Expanded(
+                                      child: Text(
+                                          'SGPA ${controller.plannedSgpa.toStringAsFixed(2)}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onTertiaryContainer,
+                                                  fontWeight:
+                                                      FontWeight.w700))),
+                                  Expanded(
+                                      child: Text(
+                                          controller.completedCredits > 0
+                                              ? 'CGPA ${controller.projectedCgpa.toStringAsFixed(2)}'
+                                              : 'No CGPA history',
+                                          textAlign: TextAlign.end,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium
+                                              ?.copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onTertiaryContainer))),
+                                  const SizedBox(width: 8),
+                                  Icon(Icons.keyboard_arrow_up_rounded,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onTertiaryContainer),
+                                ]),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ])),
           if (controller.courses.isNotEmpty)
             _ActionBar(
                 addLabel: 'Add course',
@@ -586,6 +696,9 @@ class _EmptyPlanner extends StatelessWidget {
     required this.onPrimary,
     required this.exampleLabel,
     required this.onExample,
+    required this.onSync,
+    this.syncing = false,
+    this.syncStatus = '',
   });
   final IconData icon;
   final String title;
@@ -594,62 +707,93 @@ class _EmptyPlanner extends StatelessWidget {
   final VoidCallback onPrimary;
   final String exampleLabel;
   final VoidCallback onExample;
+  final VoidCallback onSync;
+  final bool syncing;
+  final String syncStatus;
 
   @override
   Widget build(BuildContext context) => Center(
-        child: AppGlassSurface(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(20),
+        child: SingleChildScrollView(
+          child: AppGlassSurface(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 32,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
-                child: Icon(
-                  icon,
-                  size: 32,
-                  color: Theme.of(context).colorScheme.primary,
+                const SizedBox(height: 18),
+                Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleLarge
+                      ?.copyWith(fontWeight: FontWeight.w800),
                 ),
-              ),
-              const SizedBox(height: 18),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleLarge
-                    ?.copyWith(fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                message,
-                textAlign: TextAlign.center,
-                style:
-                    TextStyle(color: appSecondaryText(context), height: 1.45),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: onPrimary,
-                  icon: const Icon(Icons.add_rounded),
-                  label: Text(primaryLabel),
+                const SizedBox(height: 8),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style:
+                      TextStyle(color: appSecondaryText(context), height: 1.45),
                 ),
-              ),
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: TextButton.icon(
-                  onPressed: onExample,
-                  icon: const Icon(Icons.auto_awesome_outlined),
-                  label: Text(exampleLabel, textAlign: TextAlign.center),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: syncing ? null : onPrimary,
+                    icon: const Icon(Icons.add_rounded),
+                    label: Text(primaryLabel),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.tonalIcon(
+                    onPressed: syncing ? null : onSync,
+                    icon: syncing
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2))
+                        : const Icon(Icons.sync_rounded),
+                    label: Text(
+                        syncing ? 'Syncing with Qalam…' : 'Sync with Qalam'),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 4),
+                  child: Text(
+                      syncing
+                          ? syncStatus
+                          : 'Automatically add your previous terms and courses.',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(color: appSecondaryText(context))),
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton.icon(
+                    onPressed: syncing ? null : onExample,
+                    icon: const Icon(Icons.auto_awesome_outlined),
+                    label: Text(exampleLabel, textAlign: TextAlign.center),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );

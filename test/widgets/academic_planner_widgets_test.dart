@@ -44,12 +44,13 @@ void main() {
             termCount: 13,
             courseCount: 61,
             busy: false,
-            onImport: () => imported = true,
-            onSync: () {},
+            onReset: () {},
+            onSync: () => imported = true,
             onOpenPortal: () {})));
         expect(find.byType(Card), findsNothing);
-        expect(find.text('Import saved results'), findsOneWidget);
-        await tester.tap(find.text('Import saved results'));
+        expect(find.text('Import saved results'), findsNothing);
+        expect(find.text('Sync with Qalam'), findsOneWidget);
+        await tester.tap(find.text('Sync with Qalam'));
         expect(imported, isTrue);
         expect(tester.takeException(), isNull);
       });

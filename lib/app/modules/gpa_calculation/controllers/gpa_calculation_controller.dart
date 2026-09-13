@@ -71,7 +71,57 @@ class GpaCalculationController extends GetxController {
   final importing = false.obs;
   final AcademicSyncService academicSync = Get.find();
 
+  Future<void> syncAndImportQalam() async {
+    if (academicSync.demoMode.value) {
+      AppSnackbar.info(
+          message:
+              'Demo results are preview-only. Turn off Demo mode to import your real academic history.');
+      return;
+    }
+    if (academicSync.isSyncing.value || importing.value) return;
+    if (!academicSync.canSyncQalam) {
+      Get.toNamed(Routes.SETTINGS);
+      AppSnackbar.info(
+          message:
+              'Connect Qalam in Settings to import your academic history.');
+      return;
+    }
+    final before = academicSync.data.value.resultsSyncedAt;
+    await academicSync.syncSavedPortals(resultsOnly: true);
+    if (academicSync.credentialsRejected.value ||
+        !academicSync.qalamAuthenticated.value ||
+        academicSync.data.value.resultsSyncedAt == before) {
+      AppSnackbar.error(message: academicSync.statusText.value);
+      return;
+    }
+    await importQalamResults();
+  }
+
+  Future<void> resetPlanner() async {
+    final confirmed = await showAppConfirmationDialog(
+        context: Get.context!,
+        title: 'Start the GPA planner again?',
+        message:
+            'Delete every saved semester and course, including imported entries and your edits. Your portal connection and official university records are kept.',
+        confirmLabel: 'Delete planner',
+        icon: Icons.restart_alt_rounded,
+        destructive: true);
+    if (confirmed != true) return;
+    try {
+      await databaseController.clearGpaPlanner();
+      semesters.clear();
+      courses.clear();
+      selectedSemester.value = 'Semester 1';
+      AppSnackbar.success(
+          message: 'Planner cleared. Start fresh or sync with Qalam.');
+    } catch (_) {
+      AppSnackbar.error(
+          message: 'Could not clear the planner. Please try again.');
+    }
+  }
+
   Future<void> importQalamResults() async {
+    if (academicSync.demoMode.value) return;
     if (importing.value) return;
     if (academicSync.data.value.results.isEmpty) {
       if (!academicSync.canAutoSync) {

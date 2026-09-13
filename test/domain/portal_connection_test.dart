@@ -52,7 +52,8 @@ class MemoryAuthentication extends AuthenticationController {
 class CountingSync extends AcademicSyncService {
   int attempts = 0;
   @override
-  Future<void> syncSavedPortals() async {
+  Future<void> syncSavedPortals(
+      {bool resultsOnly = false, String? courseUrl}) async {
     attempts++;
   }
 }
@@ -61,6 +62,19 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUp(() => dotenv.loadFromString(envString: 'ENCRYPTION_KEY=fixture'));
   tearDown(Get.reset);
+  test('demo sync needs no credentials and restores cache without writes', () async {
+    Get.put<DatabaseController>(MemoryDatabase());
+    Get.put<AuthenticationController>(MemoryAuthentication());
+    final sync = Get.put(AcademicSyncService());
+    await sync.setDemoMode(true);
+    expect(sync.data.value.attendance.length, 7);
+    await sync.syncOnOpen();
+    await sync.syncSavedPortals();
+    expect(sync.isSyncing.value, isFalse);
+    expect(sync.credentialsRejected.value, isFalse);
+    await sync.setDemoMode(false);
+    expect(sync.data.value.attendance, isEmpty);
+  });
   test('connection switch persists both gates and startup sync runs', () async {
     final db = Get.put<DatabaseController>(MemoryDatabase()) as MemoryDatabase;
     final auth = Get.put<AuthenticationController>(MemoryAuthentication());

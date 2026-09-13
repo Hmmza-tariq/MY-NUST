@@ -1,6 +1,8 @@
 package com.hexagone.mynust
 
 import android.content.pm.ApplicationInfo
+import android.os.Bundle
+import androidx.core.view.WindowCompat
 import android.webkit.CookieManager
 import android.webkit.WebView
 import io.flutter.embedding.android.FlutterFragmentActivity
@@ -8,6 +10,10 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity: FlutterFragmentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        WindowCompat.enableEdgeToEdge(window)
+    }
     private val CHANNEL = "com.hexagone.mynust/webview"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {

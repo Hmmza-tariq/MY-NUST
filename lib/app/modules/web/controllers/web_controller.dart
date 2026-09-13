@@ -5,11 +5,13 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:nust/app/services/academic_sync_service.dart';
 import 'package:nust/app/controllers/database_controller.dart';
 import 'package:nust/app/controllers/download_controller.dart';
 import 'package:nust/app/controllers/internet_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
 import 'package:nust/app/domain/portal/portal_load_state.dart';
+import 'package:nust/app/domain/portal/lms_mobile_layout.dart';
 import 'package:nust/app/domain/portal/portal_url_classifier.dart';
 import 'package:nust/app/data/academic_dashboard.dart';
 import 'package:nust/app/domain/portal/portal_snapshot_parser.dart';
@@ -170,6 +172,7 @@ class WebController extends GetxController {
       try {
         final message = jsonDecode(value);
         if (message is Map && message['type'] == 'academicSnapshot') {
+          if (Get.find<AcademicSyncService>().demoMode.value) return;
           final saved = AcademicDashboardData.fromMap(
             databaseController.getAcademicDashboard(),
           );
@@ -381,6 +384,9 @@ class WebController extends GetxController {
   }
 
   Future<void> runJavaScriptOnPageLoad(String value) async {
+    if (Uri.tryParse(value)?.host == 'lms.nust.edu.pk') {
+      await webViewController?.runJavaScript(lmsMobileLayoutScript);
+    }
     if (authenticationController.isAutofillEnabled.value) {
       await autoFillLoginDetails(value);
     } else if (value.contains('kuickpay')) {
