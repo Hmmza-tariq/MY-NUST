@@ -322,7 +322,9 @@ class _CourseDetailsPageState extends State<CourseDetailsPage> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Text(refreshing
                     ? 'Fetching your official gradebook…'
-                    : 'Gradebook details aren’t available locally yet. Sync or open the official portal.')),
+                    : stamp != null
+                        ? 'No assessment results have been published yet.'
+                        : 'Gradebook details aren’t available locally yet. Sync or open the official portal.')),
           for (final category in categories)
             Card.outlined(
                 margin: const EdgeInsets.only(bottom: 12),

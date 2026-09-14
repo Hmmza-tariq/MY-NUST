@@ -3,6 +3,37 @@ import 'package:nust/app/data/academic_dashboard.dart';
 import 'package:nust/app/domain/portal/portal_snapshot_parser.dart';
 
 void main() {
+  test(
+      'nested schedule events produce one timed lecture, not a day-only duplicate',
+      () {
+    final data = PortalSnapshotParser.merge(
+        current: const AcademicDashboardData(attendance: [
+          AcademicItem(
+              title: 'Ethical Machines',
+              detail: '',
+              meta: {'instructor': 'Teacher'})
+        ]),
+        url: 'https://qalam.nust.edu.pk/student/class/schedule',
+        markup:
+            '''<div class="cd-schedule__events"><li class="cd-schedule__group">
+      <div class="cd-schedule__top-info">Monday</div>
+      <li class="cd-schedule__event"><a data-start="18:00" data-end="21:00"><em class="event-name">Teacher</em></a></li>
+      </li></div>''');
+    expect(data.timetable.length, 1);
+    expect(data.timetable.single.title, 'Ethical Machines');
+    expect(data.timetable.single.meta!['start'], '18:00');
+  });
+  test('recognized empty gradebook records a successful sync', () {
+    const url = 'https://qalam.nust.edu.pk/student/course/gradebook/123';
+    final data = PortalSnapshotParser.merge(
+        current: const AcademicDashboardData(
+            attendance: [AcademicItem(title: 'Math', detail: '', url: url)]),
+        url: url,
+        markup:
+            '<table><tr><th>Assessment Type</th><th>Obtained Percentage</th></tr></table>');
+    expect(data.attendance.single.meta!['categories'], isEmpty);
+    expect(data.attendance.single.meta!['marksSyncedAt'], isNotNull);
+  });
   test('dashboard courses inside a link retain their gradebook URL', () {
     final data = PortalSnapshotParser.merge(
         current: const AcademicDashboardData(),

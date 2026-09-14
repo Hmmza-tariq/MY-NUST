@@ -50,6 +50,7 @@ class CourseGradebookParser {
         });
       }
     }
-    return categories.isEmpty ? null : categories;
+    // A recognized, empty gradebook is a successful fetch, not a failure.
+    return categories;
   }
 }

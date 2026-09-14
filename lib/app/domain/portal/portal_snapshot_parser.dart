@@ -69,7 +69,7 @@ class PortalSnapshotParser {
             document.querySelector('.cd-schedule__event') != null ||
             RegExp(r'no (class|record)', caseSensitive: false)
                 .hasMatch(document.body?.text ?? ''))) {
-      timetable = _parseTimetable(document);
+      timetable = _parseTimetable(document, current.attendance);
     }
 
     // The dashboard contains one aggregate card per course. The attendance
@@ -184,24 +184,40 @@ class PortalSnapshotParser {
     return name.isEmpty ? null : name;
   }
 
-  static List<AcademicItem> _parseTimetable(Document document) {
+  static List<AcademicItem> _parseTimetable(
+      Document document, List<AcademicItem> courses) {
     final result = <AcademicItem>[];
     final candidates = document.querySelectorAll(
-      '.cd-schedule__event, [data-start][data-end]',
+      '[data-start][data-end]',
     );
     for (final element in candidates) {
-      final title = _clean(element.querySelector('.event-name')?.text ??
+      // Wrappers and their nested anchors describe the same lecture.
+      if (element.querySelector('[data-start][data-end]') != null) continue;
+      var title = _clean(element.attributes['data-course-name'] ??
+          element.querySelector('.course-name')?.text ??
+          element.querySelector('.event-name')?.text ??
           element.querySelector('em')?.text ??
           element.text);
       if (title.isEmpty) continue;
       final start = element.attributes['data-start'] ?? '';
       final end = element.attributes['data-end'] ?? '';
+      if (!RegExp(r'^\d{1,2}:\d{2}$').hasMatch(start.trim()) ||
+          !RegExp(r'^\d{1,2}:\d{2}$').hasMatch(end.trim())) {
+        continue;
+      }
       final day = _clean(_closestScheduleGroup(element)
               ?.querySelector('.cd-schedule__top-info')
               ?.text ??
           '');
       final time = [start, end].where((value) => value.isNotEmpty).join(' – ');
       final detail = [day, time].where((value) => value.isNotEmpty).join(' • ');
+      final matches = courses
+          .where((course) =>
+              course.meta?['instructor']?.toString().trim().toLowerCase() ==
+              title.toLowerCase())
+          .toList();
+      // Never guess a subject when one instructor teaches several courses.
+      if (matches.length == 1) title = matches.single.title;
       result.add(AcademicItem(
         title: title,
         detail: detail,
