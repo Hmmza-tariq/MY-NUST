@@ -1,4 +1,6 @@
-# My NUST
+# My NUST — Legacy Open-Source Edition
+
+> This repository preserves the legacy open-source edition of My NUST for reference. It is no longer the active feature-development repository. The published source remains available under [AGPLv3](LICENSE).
 
 An independent student app for Qalam, LMS, GPA planning and campus updates.
 Built with Flutter. Powered by Hexagone.
@@ -144,7 +146,7 @@ grades or identifiable screenshots in public issues.
 
 For a bug report, include the app version, device, steps to reproduce and what
 you expected to happen. Remove personal information from logs and screenshots.
-For a larger change, open an issue first so the scope can be discussed.
+This legacy repository is not accepting new platform feature pull requests.
 
 See [LICENSE](LICENSE) for the project's license.
 
