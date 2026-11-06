@@ -57,3 +57,5 @@ app.*.map.json
 /android/build/
 
 /temp/
+# Future product planning belongs in the private continuation.
+/Phase 2/
