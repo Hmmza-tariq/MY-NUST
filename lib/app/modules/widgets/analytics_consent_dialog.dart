@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../services/analytics_service.dart';
@@ -19,74 +18,16 @@ Future<void> showAnalyticsConsent(BuildContext context,
     await showAnalyticsDetails(context, service: analytics);
     if (analytics.needsConsent) await analytics.setEnabled(false);
   } else {
-    // Timeout, back and barrier dismissal are not affirmative consent.
+    // Back and barrier dismissal are not affirmative consent.
     await analytics.setEnabled(choice == _ConsentChoice.enable);
   }
 }
 
-class _AnalyticsLaunchPrompt extends StatefulWidget {
+class _AnalyticsLaunchPrompt extends StatelessWidget {
   const _AnalyticsLaunchPrompt();
-  @override
-  State<_AnalyticsLaunchPrompt> createState() => _AnalyticsLaunchPromptState();
-}
 
-class _AnalyticsLaunchPromptState extends State<_AnalyticsLaunchPrompt>
-    with WidgetsBindingObserver {
-  Timer? _timer;
-  int _seconds = 5;
-  bool _closing = false;
-  bool _accessible = false;
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _accessible = MediaQuery.of(context).accessibleNavigation;
-    if (_accessible) {
-      _timer?.cancel();
-    } else {
-      _startTimer();
-    }
-  }
-
-  void _startTimer() {
-    if (_accessible || _closing || _timer?.isActive == true) return;
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted || _closing) return;
-      if (_seconds <= 1) {
-        _finish(_ConsentChoice.decline);
-        return;
-      }
-      setState(() => _seconds--);
-    });
-  }
-
-  void _finish(_ConsentChoice choice) {
-    if (_closing || !mounted) return;
-    _closing = true;
-    _timer?.cancel();
-    Navigator.pop(context, choice);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _startTimer();
-    } else {
-      _timer?.cancel();
-    }
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
+  void _finish(BuildContext context, _ConsentChoice choice) =>
+      Navigator.pop(context, choice);
 
   @override
   Widget build(BuildContext context) => AlertDialog(
@@ -104,23 +45,21 @@ class _AnalyticsLaunchPromptState extends State<_AnalyticsLaunchPrompt>
                   'Credentials, grades and feedback text are excluded. No advertising.'),
               const SizedBox(height: 12),
               Text(
-                  _accessible
-                      ? 'Stays off unless you enable it. Manage this in About.'
-                      : 'Closes in ${_seconds}s · Stays off unless enabled',
+                  'Off by default. Enable only if you choose. Manage this in About.',
                   style: Theme.of(context)
                       .textTheme
                       .bodySmall
                       ?.copyWith(color: appSecondaryText(context))),
               TextButton(
-                  onPressed: () => _finish(_ConsentChoice.details),
+                  onPressed: () => _finish(context, _ConsentChoice.details),
                   child: const Text('View details')),
             ])),
         actions: [
           TextButton(
-              onPressed: () => _finish(_ConsentChoice.decline),
+              onPressed: () => _finish(context, _ConsentChoice.decline),
               child: const Text('Not now')),
           FilledButton(
-              onPressed: () => _finish(_ConsentChoice.enable),
+              onPressed: () => _finish(context, _ConsentChoice.enable),
               child: const Text('Enable analytics')),
         ],
       );

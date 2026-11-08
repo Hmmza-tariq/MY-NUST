@@ -7,6 +7,10 @@
 - Updated Android and iOS configuration for the current release and improved portal recovery, GPA, CGPA, absolute-score, and campus-selection flows.
 - Removed obsolete visual assets, generated files, and unused asset constants.
 
+## 3.0.4+41
+
+- Removed the analytics consent countdown. Analytics remains off by default until explicitly enabled; the prompt no longer closes automatically.
+
 ## 3.0.3+40
 
 - Added optional, consent-gated Firebase Analytics with Settings opt-out and validated event payloads.

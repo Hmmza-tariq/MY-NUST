@@ -33,16 +33,19 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('five-second timeout closes without consent or events',
+  testWidgets('waiting never closes the prompt or enables analytics',
       (tester) async {
     await prompt(tester);
-    expect(find.textContaining('Stays off unless enabled'), findsOneWidget);
-    await tester.pump(const Duration(seconds: 5));
+    expect(find.textContaining('Off by default'), findsOneWidget);
+    await tester.pump(const Duration(minutes: 1));
     await tester.pumpAndSettle();
-    expect(find.text('Help improve My NUST?'), findsNothing);
+    expect(find.text('Help improve My NUST?'), findsOneWidget);
     expect(service.enabled.value, false);
-    expect(service.needsConsent, false);
+    expect(service.needsConsent, true);
     expect(backend.events, isEmpty);
+    await tester.tap(find.text('Not now'));
+    await tester.pumpAndSettle();
+    expect(service.needsConsent, false);
   });
   testWidgets('explicit enable is remembered', (tester) async {
     await prompt(tester);
@@ -52,8 +55,7 @@ void main() {
     expect(service.needsConsent, false);
     expect(backend.consentCalls.last, true);
   });
-  testWidgets(
-      'opening details cancels countdown and requires an explicit enable',
+  testWidgets('opening details keeps analytics off until an explicit enable',
       (tester) async {
     await prompt(tester);
     await tester.tap(find.text('View details'));
@@ -66,7 +68,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(service.enabled.value, true);
   });
-  testWidgets('accessible navigation omits the countdown', (tester) async {
+  testWidgets('accessible navigation also keeps the prompt open',
+      (tester) async {
     await prompt(tester, accessible: true);
     await tester.pump(const Duration(seconds: 10));
     expect(find.text('Help improve My NUST?'), findsOneWidget);
@@ -75,7 +78,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(service.enabled.value, false);
   });
-  testWidgets('backgrounding pauses countdown', (tester) async {
+  testWidgets('backgrounding never enables analytics or dismisses the prompt',
+      (tester) async {
     await prompt(tester);
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
     await tester.pump(const Duration(seconds: 10));
@@ -84,7 +88,9 @@ void main() {
     await tester.pump(const Duration(seconds: 5));
     await tester.pumpAndSettle();
     expect(service.enabled.value, false);
-    expect(find.text('Help improve My NUST?'), findsNothing);
+    expect(find.text('Help improve My NUST?'), findsOneWidget);
+    await tester.tap(find.text('Not now'));
+    await tester.pumpAndSettle();
   });
   for (final brightness in Brightness.values) {
     testWidgets(
