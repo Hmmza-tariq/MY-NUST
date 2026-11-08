@@ -102,8 +102,8 @@ and capabilities in Xcode before building and testing on a physical iPhone.
 
 Firebase Messaging handles push notifications. Android token registration and
 the notification channel were checked on a Pixel, but that alone does not prove
-remote delivery. See [notification validation](docs/NOTIFICATIONS_VALIDATION.md)
-for completed checks and the remaining Android/iOS delivery tests.
+remote delivery. See [testing and release guidance](docs/TESTING_AND_RELEASE.md)
+for the validation required before a release.
 
 ## Code layout
 

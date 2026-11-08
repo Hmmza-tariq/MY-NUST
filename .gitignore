@@ -57,5 +57,15 @@ app.*.map.json
 /android/build/
 
 /temp/
-# Future product planning belongs in the private continuation.
+# Local-only internal planning.
 /Phase 2/
+
+# Native build and Firebase CLI caches must remain local.
+**/.cxx/
+.firebase/
+
+# Local signing and server credential files.
+*.p8
+*.p12
+*.mobileprovision
+**/service-account*.json
