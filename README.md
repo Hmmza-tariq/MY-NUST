@@ -136,6 +136,13 @@ entries are cached locally. Settings includes controls to disable the connection
 and delete saved app data. “Manage saved data” lets you select portal data, GPA
 entries, absolute assessments, app downloads and preferences separately.
 
+Usage analytics is optional and disabled until you accept. About lets you
+withdraw consent and reset the local analytics identifier. Custom events exclude
+credentials, student identifiers, grades, marks, attendance and feedback text.
+See [analytics implementation and release checks](docs/ANALYTICS.md) and
+[security guidance](SECURITY.md). A [Data Safety review guide](docs/DATA_SAFETY.md)
+covers the app’s separate analytics, portal and support data paths.
+
 Official portals receive login requests, and Firebase services communicate with
 Google for app services such as notifications. Do not post account details,
 grades or identifiable screenshots in public issues.

@@ -43,7 +43,7 @@ key.properties
 /build/
 /symbol/
 /assets/temp/
-# /assets/screenshots/
+/assets/screenshots/
 # Symbolication related
 app.*.symbols
 
@@ -69,3 +69,10 @@ app.*.map.json
 *.p12
 *.mobileprovision
 **/service-account*.json
+
+# Local release evidence and device captures.
+*.aab
+*.apk
+*.apks
+*.xcarchive/
+*.ipa

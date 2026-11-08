@@ -1,13 +1,14 @@
 name: nust
 description: Nust unofficial Student app
 
-version: 3.0.1+38
+version: 3.0.3+40
 publish_to: none
 
 environment: 
   sdk: '>=3.4.4 <4.0.0'
 
 dependencies:
+  crypto: ^3.0.7
   intl: ^0.20.3
   cupertino_icons: ^1.0.6
   get: 
@@ -27,7 +28,6 @@ dependencies:
   firebase_messaging: ^16.0.3
   url_launcher: ^6.3.0  
   connectivity_plus: ^7.0.0
-  app_version_update: ^6.0.0
   custom_refresh_indicator: ^4.0.1
   cached_network_image: ^3.4.1
   local_auth: ^3.0.0
@@ -52,6 +52,8 @@ dependencies:
   package_info_plus: ^8.3.1
   open_filex: ^4.7.0
   pdfrx: ^2.6.1
+  firebase_analytics: ^12.6.1
+  in_app_update: ^5.0.0
    
 
 dev_dependencies: 

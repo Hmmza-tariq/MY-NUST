@@ -1,3 +1,7 @@
+import 'package:nust/app/services/analytics_service.dart';
+import '../../widgets/analytics_consent_dialog.dart';
+import '../../../services/notification_service.dart';
+import '../../../controllers/app_update_controller.dart';
 import 'package:carousel_slider_plus/carousel_slider_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
@@ -43,7 +47,17 @@ class HomeController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    _setupAcademicSync();
+    _startup();
+  }
+
+  Future<void> _startup() async {
+    if (Get.context != null) await showAnalyticsConsent(Get.context!);
+    AnalyticsService.instance.recordLaunch();
+    if (Get.isRegistered<AppUpdateController>()) {
+      await Get.find<AppUpdateController>().start();
+    }
+    await _setupAcademicSync();
+    NotificationsService().init();
   }
 
   Future<void> _setupAcademicSync() async {

@@ -1,3 +1,4 @@
+import 'package:nust/app/services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -73,7 +74,7 @@ class AbsolutesCalculationView extends GetView<AbsolutesCalculationController> {
                               ],
                               selected: {controller.selectedType.value},
                               onSelectionChanged: (value) =>
-                                  controller.selectedType.value = value.first,
+                                  controller.switchType(value.first),
                             ),
                           ),
                           if (controller.selectedType.value == 'both') ...[
@@ -520,6 +521,9 @@ Future<void> _showAddAssessmentSheet(
   BuildContext context,
   AbsolutesCalculationController controller,
 ) async {
+  AnalyticsService.instance
+      .absAssessmentAddClick(courseType: controller.selectedType.value);
+  AnalyticsService.instance.screen('abs_add_assessment');
   final nameController = TextEditingController();
   final weightController = TextEditingController(text: '10');
   final totalController = TextEditingController(text: '10');
@@ -645,6 +649,8 @@ Future<void> _showAddAssessmentSheet(
     ),
   );
 
+  AnalyticsService.instance
+      .screen('absolute_score_${controller.selectedType.value}');
   nameController.dispose();
   weightController.dispose();
   totalController.dispose();

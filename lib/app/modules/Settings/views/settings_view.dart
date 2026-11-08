@@ -1,3 +1,6 @@
+import 'package:nust/app/services/analytics_service.dart';
+import '../../widgets/app_update_tile.dart';
+import '../../../controllers/app_update_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
@@ -109,6 +112,15 @@ class SettingsView extends GetView<SettingsController> {
                 ),
               ),
               const SizedBox(height: 18),
+              Obx(() {
+                final update = Get.find<AppUpdateController>();
+                return AppUpdateTile(
+                    checking: update.checking.value,
+                    available: update.isUpdateAvailable.value,
+                    status: update.statusText.value,
+                    onCheck: () => update.checkForUpdates(manual: true));
+              }),
+              const SizedBox(height: 18),
               AppSectionCard(
                 child: ListTile(
                   contentPadding: EdgeInsets.zero,
@@ -209,7 +221,11 @@ class SettingSwitchButton extends StatelessWidget {
 }
 
 Future<void> addCredentials(SettingsController controller,
-    {bool consentAccepted = false}) async {
+    {bool consentAccepted = false, String? source}) async {
+  source ??=
+      const ['banner', 'gpa_sync'].contains(Get.parameters['credential_source'])
+          ? Get.parameters['credential_source']
+          : 'settings';
   final context = Get.context!;
   if (!consentAccepted &&
       !Get.find<AcademicSyncService>().automaticEnabled.value &&
@@ -217,6 +233,7 @@ Future<void> addCredentials(SettingsController controller,
     return;
   }
   if (!context.mounted) return;
+  AnalyticsService.instance.screen('credentials');
   final idController = TextEditingController(
     text: controller.authenticationController.id.value,
   );
@@ -322,7 +339,13 @@ Future<void> addCredentials(SettingsController controller,
                                     lmsPasswordController.text,
                                     qalamPasswordController.text) ??
                                 '';
-                            if (error.value.isNotEmpty) return;
+                            if (error.value.isNotEmpty) {
+                              AnalyticsService.instance.credentialsSave(
+                                  status: 'fail',
+                                  errorType: 'invalid_credentials',
+                                  source: source);
+                              return;
+                            }
                             saving.value = true;
                             try {
                               final sync = Get.find<AcademicSyncService>();
@@ -334,8 +357,13 @@ Future<void> addCredentials(SettingsController controller,
                                   .setAcademicSetupSeen();
                               sync.credentialsRejected.value = false;
                               Get.back();
-                              sync.syncSavedPortals();
+                              sync.verifySavedConnection(
+                                  source: source ?? 'settings');
                             } catch (_) {
+                              AnalyticsService.instance.credentialsSave(
+                                  status: 'fail',
+                                  errorType: 'other',
+                                  source: source);
                               error.value =
                                   'Could not save credentials. Please try again.';
                               saving.value = false;
@@ -370,6 +398,7 @@ Future<void> addCredentials(SettingsController controller,
     ),
   );
   await Future<void>.delayed(const Duration(milliseconds: 400));
+  AnalyticsService.instance.screen('settings');
   idController.dispose();
   lmsPasswordController.dispose();
   qalamPasswordController.dispose();

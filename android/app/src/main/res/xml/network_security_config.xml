@@ -1,21 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <!-- Trust system and user-added certificates for all domains -->
-    <base-config cleartextTrafficPermitted="true">
+    <!-- Release connections require TLS and the platform's system trust store. -->
+    <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
-            <certificates src="user" />
         </trust-anchors>
     </base-config>
-    
-    <!-- Specific configuration for NUST domains -->
-    <domain-config cleartextTrafficPermitted="false">
-        <domain includeSubdomains="true">nust.edu.pk</domain>
-        <domain includeSubdomains="true">lms.nust.edu.pk</domain>
-        <domain includeSubdomains="true">qalam.nust.edu.pk</domain>
-        <trust-anchors>
-            <certificates src="system" />
-            <certificates src="user" />
-        </trust-anchors>
-    </domain-config>
 </network-security-config>

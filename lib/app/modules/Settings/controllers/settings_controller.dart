@@ -1,3 +1,4 @@
+import 'package:nust/app/services/analytics_service.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/modules/Authentication/controllers/authentication_controller.dart';
 import 'package:nust/app/controllers/theme_controller.dart';
@@ -40,6 +41,7 @@ class SettingsController extends GetxController {
       Get.delete<AbsolutesCalculationController>(force: true);
     }
     if (selected.contains(SavedDataCategory.preferences)) {
+      await AnalyticsService.instance.setEnabled(false);
       database.setCampus('CEME');
       database.setBiometric(false);
       database.setDarkMode(false);
@@ -60,10 +62,12 @@ class SettingsController extends GetxController {
     final sync = Get.find<AcademicSyncService>();
     await sync.disconnect();
     final database = Get.find<DatabaseController>();
+    await AnalyticsService.instance.setEnabled(false);
     if (!await database.clear()) {
       throw StateError('Could not clear local app data');
     }
     await (await SharedPreferences.getInstance()).clear();
+    await AnalyticsService.instance.setEnabled(false);
     final stories = Get.find<StoriesController>();
     stories.topStories.clear();
     stories.selectedCampus.value = database.getCampus();

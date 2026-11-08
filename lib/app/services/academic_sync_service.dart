@@ -1,3 +1,4 @@
+import 'package:nust/app/services/analytics_service.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -44,6 +45,8 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
   bool _hadErrors = false;
   final Set<String> _failedPortals = {};
   bool _qalamSignInRejected = false;
+  final Set<String> _authenticatedPortals = {};
+  String syncErrorType = 'other';
   Completer<void>? _syncDone;
 
   WebViewController? _controller;
@@ -70,6 +73,10 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
     await _authentication.toggleAutofill(enabled);
     automaticEnabled.value = enabled;
     await _database.setAcademicAutoSync(enabled);
+    AnalyticsService.instance.settingToggle(
+        settingName: 'portal_connection', newValue: enabled ? 'on' : 'off');
+    AnalyticsService.instance
+        .property('portal_connected', (enabled && canAutoSync).toString());
     if (!enabled) {
       _cancelled = true;
       _finishPortal();
@@ -79,6 +86,8 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
   Future<void> hideConnectionBanner() async {
     await _database.setConnectionBannerHidden(true);
     connectionBannerHidden.value = true;
+    AnalyticsService.instance.credBannerDismiss(dismissType: 'dont_show_again');
+    AnalyticsService.instance.property('cred_banner_dismissed', 'true');
   }
 
   Future<void> saveConnection(
@@ -91,6 +100,23 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
     await setAutomaticSync(true);
     credentialsRejected.value = false;
     _lastOpenSync = null;
+  }
+
+  Future<void> verifySavedConnection({required String source}) async {
+    if (isSyncing.value) await _syncDone?.future;
+    await syncSavedPortals();
+    final success = !_cancelled &&
+        !credentialsRejected.value &&
+        (_authentication.qalamPassword.value.isEmpty ||
+            _authenticatedPortals.contains('qalam')) &&
+        (_authentication.lmsPassword.value.isEmpty ||
+            _authenticatedPortals.contains('lms'));
+    AnalyticsService.instance.credentialsSave(
+        status: success ? 'success' : 'fail',
+        source: source,
+        errorType: success ? null : syncErrorType);
+    AnalyticsService.instance.property('credentials_added', 'true');
+    AnalyticsService.instance.property('portal_connected', success.toString());
   }
 
   Future<void> syncOnOpen() async {
@@ -164,6 +190,8 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
     _resultsOnly = resultsOnly || courseUrl != null;
     _hadErrors = false;
     _failedPortals.clear();
+    _authenticatedPortals.clear();
+    syncErrorType = 'other';
     _qalamSignInRejected = false;
     credentialsRejected.value = false;
     _syncDone = Completer<void>();
@@ -199,7 +227,7 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
                       ? '${_failedPortals.map((p) => p == 'qalam' ? 'Qalam' : 'LMS').join(' and ')} could not fully sync. Cached summaries are kept. Open the official portal or retry.'
                       : 'Sync complete';
     } catch (error) {
-      debugPrint('Background academic sync stopped: $error');
+      debugPrint('Background academic sync stopped.');
       statusText.value = 'Open a portal to finish connecting';
     } finally {
       _timeout?.cancel();
@@ -220,6 +248,8 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
     _finishPortal();
     if (isSyncing.value) await _syncDone?.future;
     await setAutomaticSync(false);
+    AnalyticsService.instance.property('portal_connected', 'false');
+    AnalyticsService.instance.property('credentials_added', 'false');
     await _authentication.setCredentials('', '', '');
     await WebViewCookieManager().clearCookies();
     final browser = _controller ?? WebViewController();
@@ -253,6 +283,9 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
         onWebResourceError: (error) {
           if (identical(_controller, controller) &&
               error.isForMainFrame != false) {
+            syncErrorType = 'network';
+            AnalyticsService.instance
+                .portalError(portal: _portal, errorType: 'network');
             _hadErrors = true;
             _failedPortals.add(_portal);
             _finishPortal();
@@ -283,6 +316,9 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
         }
         _hadErrors = true;
         credentialsRejected.value = true;
+        syncErrorType = 'invalid_credentials';
+        AnalyticsService.instance
+            .portalError(portal: _portal, errorType: 'login_failed');
         if (_portal == 'qalam') _qalamSignInRejected = true;
         statusText.value =
             '${_portal == 'qalam' ? 'Qalam' : 'LMS'} sign-in failed. Update the saved credentials.';
@@ -294,6 +330,7 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
       return;
     }
 
+    _authenticatedPortals.add(_portal);
     if (_portal == 'qalam') {
       qalamAuthenticated.value = true;
     }
@@ -328,7 +365,10 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
     } catch (error) {
       _hadErrors = true;
       _failedPortals.add(_portal);
-      debugPrint('Academic page capture failed: $error');
+      syncErrorType = 'parse_error';
+      AnalyticsService.instance
+          .portalError(portal: _portal, errorType: 'page_changed');
+      debugPrint('Academic page capture failed.');
     }
     await _openNextPageOrFinish();
   }
@@ -446,6 +486,9 @@ class AcademicSyncService extends GetxService with WidgetsBindingObserver {
   }
 
   void _onTimeout() {
+    syncErrorType = 'timeout';
+    AnalyticsService.instance
+        .portalError(portal: _portal, errorType: 'timeout');
     _hadErrors = true;
     _failedPortals.add(_portal);
     _finishPortal();

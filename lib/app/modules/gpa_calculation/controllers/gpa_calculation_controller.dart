@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'package:nust/app/services/analytics_service.dart';
 
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +24,15 @@ class GpaCalculationController extends GetxController {
   ScrollController scrollController = ScrollController();
   ScreenshotController screenshotController = ScreenshotController();
   var isCGPA = true.obs;
+  String _inputMethod = 'manual';
+  void switchTab(bool cgpa) {
+    if (isCGPA.value == cgpa) return;
+    isCGPA.value = cgpa;
+    AnalyticsService.instance.gpaTabSwitch(tab: cgpa ? 'cgpa' : 'sgpa');
+    AnalyticsService.instance
+        .screen(cgpa ? 'gpa_planner_cgpa' : 'gpa_planner_sgpa');
+  }
+
   var semesters = <Rx<Semester>>[].obs;
   var courses = <Rx<Course>>[].obs;
   var selectedSemester = "Semester 1".obs;
@@ -72,6 +81,8 @@ class GpaCalculationController extends GetxController {
   final AcademicSyncService academicSync = Get.find();
 
   Future<void> syncAndImportQalam() async {
+    AnalyticsService.instance.qalamSyncStart(
+        source: 'gpa_planner', credentialsAdded: academicSync.canSyncQalam);
     if (academicSync.demoMode.value) {
       AppSnackbar.info(
           message:
@@ -80,14 +91,24 @@ class GpaCalculationController extends GetxController {
     }
     if (academicSync.isSyncing.value || importing.value) return;
     if (!academicSync.canSyncQalam) {
-      Get.toNamed(Routes.SETTINGS);
+      Get.toNamed(Routes.SETTINGS,
+          parameters: {'credential_source': 'gpa_sync'});
       AppSnackbar.info(
           message:
               'Connect Qalam in Settings to import your academic history.');
       return;
     }
     final before = academicSync.data.value.resultsSyncedAt;
+    final clock = Stopwatch()..start();
     await academicSync.syncSavedPortals(resultsOnly: true);
+    final success = !academicSync.credentialsRejected.value &&
+        academicSync.qalamAuthenticated.value &&
+        academicSync.data.value.resultsSyncedAt != before;
+    AnalyticsService.instance.qalamSyncComplete(
+        status: success ? 'success' : 'fail',
+        errorType: success ? null : academicSync.syncErrorType,
+        semestersSynced: success ? academicSync.data.value.results.length : 0,
+        durationMs: clock.elapsedMilliseconds);
     if (academicSync.credentialsRejected.value ||
         !academicSync.qalamAuthenticated.value ||
         academicSync.data.value.resultsSyncedAt == before) {
@@ -125,7 +146,8 @@ class GpaCalculationController extends GetxController {
     if (importing.value) return;
     if (academicSync.data.value.results.isEmpty) {
       if (!academicSync.canAutoSync) {
-        Get.toNamed(Routes.SETTINGS);
+        Get.toNamed(Routes.SETTINGS,
+            parameters: {'credential_source': 'gpa_sync'});
         AppSnackbar.info(
             message:
                 'Save your Qalam credentials to sync results, or open Results in the official portal.');
@@ -171,6 +193,7 @@ class GpaCalculationController extends GetxController {
       }
       await databaseController.setData(
           'qalamPlannerImportedAt', DateTime.now().toIso8601String());
+      _inputMethod = 'qalam_sync';
       loadSemesters();
       selectedSemester.value = snapshot.results.last.name;
       loadCourses(selectedSemester.value);
@@ -218,6 +241,8 @@ class GpaCalculationController extends GetxController {
     required double gpa,
   }) {
     semesters.add(Semester(name: name, credit: credit, gpa: gpa).obs);
+    _inputMethod = 'manual';
+    AnalyticsService.instance.cgpaSemesterAdd(semesterCount: semesters.length);
     saveSemesters();
   }
 
@@ -243,6 +268,8 @@ class GpaCalculationController extends GetxController {
       semesterId: semesterId,
     ).obs);
     saveCourses();
+    AnalyticsService.instance
+        .sgpaCourseAdd(courseCount: courses.length, creditHours: credit);
   }
 
   void loadCgpaExample() {
@@ -264,17 +291,29 @@ class GpaCalculationController extends GetxController {
 
   void calculateCGPA() {
     if (semesters.isEmpty || completedCredits == 0) {
+      AnalyticsService.instance.cgpaCalculate(
+          semesterCount: semesters.length,
+          inputMethod: _inputMethod,
+          status: 'validation_error');
       AppSnackbar.error(message: 'Add at least one semester first');
       return;
     }
+    AnalyticsService.instance.cgpaCalculate(
+        semesterCount: semesters.length,
+        inputMethod: _inputMethod,
+        status: 'success');
     showResult(true, currentCgpa, 0);
   }
 
   void calculateSGPA() {
     if (courses.isEmpty || plannedCredits == 0) {
+      AnalyticsService.instance.sgpaCalculate(
+          courseCount: courses.length, status: 'validation_error');
       AppSnackbar.error(message: 'Add at least one course first');
       return;
     }
+    AnalyticsService.instance
+        .sgpaCalculate(courseCount: courses.length, status: 'success');
     showResult(false, plannedSgpa, plannedCredits.toInt());
   }
 
@@ -341,6 +380,8 @@ class GpaCalculationController extends GetxController {
 
     saveSemesters();
 
+    _inputMethod = 'from_sgpa';
+    AnalyticsService.instance.sgpaAddToCgpa(courseCount: courses.length);
     AppSnackbar.success(
       message: 'SGPA added to CGPA calculator',
     );
@@ -446,17 +487,37 @@ class GpaCalculationController extends GetxController {
   }
 
   Future<bool> captureScreenShot(String type) async {
-    await screenshotController
-        .capture(delay: const Duration(milliseconds: 10))
-        .then((Uint8List? image) async {
+    void record(String status) {
+      if (type == 'CGPA') {
+        AnalyticsService.instance
+            .cgpaDownloadImage(semesterCount: semesters.length, status: status);
+      }
+    }
+
+    File imagePath;
+    try {
+      final image = await screenshotController.capture(
+          delay: const Duration(milliseconds: 10));
+      if (image == null) throw StateError('Image unavailable');
       final directory = await getApplicationDocumentsDirectory();
-      final imagePath = await File('${directory.path}/image.png').create();
-      await imagePath.writeAsBytes(image!);
+      imagePath = File('${directory.path}/image.png');
+      await imagePath.writeAsBytes(image);
+      record('success');
+    } catch (_) {
+      record('fail');
+      AppSnackbar.error(
+          message: 'Could not save the result image. Please try again.');
+      return false;
+    }
+    try {
       await SharePlus.instance.share(ShareParams(
           files: [XFile(imagePath.path)],
           text:
-              "Hey! Check this out. I calculated my expected $type using 'My NUST' app."));
-    });
+              'Hey! Check this out. I calculated my expected $type using My NUST.'));
+    } catch (_) {
+      AppSnackbar.info(
+          message: 'Image saved locally, but sharing is unavailable.');
+    }
     return true;
   }
 }

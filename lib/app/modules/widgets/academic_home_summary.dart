@@ -1,3 +1,4 @@
+import 'package:nust/app/services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import '../../data/academic_dashboard.dart';
 
@@ -69,7 +70,7 @@ class AcademicHomeSummary extends StatelessWidget {
   }
 }
 
-class AcademicConnectionBanner extends StatelessWidget {
+class AcademicConnectionBanner extends StatefulWidget {
   const AcademicConnectionBanner(
       {required this.hasCredentials,
       required this.syncing,
@@ -85,7 +86,34 @@ class AcademicConnectionBanner extends StatelessWidget {
   final String? message;
   final bool needsCredentialUpdate;
   @override
+  State<AcademicConnectionBanner> createState() =>
+      _AcademicConnectionBannerState();
+}
+
+class _AcademicConnectionBannerState extends State<AcademicConnectionBanner> {
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.instance.enabled.addListener(_impression);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _impression());
+  }
+
+  void _impression() {
+    if (mounted) AnalyticsService.instance.bannerView();
+  }
+
+  @override
+  void dispose() {
+    AnalyticsService.instance.enabled.removeListener(_impression);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final hasCredentials = widget.hasCredentials, syncing = widget.syncing;
+    final onPressed = widget.onPressed, onDismiss = widget.onDismiss;
+    final message = widget.message,
+        needsCredentialUpdate = widget.needsCredentialUpdate;
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     return Material(
@@ -120,7 +148,9 @@ class AcademicConnectionBanner extends StatelessWidget {
                 if (onDismiss != null)
                   PopupMenuButton<String>(
                     tooltip: 'Banner options',
-                    onSelected: (_) => onDismiss!(),
+                    onOpened: () => AnalyticsService.instance
+                        .credBannerMenuOpen(placement: 'home'),
+                    onSelected: (_) => onDismiss(),
                     itemBuilder: (_) => const [
                       PopupMenuItem(
                           value: 'hide', child: Text('Don’t show again'))
@@ -131,7 +161,13 @@ class AcademicConnectionBanner extends StatelessWidget {
               Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                      onPressed: syncing ? null : onPressed,
+                      onPressed: syncing
+                          ? null
+                          : () {
+                              AnalyticsService.instance
+                                  .credBannerClick(placement: 'home');
+                              onPressed();
+                            },
                       child: Text(syncing
                           ? 'Syncing…'
                           : needsCredentialUpdate

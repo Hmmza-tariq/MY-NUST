@@ -1,3 +1,7 @@
+import 'package:nust/app/services/analytics_service.dart';
+import '../../../services/analytics_navigation_observer.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/academic_agenda_rows.dart';
@@ -90,7 +94,10 @@ class HomeView extends GetView<HomeController> {
                                         !sync.credentialsRejected.value) {
                                       sync.syncSavedPortals();
                                     } else {
-                                      Get.toNamed(Routes.SETTINGS);
+                                      openFeature(Routes.SETTINGS, 'settings',
+                                          parameters: {
+                                            'credential_source': 'banner'
+                                          });
                                     }
                                   },
                                 );
@@ -164,8 +171,9 @@ class HomeView extends GetView<HomeController> {
                                       title: 'LMS',
                                       subtitle: 'Courses & assignments',
                                       icon: Icons.school_rounded,
-                                      onTap: () => Get.toNamed(
+                                      onTap: () => openFeature(
                                         Routes.WEB,
+                                        'lms',
                                         parameters: {'url': controller.lmsUrl},
                                       ),
                                     ),
@@ -176,8 +184,9 @@ class HomeView extends GetView<HomeController> {
                                       title: 'Qalam',
                                       subtitle: 'Records & invoices',
                                       icon: Icons.account_balance_rounded,
-                                      onTap: () => Get.toNamed(
+                                      onTap: () => openFeature(
                                         Routes.WEB,
+                                        'qalam',
                                         parameters: {
                                           'url': controller.qalamUrl
                                         },
@@ -204,8 +213,9 @@ class HomeView extends GetView<HomeController> {
                                       title: 'GPA planner',
                                       subtitle:
                                           'Project SGPA and its live CGPA impact',
-                                      onTap: () =>
-                                          Get.toNamed(Routes.GPA_CALCULATION),
+                                      onTap: () => openFeature(
+                                          Routes.GPA_CALCULATION,
+                                          'gpa_planner'),
                                     ),
                                     const Divider(height: 1),
                                     _HomeAction(
@@ -213,8 +223,9 @@ class HomeView extends GetView<HomeController> {
                                       title: 'Absolute score',
                                       subtitle:
                                           'Estimate your course performance',
-                                      onTap: () => Get.toNamed(
+                                      onTap: () => openFeature(
                                         Routes.ABSOLUTES_CALCULATION,
+                                        'absolute_score',
                                       ),
                                     ),
                                   ],
@@ -234,7 +245,8 @@ class HomeView extends GetView<HomeController> {
                                     child: _UtilityButton(
                                       label: 'Settings',
                                       icon: Icons.tune_rounded,
-                                      onTap: () => Get.toNamed(Routes.SETTINGS),
+                                      onTap: () => openFeature(
+                                          Routes.SETTINGS, 'settings'),
                                     ),
                                   ),
                                   const SizedBox(width: 10),
@@ -242,7 +254,8 @@ class HomeView extends GetView<HomeController> {
                                     child: _UtilityButton(
                                       label: 'Help',
                                       icon: Icons.help_outline_rounded,
-                                      onTap: () => Get.toNamed(Routes.HELP),
+                                      onTap: () =>
+                                          openFeature(Routes.HELP, 'help'),
                                     ),
                                   ),
                                   const SizedBox(width: 10),
@@ -250,7 +263,8 @@ class HomeView extends GetView<HomeController> {
                                     child: _UtilityButton(
                                       label: 'About',
                                       icon: Icons.info_outline_rounded,
-                                      onTap: () => Get.toNamed(Routes.ABOUT),
+                                      onTap: () =>
+                                          openFeature(Routes.ABOUT, 'about'),
                                     ),
                                   ),
                                 ],
@@ -745,14 +759,16 @@ class _UpdatesList extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             itemCount: stories.length.clamp(0, 8),
             separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, index) => _StoryCard(story: stories[index]),
+            itemBuilder: (context, index) =>
+                _StoryCard(story: stories[index], position: index + 1),
           ),
         );
       });
 }
 
 class _StoryCard extends StatelessWidget {
-  const _StoryCard({required this.story});
+  const _StoryCard({required this.story, required this.position});
+  final int position;
 
   final Story story;
 
@@ -770,7 +786,25 @@ class _StoryCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             onTap: link.isEmpty
                 ? null
-                : () => Get.toNamed(Routes.WEB, parameters: {'url': link}),
+                : () {
+                    AnalyticsService.instance.featureOpen(
+                        featureName: 'latest_updates', source: 'home');
+                    final uri = Uri.tryParse(link);
+                    final category = const ['news', 'event', 'notice']
+                            .contains(story.category)
+                        ? story.category!
+                        : 'other';
+                    AnalyticsService.instance.updateClick(
+                        updateId:
+                            'news_${sha256.convert(utf8.encode(link)).toString().substring(0, 16)}',
+                        updateCategory: category,
+                        position: position,
+                        linkDomain: const ['nust.edu.pk', 'www.nust.edu.pk']
+                                .contains(uri?.host)
+                            ? uri!.host
+                            : null);
+                    Get.toNamed(Routes.WEB, parameters: {'url': link});
+                  },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

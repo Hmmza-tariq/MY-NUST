@@ -7,6 +7,14 @@
 - Updated Android and iOS configuration for the current release and improved portal recovery, GPA, CGPA, absolute-score, and campus-selection flows.
 - Removed obsolete visual assets, generated files, and unused asset constants.
 
+## 3.0.3+40
+
+- Added optional, consent-gated Firebase Analytics with Settings opt-out and validated event payloads.
+- Added automatic launch-time Google Play checks, update reminders, and a compact manual-check card in Settings.
+- Moved analytics controls to About with a themed details sheet; unanswered first-launch prompts close after five seconds with analytics off.
+- Required HTTPS for in-app pages and downloads, enabled downloader certificate checks, and restricted native certificate trust.
+- Updated consent copy, privacy policy, terms, and public-source security guidance.
+
 ## 3.0.0+32
 
 - Rebuilt Qalam/LMS loading around a non-blocking portal state model.

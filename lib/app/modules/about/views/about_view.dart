@@ -1,3 +1,5 @@
+import '../../widgets/analytics_consent_dialog.dart';
+import 'package:nust/app/services/analytics_service.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -19,6 +21,8 @@ class AboutView extends GetView<AboutController> {
             'An independent student-built companion for common academic tasks.',
         child: Column(
           children: [
+            const AnalyticsPreferenceTile(),
+            const SizedBox(height: 18),
             AppSectionCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,6 +89,10 @@ class AboutView extends GetView<AboutController> {
                   final link = Platform.isAndroid
                       ? controller.playStoreLink
                       : controller.appStoreLink;
+                  AnalyticsService.instance.share(
+                      method: 'system_share',
+                      contentType: 'app',
+                      itemId: 'app_invite');
                   await SharePlus.instance.share(
                     ShareParams(text: 'My NUST student companion: $link'),
                   );
@@ -163,7 +171,15 @@ class _StoreButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => OutlinedButton(
-        onPressed: url.isEmpty ? null : () => launchUrl(Uri.parse(url)),
+        onPressed: url.isEmpty
+            ? null
+            : () {
+                if (label == 'Google Play') {
+                  AnalyticsService.instance
+                      .playStoreClick(source: 'about', intent: 'view');
+                }
+                launchUrl(Uri.parse(url));
+              },
         child: Text(label),
       );
 }

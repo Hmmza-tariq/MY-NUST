@@ -1,3 +1,6 @@
+import 'package:nust/app/services/analytics_service.dart';
+import 'app/services/analytics_navigation_observer.dart';
+import 'app/modules/widgets/analytics_consent_dialog.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
@@ -28,6 +31,11 @@ void main() async {
   Future<String> init() async {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
+    try {
+      await AnalyticsService.instance.initialize();
+    } catch (_) {
+      debugPrint('Optional analytics remains disabled.');
+    }
     await dotenv.load(fileName: ".env");
 
     final dbController = Get.put(DatabaseController(), permanent: true);
@@ -47,11 +55,22 @@ void main() async {
     } else {
       isAuthenticated = true;
     }
-    await FlutterDownloader.initialize(debug: false, ignoreSsl: true);
+    await FlutterDownloader.initialize(debug: false, ignoreSsl: false);
     String page = AppPages.INITIAL;
+    try {
+      final message = await FirebaseMessaging.instance
+          .getInitialMessage()
+          .timeout(const Duration(seconds: 3));
+      if (message != null) {
+        AnalyticsService.instance.launchSource('notification');
+        page =
+            NotificationsService.routeForPage(message.data['page']?.toString());
+      }
+    } catch (_) {/* Notification attribution unavailable; use direct. */}
     try {
       const QuickActions quickActions = QuickActions();
       await quickActions.initialize((String shortcutType) {
+        AnalyticsService.instance.launchSource('deep_link');
         if (shortcutType == 'gpa') {
           page = Routes.GPA_CALCULATION;
         } else if (shortcutType == 'absolutes') {
@@ -105,6 +124,21 @@ void main() async {
   String page = await init();
   final themeController = Get.put(ThemeController(), permanent: true);
 
+  final analytics = AnalyticsService.instance;
+  final db = Get.find<DatabaseController>();
+  analytics.property('university', 'nust');
+  analytics.property(
+      'theme_mode', themeController.isDarkMode.value ? 'dark' : 'light');
+  analytics.property('biometric_enabled', db.getBiometric().toString());
+  analytics.property('credentials_added',
+      (db.getCredentials()['id']?.isNotEmpty == true).toString());
+  analytics.property(
+      'portal_connected',
+      (db.getAcademicAutoSync() && Get.find<AcademicSyncService>().canAutoSync)
+          .toString());
+  analytics.property(
+      'cred_banner_dismissed', db.getConnectionBannerHidden().toString());
+
   runApp(Obx(
     () => GetMaterialApp(
       title: "My Nust",
@@ -114,6 +148,7 @@ void main() async {
       transitionDuration: const Duration(milliseconds: 240),
       initialRoute: page,
       getPages: AppPages.routes,
+      navigatorObservers: [AnalyticsNavigationObserver()],
       scrollBehavior: const MaterialScrollBehavior().copyWith(
         scrollbars: false,
         overscroll: false,
@@ -134,8 +169,16 @@ void main() async {
       details: details.exceptionAsString(),
     );
   };
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    NotificationsService().init();
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    Get.find<AppUpdateController>().preload();
+    if (page != Routes.HOME &&
+        page != Routes.AUTHENTICATION &&
+        Get.context != null) {
+      await showAnalyticsConsent(Get.context!);
+      AnalyticsService.instance.recordLaunch();
+      await Get.find<AppUpdateController>().start();
+      NotificationsService().init();
+    }
     Get.find<AcademicSyncService>().syncOnOpen();
   });
 }

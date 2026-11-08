@@ -1,3 +1,4 @@
+import 'package:nust/app/services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -67,7 +68,7 @@ class GpaCalculationView extends GetView<GpaCalculationController> {
                         ],
                         selected: {controller.isCGPA.value},
                         onSelectionChanged: (value) =>
-                            controller.isCGPA.value = value.first,
+                            controller.switchTab(value.first),
                       ),
                     ),
                   ),
@@ -470,6 +471,8 @@ class _SemesterCard extends StatelessWidget {
                           (item) => identical(item.value, semester),
                         );
                         controller.saveSemesters();
+                        AnalyticsService.instance.cgpaSemesterDelete(
+                            semesterCount: controller.semesters.length);
                       }
                     },
                     icon: Icon(
@@ -548,6 +551,8 @@ class _CourseCard extends StatelessWidget {
                       onChanged: (value) {
                         controller.courses[index].value.name = value;
                         controller.saveCourses();
+                        AnalyticsService.instance.sgpaCourseDelete(
+                            courseCount: controller.courses.length);
                       },
                     ),
                   ),
@@ -1413,6 +1418,10 @@ Future<void> _showAddCourseSheet(
   BuildContext context,
   GpaCalculationController controller,
 ) async {
+  AnalyticsService.instance
+      .sgpaCourseAddClick(courseCount: controller.courses.length);
+  AnalyticsService.instance.screen('sgpa_add_course_popup');
+  var saved = false;
   final nameController = TextEditingController();
   var credits = 3;
   var grade = 'B+';
@@ -1477,6 +1486,7 @@ Future<void> _showAddCourseSheet(
               child: FilledButton.icon(
                 onPressed: () {
                   final name = nameController.text.trim();
+                  saved = true;
                   controller.addCourseEntry(
                     name: name.isEmpty
                         ? 'Course ${controller.courses.length + 1}'
@@ -1496,5 +1506,10 @@ Future<void> _showAddCourseSheet(
       ),
     ),
   );
+  if (!saved) {
+    AnalyticsService.instance
+        .sgpaCourseAddCancel(courseCount: controller.courses.length);
+  }
+  AnalyticsService.instance.screen('gpa_planner_sgpa');
   nameController.dispose();
 }

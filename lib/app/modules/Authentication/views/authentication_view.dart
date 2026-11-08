@@ -1,3 +1,8 @@
+import 'package:nust/app/services/analytics_service.dart';
+import '../../widgets/analytics_consent_dialog.dart';
+import '../../../services/notification_service.dart';
+import '../../../controllers/app_update_controller.dart';
+import '../../../routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -59,6 +64,16 @@ class AuthenticationView extends GetView<AuthenticationController> {
                   final authenticated = await controller.authenticate();
                   if (authenticated) {
                     Get.offAllNamed(controller.page.value);
+                    if (controller.page.value != Routes.HOME) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) async {
+                        if (Get.context != null) {
+                          await showAnalyticsConsent(Get.context!);
+                        }
+                        AnalyticsService.instance.recordLaunch();
+                        await Get.find<AppUpdateController>().start();
+                        NotificationsService().init();
+                      });
+                    }
                   } else {
                     AppSnackbar.error(
                         title: 'Authentication failed',

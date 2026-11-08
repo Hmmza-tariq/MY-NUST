@@ -1,5 +1,5 @@
+import 'package:nust/app/services/analytics_service.dart';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +17,13 @@ class AbsolutesCalculationController extends GetxController {
   DatabaseController databaseController = Get.find();
   ScrollController scrollController = ScrollController();
 
-  RxString selectedType = "lecture".obs;
+  RxString selectedType = 'lecture'.obs;
+  void switchType(String type) {
+    if (selectedType.value == type) return;
+    selectedType.value = type;
+    AnalyticsService.instance.absTabSwitch(courseType: type);
+    AnalyticsService.instance.screen('absolute_score_$type');
+  }
 
   RxDouble labWeight = 50.0.obs;
   RxDouble lectureWeight = 50.0.obs;
@@ -67,6 +73,11 @@ class AbsolutesCalculationController extends GetxController {
       type: type,
     ));
     saveAssessments();
+    // Names are free text, so do not derive analytics categories from them.
+    AnalyticsService.instance.absAssessmentAdd(
+        courseType: selectedType.value,
+        assessmentType: type == 'lab' ? 'lab' : 'other',
+        assessmentCount: assessments.length);
   }
 
   void loadExample() {
@@ -140,6 +151,13 @@ class AbsolutesCalculationController extends GetxController {
     confettiController.play();
     final context = Get.context;
     if (context == null) return;
+    AnalyticsService.instance.absResultView(
+        courseType: selectedType.value,
+        assessmentCount: assessments
+            .where((a) =>
+                selectedType.value == 'both' || a.type == selectedType.value)
+            .length);
+    AnalyticsService.instance.screen('abs_result');
     await showAppSheet<void>(
       context: context,
       child: _AbsoluteResultSheet(
@@ -153,6 +171,7 @@ class AbsolutesCalculationController extends GetxController {
             : " ${selectedType.value.capitalizeFirst} "),
       ),
     );
+    AnalyticsService.instance.screen('absolute_score_${selectedType.value}');
     await Get.find<ReviewPromptController>().recordSuccessfulOutcome();
   }
 
@@ -211,18 +230,34 @@ class AbsolutesCalculationController extends GetxController {
   }
 
   Future<bool> captureScreenShot(String type) async {
-    await screenshotController
-        .capture(delay: const Duration(milliseconds: 10))
-        .then((Uint8List? image) async {
+    void record(String status) {
+      AnalyticsService.instance
+          .absResultDownload(courseType: selectedType.value, status: status);
+    }
+
+    File imagePath;
+    try {
+      final image = await screenshotController.capture(
+          delay: const Duration(milliseconds: 10));
+      if (image == null) throw StateError('Image unavailable');
       final directory = await getApplicationDocumentsDirectory();
-      final imagePath = await File('${directory.path}/image.png').create();
-      await imagePath.writeAsBytes(image!);
+      imagePath = File('${directory.path}/image.png');
+      await imagePath.writeAsBytes(image);
+      record('success');
+    } catch (_) {
+      record('fail');
+      AppSnackbar.error(
+          message: 'Could not save the result image. Please try again.');
+      return false;
+    }
+    try {
       await SharePlus.instance.share(ShareParams(
-        files: [XFile(imagePath.path)],
-        text:
-            "Hey! Check this out. I have calculated my${type}Absolute score using My Nust App. It's amazing! You should try it too.",
-      ));
-    });
+          files: [XFile(imagePath.path)],
+          text: 'I calculated my absolute score using My NUST.'));
+    } catch (_) {
+      AppSnackbar.info(
+          message: 'Image saved locally, but sharing is unavailable.');
+    }
     return true;
   }
 }
@@ -371,7 +406,10 @@ class _AbsoluteResultSheet extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: FilledButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              AnalyticsService.instance.absResultDone(courseType: type);
+              Navigator.pop(context);
+            },
             child: const Text('Done'),
           ),
         ),

@@ -1,3 +1,4 @@
+import 'package:nust/app/services/analytics_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:get/get.dart';
@@ -33,7 +34,10 @@ class HelpController extends GetxController {
       );
 
       try {
+        AnalyticsService.instance.supportContactClick(channel: 'email');
         await FlutterEmailSender.send(email);
+        AnalyticsService.instance
+            .feedbackSubmit(channel: 'email', feedbackType: 'other');
         state.value = "success";
       } catch (error) {
         state.value = "error";
@@ -43,7 +47,7 @@ class HelpController extends GetxController {
 
     if (state.value == "success") {
       AppSnackbar.success(
-        message: "Your message has been sent successfully",
+        message: "Your email app has opened. Send your message there.",
       );
       mailController.clear();
       messageController.clear();

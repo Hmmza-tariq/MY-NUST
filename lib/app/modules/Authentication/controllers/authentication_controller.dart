@@ -1,3 +1,4 @@
+import 'package:nust/app/services/analytics_service.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
@@ -29,6 +30,9 @@ class AuthenticationController extends GetxController {
   void toggleBiometric(bool value) {
     isBiometricEnabled.value = value;
     databaseController.setBiometric(value);
+    AnalyticsService.instance.settingToggle(
+        settingName: 'biometric_auth', newValue: value ? 'on' : 'off');
+    AnalyticsService.instance.property('biometric_enabled', value.toString());
   }
 
   Future<void> toggleAutofill(bool value) async {
@@ -66,13 +70,16 @@ class AuthenticationController extends GetxController {
           biometricOnly: false
           // )
           );
+      AnalyticsService.instance
+          .biometricAuth(status: authenticated ? 'success' : 'cancelled');
       if (authenticated) {
         return true;
       } else {
         return false;
       }
     } catch (e) {
-      debugPrint('Error authenticating user: $e');
+      AnalyticsService.instance.biometricAuth(status: 'not_available');
+      debugPrint('Biometric authentication unavailable.');
       return false;
     }
   }

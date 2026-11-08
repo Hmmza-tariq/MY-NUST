@@ -42,6 +42,32 @@ void main() {
       );
     });
 
+    test(
+        'rejects HTTP pages and downloads before sending cookies or credentials',
+        () {
+      for (final url in [
+        'http://qalam.nust.edu.pk/web/login',
+        'http://lms.nust.edu.pk/file.pdf',
+        'http://example.com/public.pdf',
+        'https://user:password@qalam.nust.edu.pk/student',
+        'javascript:private.pdf',
+      ]) {
+        expect(PortalUrlClassifier.isAllowedPage(url), false);
+        expect(PortalUrlClassifier.isSecureNetworkUrl(url), false);
+        expect(PortalUrlClassifier.classify(url),
+            PortalNavigationKind.unsupported);
+      }
+    });
+
+    test('rejects lookalike hosts for embedded portal access', () {
+      expect(
+          PortalUrlClassifier.isAllowedPage(
+              'https://qalam.nust.edu.pk.example.com/login'),
+          false);
+      expect(PortalUrlClassifier.isAllowedPage('https://evilnust.edu.pk/login'),
+          false);
+    });
+
     test('rejects unsafe custom schemes', () {
       expect(
         PortalUrlClassifier.classify('javascript:alert(1)'),

@@ -1,3 +1,4 @@
+import 'package:nust/app/services/analytics_service.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -50,6 +51,13 @@ class WebController extends GetxController {
   Timer? _timeoutTimer;
   String _activeUrl = '';
   bool _autoLoginSubmitted = false;
+  final _loadClock = Stopwatch()..start();
+  bool _portalOpened = false;
+  String? get _analyticsPortal => Uri.tryParse(url)?.host == 'lms.nust.edu.pk'
+      ? 'lms'
+      : Uri.tryParse(url)?.host == 'qalam.nust.edu.pk'
+          ? 'qalam'
+          : null;
 
   @override
   void onInit() {
@@ -103,8 +111,8 @@ class WebController extends GetxController {
         return;
       }
       await controller.loadRequest(uri);
-    } catch (error, stackTrace) {
-      debugPrint('WebView initialization failed: $error\n$stackTrace');
+    } catch (_) {
+      debugPrint('WebView initialization failed.');
       _fail('The portal could not be started. Please try again.');
     }
   }
@@ -128,18 +136,33 @@ class WebController extends GetxController {
       final title = await webViewController?.getTitle();
       pageTitle.value =
           title?.trim().isNotEmpty == true ? title!.trim() : 'Portal';
+      final portal = _analyticsPortal;
+      if (!_portalOpened && portal != null) {
+        _portalOpened = true;
+        AnalyticsService.instance.screen('${portal}_webview');
+        final authenticated = await webViewController?.runJavaScriptReturningResult(
+            "!!document.querySelector('a[href*=logout],a[href*=signout],form[action*=logout]')");
+        AnalyticsService.instance.portalOpen(
+            portal: portal,
+            loggedIn: authenticated == true || authenticated == 'true',
+            loadTimeMs: _loadClock.elapsedMilliseconds);
+      }
       await _installPortalBridge();
       await runJavaScriptOnPageLoad(value);
       await _captureAcademicSnapshot(value);
     } catch (error) {
-      debugPrint('Post-load setup skipped: $error');
+      debugPrint('Post-load setup skipped.');
     }
   }
 
   void _onWebResourceError(WebResourceError error) {
-    debugPrint('WebView error ${error.errorCode}: ${error.description}');
+    debugPrint('WebView error ${error.errorCode}.');
     if (error.isForMainFrame == false) return;
     _cancelLoadTimers();
+    if (_analyticsPortal != null) {
+      AnalyticsService.instance
+          .portalError(portal: _analyticsPortal, errorType: 'network');
+    }
     if (!internetController.isOnline.value ||
         error.errorType == WebResourceErrorType.hostLookup) {
       _setPhase(PortalPhase.offline);
@@ -185,7 +208,7 @@ class WebController extends GetxController {
           return;
         }
       } catch (error) {
-        debugPrint('Academic portal snapshot ignored: $error');
+        debugPrint('Academic portal snapshot ignored.');
       }
     }
     if (value == 'print') {
@@ -237,7 +260,7 @@ class WebController extends GetxController {
               .invokeMethod<String>('getCookies', {'url': value}) ??
           '';
     } catch (error) {
-      debugPrint('Native cookies unavailable: $error');
+      debugPrint('Native cookies unavailable.');
       return '';
     }
   }
@@ -275,8 +298,7 @@ class WebController extends GetxController {
   Future<void> _captureAcademicSnapshot(String value) async {
     final uri = Uri.tryParse(value);
     final host = uri?.host.toLowerCase() ?? '';
-    if (!host.contains('qalam.nust.edu.pk') &&
-        !host.contains('lms.nust.edu.pk')) {
+    if (host != 'qalam.nust.edu.pk' && host != 'lms.nust.edu.pk') {
       return;
     }
     final path = uri?.path.toLowerCase() ?? '';
@@ -313,6 +335,10 @@ class WebController extends GetxController {
     _timeoutTimer = Timer(const Duration(seconds: 45), () {
       if (phase.value == PortalPhase.loading ||
           phase.value == PortalPhase.slow) {
+        if (_analyticsPortal != null) {
+          AnalyticsService.instance
+              .portalError(portal: _analyticsPortal, errorType: 'timeout');
+        }
         errorMessage.value =
             'The portal is still loading. You can keep waiting, retry, or open it in your browser.';
         _setPhase(PortalPhase.slow);
@@ -360,6 +386,7 @@ class WebController extends GetxController {
     final target = value ?? (_activeUrl.isEmpty ? url : _activeUrl);
     final uri = Uri.tryParse(target);
     if (uri == null ||
+        !PortalUrlClassifier.isSecureNetworkUrl(target) ||
         !await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       AppSnackbar.error(message: 'Could not open this link in your browser.');
     }
@@ -395,16 +422,19 @@ class WebController extends GetxController {
   }
 
   Future<void> autoFillLoginDetails(String value) async {
-    final path = Uri.tryParse(value)?.path.toLowerCase() ?? '';
+    final uri = Uri.tryParse(value);
+    if (uri?.scheme != 'https') return;
+    final path = uri?.path.toLowerCase() ?? '';
+    final host = uri?.host.toLowerCase();
     String? userSelector;
     String? passwordSelector;
     String? password;
-    if (value.contains('lms.nust.edu.pk')) {
+    if (host == 'lms.nust.edu.pk') {
       if (!path.contains('login')) return;
       userSelector = 'username';
       passwordSelector = 'password';
       password = authenticationController.lmsPassword.value;
-    } else if (value.contains('qalam.nust.edu.pk')) {
+    } else if (host == 'qalam.nust.edu.pk') {
       if (!path.contains('login')) return;
       userSelector = 'login';
       passwordSelector = 'password';

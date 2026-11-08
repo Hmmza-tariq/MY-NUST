@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:get/get.dart';
 import 'package:nust/app/modules/widgets/custom_snackbar.dart';
+import 'package:nust/app/domain/portal/portal_url_classifier.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart' as ph;
 
@@ -65,6 +66,10 @@ class DownloadController extends GetxController {
     String? suggestedFileName,
   }) async {
     try {
+      if (!PortalUrlClassifier.isSecureNetworkUrl(url)) {
+        AppSnackbar.error(message: 'Downloads require a secure HTTPS link.');
+        return DownloadStartResult.failed;
+      }
       if (!await _requestPermission()) {
         AppSnackbar.error(message: 'Download permission was not granted');
         return DownloadStartResult.permissionDenied;
@@ -87,8 +92,8 @@ class DownloadController extends GetxController {
       }
       AppSnackbar.info(title: 'Downloading', message: fileName);
       return DownloadStartResult.accepted;
-    } catch (error, stackTrace) {
-      debugPrint('Download could not start: $error\n$stackTrace');
+    } catch (_) {
+      debugPrint('Download could not start.');
       _showFailure();
       return DownloadStartResult.failed;
     }
